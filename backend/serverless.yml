@@ -1,0 +1,130 @@
+service: roomie-match-backend
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - !GetAtt ProfilesTable.Arn
+  httpApi:
+    authorizers:
+      cognitoAuthorizer:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}"
+        audience:
+          - !Ref UserPoolClient
+
+functions:
+  health:
+    handler: src/handlers/health.handler
+    events:
+      - httpApi:
+          path: /health
+          method: get
+  createProfile:
+    handler: src/handlers/createProfile.handler
+    events:
+      - httpApi:
+          path: /profiles
+          method: post
+          authorizer:
+            name: cognitoAuthorizer
+  getProfile:
+    handler: src/handlers/getProfile.handler
+    events:
+      - httpApi:
+          path: /profiles
+          method: get
+          authorizer:
+            name: cognitoAuthorizer          
+  updateProfile:
+    handler: src/handlers/updateProfile.handler
+    events:
+      - httpApi:
+          path: /profiles
+          method: put
+          authorizer:
+            name: cognitoAuthorizer
+  deleteProfile:
+    handler: src/handlers/deleteProfile.handler
+    events:
+      - httpApi:
+          path: /profiles
+          method: delete
+          authorizer:
+            name: cognitoAuthorizer
+  signup:
+    handler: src/handlers/signup.handler
+    environment:
+      USER_POOL_CLIENT_ID: !Ref UserPoolClient
+    events:
+      - httpApi:
+          path: /signup
+          method: post
+  confirmSignup:
+    handler: src/handlers/confirmSignup.handler
+    environment:
+      USER_POOL_CLIENT_ID: !Ref UserPoolClient
+    events:
+      - httpApi:
+          path: /signup/confirm
+          method: post
+  login:
+    handler: src/handlers/login.handler
+    environment:
+      USER_POOL_CLIENT_ID: !Ref UserPoolClient
+    events:
+      - httpApi:
+          path: /login
+          method: post
+
+resources:
+  Resources:
+    ProfilesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: profiles
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+    UserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: roomie-match-users
+        AutoVerifiedAttributes:
+          - email
+        UsernameAttributes:
+          - email
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireUppercase: true
+            RequireLowercase: true
+            RequireNumbers: true
+
+    UserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: roomie-match-client
+        UserPoolId: !Ref UserPool
+        ExplicitAuthFlows:
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
