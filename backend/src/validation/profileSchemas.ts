@@ -1,10 +1,47 @@
 import { z } from "zod";
 
+// Fixed lists. Matching compares these, so they can't be free text.
+export const TAGS = [
+    "Quiet", "Social", "Studious", "Organized", "Creative",
+    "Gaming", "Gym", "Sports", "Hiking", "Music",
+    "Photography", "Art", "Cooking", "Movies", "Reading",
+    "Coffee", "Travel", "Parties", "Homebody", "Engineering"
+] as const;
+
+export const PROMPT_QUESTIONS = [
+    "My ideal roommate night looks like...",
+    "You should room with me if...",
+    "A non-negotiable for our room is...",
+    "Something I always bring to the room is...",
+    "The fastest way to annoy me is..."
+] as const;
+
 // The one place that defines what a valid profile looks like.
 // .strict() rejects any field not listed here (like "isAdmin").
 export const profileSchema = z.object({
+    // About you
     name: z.string().trim().min(1, "Name can't be empty").max(50),
-    age: z.number().int().min(17).max(100)
+    age: z.number().int().min(17).max(100),
+    school: z.string().trim().min(1).max(100),
+    major: z.string().trim().min(1).max(100),
+    classYear: z.number().int().min(2020).max(2040),
+    bio: z.string().trim().max(500).optional(),
+    tags: z.array(z.enum(TAGS, "Not one of the allowed tags")).max(5, "Pick at most 5 tags").default([]),
+    prompt: z.object({
+        question: z.enum(PROMPT_QUESTIONS),
+        answer: z.string().trim().min(1).max(200)
+    }).strict().optional(),
+
+    // Living preferences (what matching is built on)
+    budget: z.object({
+        min: z.number().int().min(0),
+        max: z.number().int().min(0)
+    }).strict().refine(b => b.min <= b.max, "Budget min can't be more than max"),
+    moveInDate: z.iso.date("Use the format YYYY-MM-DD"),
+    sleepSchedule: z.enum(["early_bird", "flexible", "night_owl"]),
+    cleanliness: z.enum(["very_clean", "clean", "relaxed"]),
+    smoking: z.boolean(),
+    pets: z.boolean()
 }).strict();
 
 // The TypeScript type, generated from the schema so the two can never drift apart.

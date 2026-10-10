@@ -1,10 +1,12 @@
 import { DynamoDBClient, ConditionalCheckFailedException } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, GetCommand, PutCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
 import { ProfileInput } from "../validation/profileSchemas.js";
 import { requireEnv } from "../lib/env.js";
 
 const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+const docClient = DynamoDBDocumentClient.from(client, {
+    marshallOptions: { removeUndefinedValues: true } // skip optional fields that weren't filled in
+});
 const tableName = requireEnv("TABLE_NAME");
 
 // What the rest of the app sees. No PK/SK: those are DynamoDB's filing labels,
@@ -12,11 +14,9 @@ const tableName = requireEnv("TABLE_NAME");
 export type Profile = ProfileInput & { id: string };
 
 function toProfile(item: Record<string, any>): Profile {
-    return {
-        id: item.userId,
-        name: item.name,
-        age: item.age
-    };
+    // Pull out the DynamoDB-only labels; everything left over is the profile.
+    const { PK, SK, userId, ...profile } = item;
+    return { id: userId, ...profile } as Profile;
 }
 
 export async function getProfileByUserId(userId: string) {
@@ -49,27 +49,22 @@ export async function createProfile(userId: string, profile: ProfileInput) {
     return { id: userId, ...profile };
 }
 
-// Returns undefined if there's no profile to update.
-export async function updateProfile(userId: string, name: string, age: number) {
-    const command = new UpdateCommand({
+// Replaces the whole profile. Returns undefined if there's no profile to update.
+export async function updateProfile(userId: string, profile: ProfileInput) {
+    const command = new PutCommand({
         TableName: tableName,
-        Key: { PK: "USER#" + userId, SK: "PROFILE" },
-        UpdateExpression: "SET #name = :name, age = :age",
-        ConditionExpression: "attribute_exists(PK)", // only if it already exists
-        ExpressionAttributeNames: { "#name": "name" },
-        ExpressionAttributeValues: { ":name": name, ":age": age },
-        ReturnValues: "ALL_NEW"
+        Item: { PK: "USER#" + userId, SK: "PROFILE", userId: userId, ...profile },
+        ConditionExpression: "attribute_exists(PK)" // only if it already exists
     });
-    let result;
     try {
-        result = await docClient.send(command);
+        await docClient.send(command);
     } catch (error) {
         if (error instanceof ConditionalCheckFailedException) {
             return undefined;
         }
         throw error;
     }
-    return toProfile(result.Attributes!);
+    return { id: userId, ...profile };
 }
 
 // Returns undefined if there was nothing to delete.
