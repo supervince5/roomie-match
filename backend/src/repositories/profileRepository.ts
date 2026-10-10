@@ -1,5 +1,6 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
+import { ProfileInput } from "../validation/profileSchemas.js";
 
 function requireEnv(name: string): string {
     const value = process.env[name];
@@ -22,10 +23,10 @@ export async function getProfileByUserId(userId: string) {
     return result.Item;
 }
 
-export async function createProfile(userId: string, body: any) {
+export async function createProfile(userId: string, profile: ProfileInput) {
     const command = new PutCommand({
         TableName: tableName,
-        Item: { PK: "USER#" + userId, SK: "PROFILE", userId: userId, ...body }
+        Item: { PK: "USER#" + userId, SK: "PROFILE", userId: userId, ...profile }
     });
     await docClient.send(command);
 }
