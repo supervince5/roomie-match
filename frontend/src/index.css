@@ -317,16 +317,6 @@ img {
   font-size: 0.88rem;
 }
 
-.compatibility-badge {
-  flex: 0 0 auto;
-  padding: 9px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 999px;
-  background: rgba(42, 32, 57, 0.53);
-  font-size: 0.77rem;
-  font-weight: 900;
-  backdrop-filter: blur(12px);
-}
 
 .profile-card__details {
   padding: 20px;
@@ -735,18 +725,16 @@ a:focus-visible {
     flex-direction: column;
   }
 
-  .compatibility-badge {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-  }
-
   .match-card {
     grid-template-columns: 92px 1fr;
   }
 
-  .match-card__photo {
+  .match-card__avatar {
     width: 92px;
+  }
+
+  .field-row {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -759,4 +747,535 @@ a:focus-visible {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+/* ---------- Real-data screens (Module 11) ---------- */
+
+/* Placeholder "photo": a big initial until photo uploads exist */
+.profile-card__photo-area--avatar {
+  display: grid;
+  height: 300px;
+  min-height: 0;
+  place-items: center;
+  background: linear-gradient(135deg, var(--primary), #b34ed4);
+}
+
+.profile-card__initial {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 7rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.living-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 12px 0;
+}
+
+.living-list span {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: #4f495b;
+  background: #faf8fd;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.match-card__avatar {
+  display: grid;
+  width: 104px;
+  place-items: center;
+  color: white;
+  background: linear-gradient(135deg, var(--primary), #b34ed4);
+  font-size: 2.6rem;
+  font-weight: 900;
+}
+
+.match-card {
+  min-height: 0;
+}
+
+.match-card .small-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.match-list__profile {
+  margin-top: 10px;
+}
+
+/* Forms */
+.auth-card {
+  display: grid;
+  gap: 14px;
+  text-align: left;
+}
+
+.auth-card h1 {
+  margin: 0;
+}
+
+.auth-card .primary-button {
+  margin-top: 6px;
+}
+
+.auth-card__switch {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.auth-card__switch a {
+  color: var(--primary-dark);
+  font-weight: 800;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field > span {
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.field small,
+.profile-form legend small {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  color: var(--text);
+  background: white;
+  font: inherit;
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--primary);
+  outline: 3px solid rgba(116, 84, 232, 0.18);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  font-weight: 700;
+}
+
+.checkbox-field input {
+  width: 19px;
+  height: 19px;
+  accent-color: var(--primary);
+}
+
+.profile-form {
+  display: grid;
+  gap: 16px;
+}
+
+.profile-form fieldset {
+  display: grid;
+  gap: 13px;
+  margin: 0;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: white;
+}
+
+.profile-form legend {
+  padding: 0 6px;
+  font-weight: 900;
+}
+
+.tag--choice {
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.tag--selected {
+  border-color: var(--primary);
+  color: white;
+  background: var(--primary);
+}
+
+.profile-form__cancel,
+.profile-page__edit {
+  width: 100%;
+}
+
+.profile-page__edit {
+  margin-top: 16px;
+}
+
+.form-error {
+  padding: 12px 15px;
+  border-radius: 14px;
+  color: #9b2335;
+  background: var(--danger-soft);
+  font-size: 0.86rem;
+}
+
+.form-error p {
+  margin: 0;
+  font-weight: 800;
+}
+
+.form-error ul {
+  margin: 7px 0 0;
+  padding-left: 18px;
+}
+
+.status-message {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+/* Discover filters + match banner */
+.filter-button {
+  position: relative;
+}
+
+.filter-button__count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 999px;
+  color: white;
+  background: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.filter-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: white;
+}
+
+.filter-panel .small-button {
+  grid-column: 1 / -1;
+}
+
+.match-banner {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  color: white;
+  background: linear-gradient(135deg, var(--primary), #b34ed4);
+  box-shadow: 0 12px 26px rgba(116, 84, 232, 0.28);
+}
+
+.match-banner p {
+  margin: 3px 0 0;
+  font-size: 0.86rem;
+}
+
+.match-banner a {
+  color: white;
+  font-weight: 800;
+}
+
+.match-banner__close {
+  margin-left: auto;
+  border: 0;
+  color: white;
+  background: transparent;
+}
+
+.empty-state .primary-button {
+  width: auto;
+}
+
+/* School picker */
+.school-picker {
+  position: relative;
+}
+
+.school-picker input {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  font: inherit;
+}
+
+.school-picker__results {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  overflow-y: auto;
+  max-height: 280px;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: white;
+  box-shadow: var(--shadow);
+  list-style: none;
+}
+
+.school-picker__results button {
+  display: grid;
+  width: 100%;
+  gap: 2px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+}
+
+.school-picker__results button:hover,
+.school-picker__results button:focus-visible {
+  background: var(--primary-soft);
+}
+
+.school-picker__results span,
+.school-picker__empty {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.school-picker__empty {
+  padding: 9px 10px;
+}
+
+.school-picker__selected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 46px;
+  padding: 8px 8px 8px 13px;
+  border: 1px solid var(--primary);
+  border-radius: 13px;
+  background: var(--primary-soft);
+  font-weight: 700;
+}
+
+/* Photos, Instagram, unmatch, delete account */
+.photo-picker {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.photo-picker__preview {
+  display: grid;
+  overflow: hidden;
+  flex: 0 0 auto;
+  width: 88px;
+  height: 88px;
+  place-items: center;
+  border-radius: 22px;
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.photo-picker__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-picker__button {
+  cursor: pointer;
+}
+
+.instagram-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 4px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  color: white;
+  background: linear-gradient(135deg, #f58529, #dd2a7b 50%, #8134af);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.match-banner .instagram-link {
+  margin: 4px 0 0;
+}
+
+.match-banner__photo {
+  width: 52px;
+  height: 52px;
+  border: 2px solid white;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.match-card__no-instagram {
+  margin: 8px 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.match-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.small-button--danger {
+  color: #9b2335;
+  background: var(--danger-soft);
+}
+
+.danger-zone {
+  margin-top: 28px;
+  padding: 18px;
+  border: 1px solid #f5c7cf;
+  border-radius: 20px;
+  background: white;
+}
+
+.danger-zone h2 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.danger-zone p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.field__link {
+  justify-self: end;
+  color: var(--primary-dark);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* Matches list rows + match profile page */
+.match-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: inherit;
+  background: white;
+  box-shadow: 0 8px 22px rgba(48, 34, 79, 0.06);
+  text-decoration: none;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.match-row:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(48, 34, 79, 0.1);
+}
+
+.match-row__photo {
+  flex: 0 0 auto;
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
+.match-row__photo--initial {
+  display: grid;
+  place-items: center;
+  color: white;
+  background: linear-gradient(135deg, var(--primary), #b34ed4);
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.match-row__text {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.match-row__text strong {
+  font-size: 1.05rem;
+}
+
+.match-row__text span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.match-row__arrow {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--muted);
+}
+
+.page-header--with-back {
+  justify-content: flex-start;
+}
+
+.match-profile__contact {
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: white;
+}
+
+.match-profile__contact > p {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.match-profile__unmatch {
+  display: block;
+  margin: 18px auto 0;
 }

@@ -1,4 +1,4 @@
-import { HeartHandshake, ShieldCheck, Sparkles } from "lucide-react";
+import { HeartHandshake, ShieldCheck, SlidersHorizontal } from "lucide-react";
 import { Link } from "react-router";
 
 function LandingPage() {
@@ -14,14 +14,14 @@ function LandingPage() {
         <h1>Meet your future roomie.</h1>
 
         <p className="landing-card__description">
-          Build a profile, compare living habits, and match with incoming
-          students who fit your lifestyle.
+          Build a profile, browse students at your school, and match when
+          you both say yes.
         </p>
 
         <div className="landing-features">
           <div className="landing-feature">
-            <Sparkles size={21} />
-            <span>Lifestyle compatibility</span>
+            <SlidersHorizontal size={21} />
+            <span>Filter by living habits</span>
           </div>
 
           <div className="landing-feature">
@@ -39,8 +39,8 @@ function LandingPage() {
           Start matching
         </Link>
 
-        <p className="landing-card__disclaimer">
-          Day 2 frontend prototype using sample profiles.
+        <p className="auth-card__switch">
+          Already have an account? <Link to="/login">Log in</Link>
         </p>
       </section>
     </main>

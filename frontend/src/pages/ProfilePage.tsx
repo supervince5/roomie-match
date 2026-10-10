@@ -1,10 +1,90 @@
-import { Pencil, Settings } from "lucide-react";
-import { myProfile } from "../data/mockProfiles";
+import { LogOut, Pencil } from "lucide-react";
+import { useState } from "react";
+import { useAuth } from "../auth/authContext";
+import ProfileCard from "../components/ProfileCard";
+import FormErrors from "../components/FormErrors";
+import ProfileForm from "../components/ProfileForm";
+import { apiRequest } from "../lib/api";
+import { useApi } from "../lib/useApi";
+import type { Profile, ProfileInput } from "../types/profile";
 
 function ProfilePage() {
-  function showEditingMessage() {
-    window.alert(
-      "Profile editing will be built after the frontend preview is complete.",
+  const { logout } = useAuth();
+  const { data: profile, error, loading, reload, setData } = useApi<Profile>("/profiles");
+  const [editing, setEditing] = useState(false);
+
+  const hasNoProfile = error?.status === 404;
+  // Older profiles have no schoolId (saved before the school list existed)
+  const isIncomplete = profile !== null && !profile.schoolId;
+
+  const [deleteError, setDeleteError] = useState<unknown>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  async function deleteAccount() {
+    const typed = window.prompt(
+      "This permanently deletes your profile, photos, matches, and login. Type DELETE to confirm.",
+    );
+    if (typed !== "DELETE") {
+      return;
+    }
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await apiRequest("/account", { method: "DELETE" });
+      logout();
+    } catch (caught) {
+      setDeleteError(caught);
+      setDeleting(false);
+    }
+  }
+
+  async function createProfile(input: ProfileInput) {
+    setData(await apiRequest<Profile>("/profiles", { method: "POST", body: input }));
+  }
+
+  async function updateProfile(input: ProfileInput) {
+    setData(await apiRequest<Profile>("/profiles", { method: "PUT", body: input }));
+    setEditing(false);
+  }
+
+  let content;
+  if (loading) {
+    content = <p className="status-message">Loading your profile...</p>;
+  } else if (hasNoProfile) {
+    content = (
+      <>
+        <p className="status-message">Set up your profile so other students can find you.</p>
+        <ProfileForm submitLabel="Create profile" onSubmit={createProfile} />
+      </>
+    );
+  } else if (error) {
+    content = (
+      <div className="status-message">
+        <p>{error.message}</p>
+        <button className="secondary-button" type="button" onClick={reload}>Try again</button>
+      </div>
+    );
+  } else if (profile && (editing || isIncomplete)) {
+    content = (
+      <>
+        {isIncomplete && <p className="status-message">Finish your profile to start using Discover.</p>}
+        <ProfileForm
+          initial={profile}
+          submitLabel="Save profile"
+          onSubmit={updateProfile}
+          onCancel={isIncomplete ? undefined : () => setEditing(false)}
+        />
+      </>
+    );
+  } else if (profile) {
+    content = (
+      <>
+        <ProfileCard profile={profile} />
+        <button className="secondary-button profile-page__edit" type="button" onClick={() => setEditing(true)}>
+          <Pencil size={17} />
+          Edit profile
+        </button>
+      </>
     );
   }
 
@@ -16,91 +96,23 @@ function ProfilePage() {
           <h1>Profile</h1>
         </div>
 
-        <button
-          className="icon-button"
-          type="button"
-          aria-label="Open settings"
-          onClick={() =>
-            window.alert("Settings will be added in a later step.")
-          }
-        >
-          <Settings size={23} />
+        <button className="icon-button" type="button" aria-label="Log out" title="Log out" onClick={logout}>
+          <LogOut size={22} />
         </button>
       </header>
 
-      <section className="my-profile-card">
-        <img
-          className="my-profile-card__photo"
-          src={myProfile.photoUrl}
-          alt="Sample personal profile"
-        />
+      {content}
 
-        <div className="my-profile-card__content">
-          <div className="my-profile-card__heading">
-            <div>
-              <h2>{myProfile.name}</h2>
-              <p>
-                {myProfile.major} · {myProfile.year}
-              </p>
-            </div>
-
-            <button
-              className="edit-button"
-              type="button"
-              onClick={showEditingMessage}
-            >
-              <Pencil size={17} />
-              Edit
-            </button>
-          </div>
-
-          <p className="my-profile-card__school">
-            {myProfile.school}
-          </p>
-
-          <div className="tag-list">
-            {myProfile.tags.map((tag) => (
-              <span className="tag" key={tag}>
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          <p className="my-profile-card__bio">{myProfile.bio}</p>
-
-          <div className="profile-prompt">
-            <p className="profile-prompt__question">
-              {myProfile.promptQuestion}
-            </p>
-
-            <p className="profile-prompt__answer">
-              {myProfile.promptAnswer}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="profile-progress">
-        <div className="profile-progress__heading">
-          <h2>Profile strength</h2>
-          <span>80%</span>
-        </div>
-
-        <div
-          className="profile-progress__track"
-          role="progressbar"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={80}
-        >
-          <div className="profile-progress__fill" />
-        </div>
-
-        <p>
-          Adding housing preferences and additional prompts will improve your
-          future recommendations.
-        </p>
-      </section>
+      {!loading && (
+        <section className="danger-zone">
+          <h2>Delete account</h2>
+          <p>Removes your profile, photos, matches, and login for good.</p>
+          <FormErrors error={deleteError} />
+          <button className="small-button small-button--danger" type="button" disabled={deleting} onClick={deleteAccount}>
+            {deleting ? "Deleting..." : "Delete my account"}
+          </button>
+        </section>
+      )}
     </main>
   );
 }
