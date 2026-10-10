@@ -11,5 +11,8 @@ export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2Wit
     }
     const userId = event.requestContext.authorizer.jwt.claims.sub as string;
     const updated = await updateProfile(userId, parsed.data.name, parsed.data.age);
+    if (updated === undefined) {
+        return { statusCode: 404, body: JSON.stringify({ message: "No profile to update. Create one first." }) }
+    }
     return { statusCode: 200, body: JSON.stringify(updated) }
 });

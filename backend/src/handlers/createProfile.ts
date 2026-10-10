@@ -9,14 +9,13 @@ export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2Wit
     if (!parsed.success) {
         return parsed.response;
     }
-    const profile = parsed.data;
     const userId = event.requestContext.authorizer.jwt.claims.sub as string;
-    await createProfile(userId, profile);
-    return {
-        statusCode: 200,
-        body: JSON.stringify({
-            id: userId,
-            ...profile
-        })
+    const created = await createProfile(userId, parsed.data);
+    if (created === undefined) {
+        return {
+            statusCode: 409,
+            body: JSON.stringify({ message: "You already have a profile. Use PUT to update it." })
+        }
     }
+    return { statusCode: 201, body: JSON.stringify(created) }
 });
