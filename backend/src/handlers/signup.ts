@@ -5,16 +5,15 @@ import {
     InvalidPasswordException,
     InvalidParameterException
 } from "@aws-sdk/client-cognito-identity-provider";
+import { parseBody } from "../validation/parseBody.js";
+import { signupSchema } from "../validation/authSchemas.js";
 
 export async function handler(event: APIGatewayProxyEventV2) {
-    const rawBody = event.body;
-    if (rawBody === undefined) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ error: "Missing request body" })
-        }
+    const parsed = parseBody(event.body, signupSchema);
+    if (!parsed.success) {
+        return parsed.response;
     }
-    const body = JSON.parse(rawBody);
+    const body = parsed.data;
     const clientId = process.env.USER_POOL_CLIENT_ID;
     if (clientId === undefined) {
         return {
