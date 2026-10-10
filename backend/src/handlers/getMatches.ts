@@ -1,6 +1,7 @@
 import { APIGatewayProxyEventV2WithJWTAuthorizer } from "aws-lambda";
 import { getProfileByUserId } from "../repositories/profileRepository.js";
 import { getMatches } from "../repositories/swipeRepository.js";
+import { fullView } from "../services/profileViews.js";
 import { withErrorHandling } from "../lib/withErrorHandling.js";
 
 export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2WithJWTAuthorizer) => {
@@ -13,7 +14,7 @@ export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2Wit
         if (profile === undefined) {
             return undefined;
         }
-        return { ...profile, matchedAt: match.matchedAt };
+        return { ...(await fullView(profile)), matchedAt: match.matchedAt };
     }));
     const profiles = withProfiles.filter(profile => profile !== undefined);
 

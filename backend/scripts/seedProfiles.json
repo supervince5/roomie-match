@@ -1,64 +1,186 @@
 [
   {
     "id": "seed-maya",
-    "name": "Maya", "age": 19, "school": "Virginia Tech", "major": "Architecture", "classYear": 2030,
+    "name": "Maya",
+    "age": 19,
+    "major": "Architecture",
+    "classYear": 2030,
     "bio": "I love coffee shops, sketching, and keeping a calm room. I usually wake up early and like a clean shared space.",
-    "tags": ["Quiet", "Coffee", "Art"],
-    "prompt": { "question": "My ideal roommate night looks like...", "answer": "Cooking something together and watching a movie." },
-    "budget": { "min": 600, "max": 900 }, "moveInDate": "2027-08-15",
-    "sleepSchedule": "early_bird", "cleanliness": "very_clean", "smoking": false, "pets": false
+    "tags": [
+      "Quiet",
+      "Coffee",
+      "Art"
+    ],
+    "prompt": {
+      "question": "My ideal roommate night looks like...",
+      "answer": "Cooking something together and watching a movie."
+    },
+    "budget": {
+      "min": 600,
+      "max": 900
+    },
+    "moveInDate": "2027-08-15",
+    "sleepSchedule": "early_bird",
+    "cleanliness": "very_clean",
+    "smoking": false,
+    "pets": false,
+    "schoolId": 233921
   },
   {
     "id": "seed-jordan",
-    "name": "Jordan", "age": 19, "school": "Virginia Tech", "major": "Computer Science", "classYear": 2030,
+    "name": "Jordan",
+    "age": 19,
+    "major": "Computer Science",
+    "classYear": 2030,
     "bio": "Usually studying, playing basketball, gaming, or looking for good food. Social but I respect quiet time.",
-    "tags": ["Gaming", "Sports", "Social"],
-    "prompt": { "question": "You should room with me if...", "answer": "You like a balance between having fun and getting work done." },
-    "budget": { "min": 500, "max": 750 }, "moveInDate": "2027-08-20",
-    "sleepSchedule": "night_owl", "cleanliness": "clean", "smoking": false, "pets": false
+    "tags": [
+      "Gaming",
+      "Sports",
+      "Social"
+    ],
+    "prompt": {
+      "question": "You should room with me if...",
+      "answer": "You like a balance between having fun and getting work done."
+    },
+    "budget": {
+      "min": 500,
+      "max": 750
+    },
+    "moveInDate": "2027-08-20",
+    "sleepSchedule": "night_owl",
+    "cleanliness": "clean",
+    "smoking": false,
+    "pets": false,
+    "schoolId": 233921
   },
   {
     "id": "seed-priya",
-    "name": "Priya", "age": 20, "school": "Virginia Tech", "major": "Biology", "classYear": 2029,
+    "name": "Priya",
+    "age": 20,
+    "major": "Biology",
+    "classYear": 2029,
     "bio": "Pre-med, so I'm at the library a lot. At home I like things organized and peaceful.",
-    "tags": ["Studious", "Organized", "Gym"],
-    "prompt": { "question": "A non-negotiable for our room is...", "answer": "Quiet hours on weeknights after 11." },
-    "budget": { "min": 650, "max": 950 }, "moveInDate": "2027-08-10",
-    "sleepSchedule": "early_bird", "cleanliness": "very_clean", "smoking": false, "pets": false
+    "tags": [
+      "Studious",
+      "Organized",
+      "Gym"
+    ],
+    "prompt": {
+      "question": "A non-negotiable for our room is...",
+      "answer": "Quiet hours on weeknights after 11."
+    },
+    "budget": {
+      "min": 650,
+      "max": 950
+    },
+    "moveInDate": "2027-08-10",
+    "sleepSchedule": "early_bird",
+    "cleanliness": "very_clean",
+    "smoking": false,
+    "pets": false,
+    "schoolId": 233921
   },
   {
     "id": "seed-marcus",
-    "name": "Marcus", "age": 21, "school": "Virginia Tech", "major": "Music Technology", "classYear": 2028,
+    "name": "Marcus",
+    "age": 21,
+    "major": "Music Technology",
+    "classYear": 2028,
     "bio": "Producer and part-time DJ. Pretty relaxed about mess, and I have a very chill cat named Biscuit.",
-    "tags": ["Music", "Parties", "Creative"],
-    "prompt": { "question": "Something I always bring to the room is...", "answer": "A good speaker and better playlists." },
-    "budget": { "min": 400, "max": 650 }, "moveInDate": "2027-09-01",
-    "sleepSchedule": "night_owl", "cleanliness": "relaxed", "smoking": true, "pets": true
+    "tags": [
+      "Music",
+      "Parties",
+      "Creative"
+    ],
+    "prompt": {
+      "question": "Something I always bring to the room is...",
+      "answer": "A good speaker and better playlists."
+    },
+    "budget": {
+      "min": 400,
+      "max": 650
+    },
+    "moveInDate": "2027-09-01",
+    "sleepSchedule": "night_owl",
+    "cleanliness": "relaxed",
+    "smoking": true,
+    "pets": true,
+    "schoolId": 233921
   },
   {
     "id": "seed-ella",
-    "name": "Ella", "age": 19, "school": "Virginia Tech", "major": "Photography", "classYear": 2030,
+    "name": "Ella",
+    "age": 19,
+    "major": "Photography",
+    "classYear": 2030,
     "bio": "Always out shooting photos or hiking. Pretty flexible on schedules as long as we communicate.",
-    "tags": ["Photography", "Hiking", "Coffee"],
-    "prompt": { "question": "The fastest way to annoy me is...", "answer": "Leaving dishes in the sink overnight." },
-    "budget": { "min": 550, "max": 850 }, "moveInDate": "2027-08-15",
-    "sleepSchedule": "flexible", "cleanliness": "clean", "smoking": false, "pets": false
+    "tags": [
+      "Photography",
+      "Hiking",
+      "Coffee"
+    ],
+    "prompt": {
+      "question": "The fastest way to annoy me is...",
+      "answer": "Leaving dishes in the sink overnight."
+    },
+    "budget": {
+      "min": 550,
+      "max": 850
+    },
+    "moveInDate": "2027-08-15",
+    "sleepSchedule": "flexible",
+    "cleanliness": "clean",
+    "smoking": false,
+    "pets": false,
+    "schoolId": 233921
   },
   {
     "id": "seed-sam",
-    "name": "Sam", "age": 20, "school": "Virginia Tech", "major": "Mechanical Engineering", "classYear": 2029,
+    "name": "Sam",
+    "age": 20,
+    "major": "Mechanical Engineering",
+    "classYear": 2029,
     "bio": "Engineering student who spends weekends at the gym or on a trail. Homebody on weeknights.",
-    "tags": ["Engineering", "Gym", "Homebody"],
-    "prompt": { "question": "You should room with me if...", "answer": "You don't mind a 6am alarm." },
-    "budget": { "min": 600, "max": 800 }, "moveInDate": "2027-08-12",
-    "sleepSchedule": "early_bird", "cleanliness": "clean", "smoking": false, "pets": false
+    "tags": [
+      "Engineering",
+      "Gym",
+      "Homebody"
+    ],
+    "prompt": {
+      "question": "You should room with me if...",
+      "answer": "You don't mind a 6am alarm."
+    },
+    "budget": {
+      "min": 600,
+      "max": 800
+    },
+    "moveInDate": "2027-08-12",
+    "sleepSchedule": "early_bird",
+    "cleanliness": "clean",
+    "smoking": false,
+    "pets": false,
+    "schoolId": 233921
   },
   {
     "id": "seed-noah",
-    "name": "Noah", "age": 19, "school": "University of Virginia", "major": "Economics", "classYear": 2030,
+    "name": "Noah",
+    "age": 19,
+    "major": "Economics",
+    "classYear": 2030,
     "bio": "Different school on purpose, so he should never show up in a Virginia Tech Discover feed.",
-    "tags": ["Reading", "Travel"],
-    "budget": { "min": 700, "max": 1000 }, "moveInDate": "2027-08-20",
-    "sleepSchedule": "flexible", "cleanliness": "clean", "smoking": false, "pets": false
+    "tags": [
+      "Reading",
+      "Travel"
+    ],
+    "budget": {
+      "min": 700,
+      "max": 1000
+    },
+    "moveInDate": "2027-08-20",
+    "sleepSchedule": "flexible",
+    "cleanliness": "clean",
+    "smoking": false,
+    "pets": false,
+    "schoolId": 234076
   }
 ]

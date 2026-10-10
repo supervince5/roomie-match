@@ -1,6 +1,7 @@
 import { APIGatewayProxyEventV2WithJWTAuthorizer } from "aws-lambda";
 import { getProfileByUserId } from "../repositories/profileRepository.js";
 import { saveSwipe, hasLiked, saveMatch } from "../repositories/swipeRepository.js";
+import { fullView } from "../services/profileViews.js";
 import { parseBody } from "../validation/parseBody.js";
 import { swipeSchema } from "../validation/swipeSchemas.js";
 import { withErrorHandling } from "../lib/withErrorHandling.js";
@@ -30,11 +31,11 @@ export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2Wit
 
     // 2. ...then, if it was a like, check whether they already liked me.
     // (Saving first means if we both swipe at the same moment, at least one of us sees the other's like.)
-    let matched = false;
     if (direction === "like" && await hasLiked(targetId, userId)) {
         await saveMatch(userId, targetId);
-        matched = true;
+        // It's a match: now (and only now) you get to see their Instagram
+        return { statusCode: 201, body: JSON.stringify({ matched: true, match: await fullView(target) }) }
     }
 
-    return { statusCode: 201, body: JSON.stringify({ matched: matched }) }
+    return { statusCode: 201, body: JSON.stringify({ matched: false }) }
 });

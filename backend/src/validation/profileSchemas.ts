@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { getSchool } from "../data/schools.js";
 
 // Fixed lists. Matching compares these, so they can't be free text.
 export const TAGS = [
@@ -22,11 +23,18 @@ export const profileSchema = z.object({
     // About you
     name: z.string().trim().min(1, "Name can't be empty").max(50),
     age: z.number().int().min(17).max(100),
-    school: z.string().trim().min(1).max(100),
+    schoolId: z.number().int().refine(id => getSchool(id) !== undefined, "Pick a school from the list"),
     major: z.string().trim().min(1).max(100),
     classYear: z.number().int().min(2020).max(2040),
     bio: z.string().trim().max(500).optional(),
     tags: z.array(z.enum(TAGS, "Not one of the allowed tags")).max(5, "Pick at most 5 tags").default([]),
+    // Only shown to people you've matched with. A leading "@" is fine; we strip it.
+    instagram: z.string().trim()
+        .transform(handle => handle.replace(/^@/, ""))
+        .pipe(z.string().regex(/^[A-Za-z0-9._]{1,30}$/, "Instagram handles only use letters, numbers, periods, and underscores"))
+        .optional(),
+    // Where your photo lives in S3. You get this from POST /profiles/photo.
+    photoKey: z.string().regex(/^photos\/[\w-]+\/[\w-]+\.jpg$/, "Invalid photo").optional(),
     prompt: z.object({
         question: z.enum(PROMPT_QUESTIONS),
         answer: z.string().trim().min(1).max(200)
@@ -46,3 +54,8 @@ export const profileSchema = z.object({
 
 // The TypeScript type, generated from the schema so the two can never drift apart.
 export type ProfileInput = z.infer<typeof profileSchema>;
+
+// A photo key looks like photos/<userId>/<random>.jpg. You can only use your own photos.
+export function photoBelongsTo(photoKey: string | undefined, userId: string) {
+    return photoKey === undefined || photoKey.startsWith("photos/" + userId + "/");
+}

@@ -2,6 +2,7 @@ import { DynamoDBClient, ConditionalCheckFailedException } from "@aws-sdk/client
 import { DynamoDBDocumentClient, GetCommand, PutCommand, DeleteCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { ProfileInput } from "../validation/profileSchemas.js";
 import { requireEnv } from "../lib/env.js";
+import { getSchool } from "../data/schools.js";
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client, {
@@ -11,11 +12,11 @@ const tableName = requireEnv("TABLE_NAME");
 
 // What the rest of the app sees. No PK/SK: those are DynamoDB's filing labels,
 // and they stay inside this file.
-export type Profile = ProfileInput & { id: string };
+export type Profile = ProfileInput & { id: string; school: string };
 
-// "Virginia Tech", " virginia tech " and "VIRGINIA TECH" all file into the same drawer.
-function schoolKey(school: string) {
-    return "SCHOOL#" + school.trim().toLowerCase();
+// Profiles are filed by the school's official id, so spelling can never split a school in two.
+function schoolKey(schoolId: number) {
+    return "SCHOOL#" + schoolId;
 }
 
 // Everything DynamoDB needs to store a profile: the profile itself plus its filing labels.
@@ -23,10 +24,11 @@ function toItem(userId: string, profile: ProfileInput) {
     return {
         PK: "USER#" + userId,
         SK: "PROFILE",
-        GSI1PK: schoolKey(profile.school),
+        GSI1PK: schoolKey(profile.schoolId),
         GSI1SK: "USER#" + userId,
         userId: userId,
-        ...profile
+        ...profile,
+        school: getSchool(profile.schoolId)?.name // stored so reads don't need a lookup
     };
 }
 
@@ -63,7 +65,7 @@ export async function createProfile(userId: string, profile: ProfileInput) {
         }
         throw error;
     }
-    return { id: userId, ...profile };
+    return toProfile(toItem(userId, profile));
 }
 
 // Replaces the whole profile. Returns undefined if there's no profile to update.
@@ -81,7 +83,7 @@ export async function updateProfile(userId: string, profile: ProfileInput) {
         }
         throw error;
     }
-    return { id: userId, ...profile };
+    return toProfile(toItem(userId, profile));
 }
 
 // Returns undefined if there was nothing to delete.
@@ -98,15 +100,38 @@ export async function deleteProfile(userId: string) {
     return toProfile(result.Attributes);
 }
 
-// All profiles at a school, using the school index (a Query, not a Scan).
-export async function getProfilesBySchool(school: string, limit: number) {
+// One page of profiles at a school, using the school index (a Query, not a Scan).
+// DynamoDB hands back a bookmark (LastEvaluatedKey) when there's more; we pass it back in to continue.
+export async function getProfilesBySchool(schoolId: number, limit: number, startKey?: Record<string, any>) {
     const command = new QueryCommand({
         TableName: tableName,
         IndexName: "GSI1",
         KeyConditionExpression: "GSI1PK = :school",
-        ExpressionAttributeValues: { ":school": schoolKey(school) },
-        Limit: limit
+        ExpressionAttributeValues: { ":school": schoolKey(schoolId) },
+        Limit: limit,
+        ExclusiveStartKey: startKey
     });
     const result = await docClient.send(command);
-    return (result.Items ?? []).map(toProfile);
+    return {
+        profiles: (result.Items ?? []).map(toProfile),
+        nextKey: result.LastEvaluatedKey
+    };
+}
+
+// The bookmark goes to the browser as an opaque string ("cursor") and comes back on the next request.
+export function encodeCursor(key: Record<string, any>) {
+    return Buffer.from(JSON.stringify(key)).toString("base64url");
+}
+
+// Never trust a cursor from the browser: it must be a bookmark into *your* school's drawer.
+export function decodeCursor(cursor: string, schoolId: number) {
+    try {
+        const key = JSON.parse(Buffer.from(cursor, "base64url").toString("utf8"));
+        const looksRight = key.GSI1PK === schoolKey(schoolId)
+            && typeof key.GSI1SK === "string" && typeof key.PK === "string" && typeof key.SK === "string"
+            && Object.keys(key).length === 4;
+        return looksRight ? key : undefined;
+    } catch {
+        return undefined;
+    }
 }

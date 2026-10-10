@@ -1,9 +1,14 @@
 import { APIGatewayProxyEventV2WithJWTAuthorizer } from "aws-lambda";
-import { getProfileByUserId, getProfilesBySchool, Profile } from "../repositories/profileRepository.js";
+import { getProfileByUserId, getProfilesBySchool, encodeCursor, decodeCursor, Profile } from "../repositories/profileRepository.js";
 import { getSwipedIds } from "../repositories/swipeRepository.js";
+import { publicView } from "../services/profileViews.js";
 import { parseQuery } from "../validation/parseQuery.js";
 import { discoverFiltersSchema, DiscoverFilters } from "../validation/discoverSchemas.js";
 import { withErrorHandling } from "../lib/withErrorHandling.js";
+
+const PAGE_SIZE = 20;      // profiles to send back per request
+const READ_SIZE = 50;      // profiles to read from DynamoDB at a time
+const MAX_READS = 5;       // stop after this many reads, even if the page isn't full yet
 
 export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2WithJWTAuthorizer) => {
     const parsed = parseQuery(event.queryStringParameters, discoverFiltersSchema);
@@ -18,17 +23,44 @@ export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2Wit
     if (me === undefined) {
         return { statusCode: 404, body: JSON.stringify({ message: "Create your profile before using Discover." }) }
     }
+    // Profiles saved before the school list existed have no schoolId yet
+    if (!me.schoolId) {
+        return { statusCode: 409, body: JSON.stringify({ message: "Finish your profile before using Discover." }) }
+    }
 
-    // 2. Everyone at my school, minus me and anyone I've already swiped on,
-    //    narrowed down by whatever filters were picked
-    const schoolmates = await getProfilesBySchool(me.school, 50);
+    // 2. Where to start: the beginning, or the bookmark from the last page
+    let startKey: Record<string, any> | undefined = undefined;
+    if (filters.cursor !== undefined) {
+        startKey = decodeCursor(filters.cursor, me.schoolId);
+        if (startKey === undefined) {
+            return { statusCode: 400, body: JSON.stringify({ message: "Invalid cursor" }) }
+        }
+    }
+
+    // 3. Read my school's drawer in chunks until we have a full page of people to show.
+    //    (Filters and "already swiped" can throw most of a chunk away, so one read isn't always enough.)
     const swiped = new Set(await getSwipedIds(userId));
-    const profiles = schoolmates
-        .filter(profile => profile.id !== userId)
-        .filter(profile => !swiped.has(profile.id))
-        .filter(profile => matchesFilters(profile, filters));
+    const results: Profile[] = [];
+    let reads = 0;
+    do {
+        const page = await getProfilesBySchool(me.schoolId, READ_SIZE, startKey);
+        for (const profile of page.profiles) {
+            if (profile.id !== userId && !swiped.has(profile.id) && matchesFilters(profile, filters)) {
+                results.push(profile);
+            }
+        }
+        startKey = page.nextKey;
+        reads++;
+    } while (startKey !== undefined && results.length < PAGE_SIZE && reads < MAX_READS);
 
-    return { statusCode: 200, body: JSON.stringify({ profiles: profiles }) }
+    return {
+        statusCode: 200,
+        body: JSON.stringify({
+            profiles: await Promise.all(results.map(publicView)),
+            // If there's more to read, hand the browser a bookmark for next time
+            nextCursor: startKey === undefined ? null : encodeCursor(startKey)
+        })
+    }
 });
 
 // A filter that wasn't picked (undefined) lets everyone through.

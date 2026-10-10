@@ -16,3 +16,13 @@ export const loginSchema = z.object({
     email: z.email("Must be a valid email"),
     password: z.string().min(1, "Password is required")
 }).strict();
+
+export const forgotPasswordSchema = z.object({
+    email: z.email("Must be a valid email")
+}).strict();
+
+export const resetPasswordSchema = z.object({
+    email: z.email("Must be a valid email"),
+    confirmationCode: z.string().regex(/^\d{6}$/, "Code must be 6 digits"),
+    newPassword: z.string().min(8, "Password must be at least 8 characters")
+}).strict();

@@ -6,6 +6,7 @@ provider:
   region: us-east-1
   environment:
     TABLE_NAME: !Ref ProfilesTable
+    PHOTOS_BUCKET: !Ref PhotosBucket
   iam:
     role:
       statements:
@@ -15,10 +16,43 @@ provider:
             - dynamodb:PutItem
             - dynamodb:DeleteItem
             - dynamodb:Query
+            - dynamodb:BatchWriteItem
           Resource:
             - !GetAtt ProfilesTable.Arn
             - !Sub "${ProfilesTable.Arn}/index/*"
+        # Photos: upload, view, and delete files under photos/
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+          Resource:
+            - !Sub "${PhotosBucket.Arn}/photos/*"
+        - Effect: Allow
+          Action:
+            - s3:ListBucket
+          Resource:
+            - !GetAtt PhotosBucket.Arn
+        # Delete account removes the Cognito login too
+        - Effect: Allow
+          Action:
+            - cognito-idp:AdminDeleteUser
+          Resource:
+            - !GetAtt UserPool.Arn
   httpApi:
+    # Which websites are allowed to call this API from a browser.
+    # Add the real site's address here once the frontend is hosted (Module 12).
+    cors:
+      allowedOrigins:
+        - http://localhost:5173
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
     authorizers:
       cognitoAuthorizer:
         type: jwt
@@ -90,6 +124,62 @@ functions:
           method: get
           authorizer:
             name: cognitoAuthorizer
+  searchSchools:
+    handler: src/handlers/searchSchools.handler
+    events:
+      - httpApi:
+          path: /schools
+          method: get
+  photoUploadUrl:
+    handler: src/handlers/photoUploadUrl.handler
+    events:
+      - httpApi:
+          path: /profiles/photo
+          method: post
+          authorizer:
+            name: cognitoAuthorizer
+  getMatch:
+    handler: src/handlers/getMatch.handler
+    events:
+      - httpApi:
+          path: /matches/{userId}
+          method: get
+          authorizer:
+            name: cognitoAuthorizer
+  unmatch:
+    handler: src/handlers/unmatch.handler
+    events:
+      - httpApi:
+          path: /matches/{userId}
+          method: delete
+          authorizer:
+            name: cognitoAuthorizer
+  deleteAccount:
+    handler: src/handlers/deleteAccount.handler
+    environment:
+      USER_POOL_ID: !Ref UserPool
+    events:
+      - httpApi:
+          path: /account
+          method: delete
+          authorizer:
+            name: cognitoAuthorizer
+  forgotPassword:
+    handler: src/handlers/forgotPassword.handler
+    environment:
+      USER_POOL_CLIENT_ID: !Ref UserPoolClient
+    events:
+      - httpApi:
+          path: /password/forgot
+          method: post
+  resetPassword:
+    handler: src/handlers/resetPassword.handler
+    environment:
+      USER_POOL_CLIENT_ID: !Ref UserPoolClient
+    events:
+      - httpApi:
+          path: /password/reset
+          method: post
   signup:
     handler: src/handlers/signup.handler
     environment:
@@ -146,6 +236,19 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
+    # Private bucket for profile photos. Browsers upload with one-time presigned POSTs
+    # and view through links that expire, so nothing here is ever public.
+    PhotosBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - http://localhost:5173
+              AllowedMethods:
+                - POST
+              AllowedHeaders:
+                - "*"
     UserPool:
       Type: AWS::Cognito::UserPool
       Properties:

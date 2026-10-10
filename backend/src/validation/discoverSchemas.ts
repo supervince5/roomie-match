@@ -13,7 +13,8 @@ export const discoverFiltersSchema = z.object({
     pets: booleanText.optional(),
     maxBudget: z.coerce.number().int().min(0).optional(),  // their budget has to start at or below this
     classYear: z.coerce.number().int().optional(),
-    tag: z.enum(TAGS, "Not one of the allowed tags").optional()
+    tag: z.enum(TAGS, "Not one of the allowed tags").optional(),
+    cursor: z.string().max(2000).optional() // bookmark from the previous page ("load more")
 }).strict();
 
 export type DiscoverFilters = z.infer<typeof discoverFiltersSchema>;
