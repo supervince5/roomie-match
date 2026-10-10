@@ -14,8 +14,10 @@ provider:
             - dynamodb:GetItem
             - dynamodb:PutItem
             - dynamodb:DeleteItem
+            - dynamodb:Query
           Resource:
             - !GetAtt ProfilesTable.Arn
+            - !Sub "${ProfilesTable.Arn}/index/*"
   httpApi:
     authorizers:
       cognitoAuthorizer:
@@ -64,6 +66,14 @@ functions:
           method: delete
           authorizer:
             name: cognitoAuthorizer
+  discover:
+    handler: src/handlers/discover.handler
+    events:
+      - httpApi:
+          path: /discover
+          method: get
+          authorizer:
+            name: cognitoAuthorizer
   signup:
     handler: src/handlers/signup.handler
     environment:
@@ -100,11 +110,26 @@ resources:
             AttributeType: S
           - AttributeName: SK
             AttributeType: S
+          - AttributeName: GSI1PK
+            AttributeType: S
+          - AttributeName: GSI1SK
+            AttributeType: S
         KeySchema:
           - AttributeName: PK
             KeyType: HASH
           - AttributeName: SK
             KeyType: RANGE
+        GlobalSecondaryIndexes:
+          # Second way of filing the same profiles: by school, so Discover can
+          # Query one school instead of Scanning the whole table.
+          - IndexName: GSI1
+            KeySchema:
+              - AttributeName: GSI1PK
+                KeyType: HASH
+              - AttributeName: GSI1SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
     UserPool:
       Type: AWS::Cognito::UserPool
       Properties:

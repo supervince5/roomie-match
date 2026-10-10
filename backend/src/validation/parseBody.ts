@@ -30,7 +30,7 @@ export function parseBody<T>(rawBody: string | undefined, schema: z.ZodType<T>):
     return { success: true, data: result.data };
 }
 
-function badRequest(message: string, errors?: { field: string; message: string }[]) {
+export function badRequest(message: string, errors?: { field: string; message: string }[]) {
     return {
         success: false as const,
         response: {
