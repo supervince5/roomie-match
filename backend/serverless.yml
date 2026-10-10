@@ -4,6 +4,8 @@ provider:
   name: aws
   runtime: nodejs20.x
   region: us-east-1
+  environment:
+    TABLE_NAME: !Ref ProfilesTable
   iam:
     role:
       statements:
@@ -93,7 +95,6 @@ resources:
     ProfilesTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: profiles
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: PK

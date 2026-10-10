@@ -1,11 +1,14 @@
-import { CognitoIdentityProviderClient, ConfirmSignUpCommand, CodeMismatchException, ExpiredCodeException, UserNotFoundException } from "@aws-sdk/client-cognito-identity-provider";
 import { APIGatewayProxyEventV2 } from "aws-lambda";
-
-const cognitoClient = new CognitoIdentityProviderClient({});
+import { confirmSignUp } from "../repositories/authRepository.js";
+import {
+    CodeMismatchException,
+    ExpiredCodeException,
+    UserNotFoundException
+} from "@aws-sdk/client-cognito-identity-provider";
 
 export async function handler(event:APIGatewayProxyEventV2){
     const rawBody = event.body;
-    if (rawBody == undefined){
+    if (rawBody === undefined){
         return{
             statusCode: 400,
             body: JSON.stringify({message: "Missing body request"})
@@ -13,15 +16,17 @@ export async function handler(event:APIGatewayProxyEventV2){
     }
     const body = JSON.parse(rawBody)
     const ClientID = process.env.USER_POOL_CLIENT_ID;
+    if (ClientID === undefined){
+        return{
+            statusCode: 500,
+            body: JSON.stringify({message: "Client ID not created"})
+        }
+    }
 
-    const command = new ConfirmSignUpCommand({
-        ClientId: ClientID, 
-        Username: body.email,
-        ConfirmationCode: body.confirmationCode
-    })
+
 
     try{
-    await cognitoClient.send(command);
+        await confirmSignUp(ClientID, body.email, body.confirmationCode);
     } catch(error:any){
         if (error instanceof CodeMismatchException) {
             return{
@@ -41,7 +46,7 @@ export async function handler(event:APIGatewayProxyEventV2){
         } else {
             return{
                 statusCode: 500,
-                body: JSON.stringify({message: "An unexpected error occurred:"})
+                body: JSON.stringify({message: "An unexpected error occurred."})
             }
         }
     }
