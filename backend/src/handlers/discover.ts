@@ -1,5 +1,6 @@
 import { APIGatewayProxyEventV2WithJWTAuthorizer } from "aws-lambda";
 import { getProfileByUserId, getProfilesBySchool, Profile } from "../repositories/profileRepository.js";
+import { getSwipedIds } from "../repositories/swipeRepository.js";
 import { parseQuery } from "../validation/parseQuery.js";
 import { discoverFiltersSchema, DiscoverFilters } from "../validation/discoverSchemas.js";
 import { withErrorHandling } from "../lib/withErrorHandling.js";
@@ -18,10 +19,13 @@ export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2Wit
         return { statusCode: 404, body: JSON.stringify({ message: "Create your profile before using Discover." }) }
     }
 
-    // 2. Everyone at my school, minus me, narrowed down by whatever filters were picked
+    // 2. Everyone at my school, minus me and anyone I've already swiped on,
+    //    narrowed down by whatever filters were picked
     const schoolmates = await getProfilesBySchool(me.school, 50);
+    const swiped = new Set(await getSwipedIds(userId));
     const profiles = schoolmates
         .filter(profile => profile.id !== userId)
+        .filter(profile => !swiped.has(profile.id))
         .filter(profile => matchesFilters(profile, filters));
 
     return { statusCode: 200, body: JSON.stringify({ profiles: profiles }) }

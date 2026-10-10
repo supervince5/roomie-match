@@ -74,6 +74,22 @@ functions:
           method: get
           authorizer:
             name: cognitoAuthorizer
+  swipe:
+    handler: src/handlers/swipe.handler
+    events:
+      - httpApi:
+          path: /swipes
+          method: post
+          authorizer:
+            name: cognitoAuthorizer
+  getMatches:
+    handler: src/handlers/getMatches.handler
+    events:
+      - httpApi:
+          path: /matches
+          method: get
+          authorizer:
+            name: cognitoAuthorizer
   signup:
     handler: src/handlers/signup.handler
     environment:
