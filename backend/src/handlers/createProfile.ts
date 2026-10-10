@@ -2,8 +2,9 @@ import { APIGatewayProxyEventV2WithJWTAuthorizer } from "aws-lambda";
 import { createProfile } from "../repositories/profileRepository.js";
 import { parseBody } from "../validation/parseBody.js";
 import { profileSchema } from "../validation/profileSchemas.js";
+import { withErrorHandling } from "../lib/withErrorHandling.js";
 
-export async function handler(event: APIGatewayProxyEventV2WithJWTAuthorizer) {
+export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2WithJWTAuthorizer) => {
     const parsed = parseBody(event.body, profileSchema);
     if (!parsed.success) {
         return parsed.response;
@@ -18,4 +19,4 @@ export async function handler(event: APIGatewayProxyEventV2WithJWTAuthorizer) {
             ...profile
         })
     }
-}
+});

@@ -7,23 +7,19 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { parseBody } from "../validation/parseBody.js";
 import { signupSchema } from "../validation/authSchemas.js";
+import { withErrorHandling } from "../lib/withErrorHandling.js";
+import { requireEnv } from "../lib/env.js";
 
-export async function handler(event: APIGatewayProxyEventV2) {
+export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2) => {
     const parsed = parseBody(event.body, signupSchema);
     if (!parsed.success) {
         return parsed.response;
     }
     const body = parsed.data;
-    const clientId = process.env.USER_POOL_CLIENT_ID;
-    if (clientId === undefined) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: "ClientID not created" })
-        }
-    }
+    const clientId = requireEnv("USER_POOL_CLIENT_ID");
     try {
         await signUp(clientId, body.email, body.password);
-    } catch (error: any) {
+    } catch (error) {
         if (error instanceof UsernameExistsException) {
             return {
                 statusCode: 409,
@@ -39,15 +35,11 @@ export async function handler(event: APIGatewayProxyEventV2) {
                 statusCode: 400,
                 body: JSON.stringify({ message: "Invalid email or password format." })
             }
-        } else {
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ message: "An unexpected error occurred." })
-            }
         }
+        throw error; // not one we planned for, so the safety net handles it
     }
     return {
         statusCode: 200,
         body: JSON.stringify({ message: "User Created" })
     }
-}
+});

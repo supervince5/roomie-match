@@ -1,14 +1,7 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
 import { ProfileInput } from "../validation/profileSchemas.js";
-
-function requireEnv(name: string): string {
-    const value = process.env[name];
-    if (value === undefined) {
-        throw new Error(`Missing environment variable: ${name}`);
-    }
-    return value;
-}
+import { requireEnv } from "../lib/env.js";
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);

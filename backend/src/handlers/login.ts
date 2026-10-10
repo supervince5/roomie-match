@@ -6,24 +6,20 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { parseBody } from "../validation/parseBody.js";
 import { loginSchema } from "../validation/authSchemas.js";
+import { withErrorHandling } from "../lib/withErrorHandling.js";
+import { requireEnv } from "../lib/env.js";
 
-export async function handler(event: APIGatewayProxyEventV2) {
+export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2) => {
     const parsed = parseBody(event.body, loginSchema);
     if (!parsed.success) {
         return parsed.response;
     }
     const body = parsed.data;
-    const clientId = process.env.USER_POOL_CLIENT_ID;
-    if (clientId === undefined) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: "ClientID not created" })
-        }
-    }
+    const clientId = requireEnv("USER_POOL_CLIENT_ID");
     let token;
     try {
         token = await login(clientId, body.email, body.password);
-    } catch (error: any) {
+    } catch (error) {
         if (error instanceof UserNotFoundException) {
             return {
                 statusCode: 400,
@@ -34,21 +30,14 @@ export async function handler(event: APIGatewayProxyEventV2) {
                 statusCode: 400,
                 body: JSON.stringify({ message: "The password you entered is invalid. Please try again." })
             }
-        } else {
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ message: "Unexpected error occurred." })
-            }
         }
+        throw error; // not one we planned for, so the safety net handles it
     }
     if (token === undefined) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ message: "Login succeeded but no token was returned." })
-        }
+        throw new Error("Login succeeded but Cognito returned no token");
     }
     return {
         statusCode: 200,
         body: JSON.stringify({ message: "Authenticated", token: token })
     }
-}
+});
