@@ -60,6 +60,38 @@ export async function saveMatch(userA: string, userB: string) {
     ]);
 }
 
+// My most recent swipes, newest first (for the history screen).
+export async function getRecentSwipes(userId: string, limit: number) {
+    const items = await queryMyFolder(userId, "SWIPE#");
+    return items
+        .map(item => ({
+            userId: (item.SK as string).replace("SWIPE#", ""),
+            direction: item.direction as "like" | "pass",
+            swipedAt: item.swipedAt as string
+        }))
+        .sort((a, b) => b.swipedAt.localeCompare(a.swipedAt))
+        .slice(0, limit);
+}
+
+// My swipe on one person, or undefined if I haven't swiped on them.
+export async function getSwipe(userId: string, targetId: string) {
+    const result = await docClient.send(new GetCommand({
+        TableName: tableName,
+        Key: { PK: "USER#" + userId, SK: "SWIPE#" + targetId }
+    }));
+    return result.Item?.direction as "like" | "pass" | undefined;
+}
+
+// Undo: forget my swipe, so they show up in Discover again. Returns false if there was none.
+export async function deleteSwipe(userId: string, targetId: string) {
+    const result = await docClient.send(new DeleteCommand({
+        TableName: tableName,
+        Key: { PK: "USER#" + userId, SK: "SWIPE#" + targetId },
+        ReturnValues: "ALL_OLD"
+    }));
+    return result.Attributes !== undefined;
+}
+
 // Everyone I've swiped on (like or pass), so Discover can hide them.
 export async function getSwipedIds(userId: string) {
     const items = await queryMyFolder(userId, "SWIPE#");
@@ -70,7 +102,8 @@ export async function getSwipedIds(userId: string) {
 export async function getMatch(userId: string, otherId: string) {
     const result = await docClient.send(new GetCommand({
         TableName: tableName,
-        Key: { PK: "USER#" + userId, SK: "MATCH#" + otherId }
+        Key: { PK: "USER#" + userId, SK: "MATCH#" + otherId },
+        ConsistentRead: true
     }));
     if (result.Item === undefined) {
         return undefined;
@@ -101,6 +134,8 @@ export async function deleteMatch(userId: string, otherId: string) {
         TableName: tableName,
         Key: { PK: "USER#" + otherId, SK: "MATCH#" + userId }
     }));
+    const messages = [...await queryMyFolder(userId, `MESSAGE#${otherId}#`), ...await queryMyFolder(otherId, `MESSAGE#${userId}#`)];
+    await deleteKeys(messages.map(item => ({ PK: item.PK as string, SK: item.SK as string })));
     return true;
 }
 
@@ -113,8 +148,22 @@ export async function deleteEverythingFor(userId: string) {
         if ((item.SK as string).startsWith("MATCH#")) {
             const otherId = (item.SK as string).replace("MATCH#", "");
             keys.push({ PK: "USER#" + otherId, SK: "MATCH#" + userId });
+            const sharedMessages = await queryMyFolder(otherId, `MESSAGE#${userId}#`);
+            keys.push(...sharedMessages.map(message => ({ PK: message.PK as string, SK: message.SK as string })));
         }
     }
+    for (const item of myItems) {
+        if ((item.SK as string).startsWith("MESSAGE#")) {
+            const peer = (item.SK as string).split("#")[1];
+            keys.push({ PK: `USER#${peer}`, SK: `MESSAGE#${userId}#${item.id}` });
+        }
+    }
+    const unique = [...new Map(keys.map(key => [JSON.stringify(key), key])).values()];
+    await deleteKeys(unique);
+    return unique.length;
+}
+
+async function deleteKeys(keys: {PK:string;SK:string}[]) {
     // DynamoDB deletes up to 25 items per batch request
     for (let i = 0; i < keys.length; i += 25) {
         const batch = keys.slice(i, i + 25).map(key => ({ DeleteRequest: { Key: key } }));
@@ -124,7 +173,6 @@ export async function deleteEverythingFor(userId: string) {
             unprocessed = result.UnprocessedItems;
         }
     }
-    return keys.length;
 }
 
 // All items in my folder whose SK starts with a prefix ("" = everything), following DynamoDB's pages.

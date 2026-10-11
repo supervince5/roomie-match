@@ -4,6 +4,7 @@ import { getSwipedIds } from "../repositories/swipeRepository.js";
 import { publicView } from "../services/profileViews.js";
 import { parseQuery } from "../validation/parseQuery.js";
 import { discoverFiltersSchema, DiscoverFilters } from "../validation/discoverSchemas.js";
+import { getSchool } from "../data/schools.js";
 import { withErrorHandling } from "../lib/withErrorHandling.js";
 
 const PAGE_SIZE = 20;      // profiles to send back per request
@@ -28,10 +29,13 @@ export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2Wit
         return { statusCode: 409, body: JSON.stringify({ message: "Finish your profile before using Discover." }) }
     }
 
+    // Browse my school unless a different one was picked
+    const schoolId = filters.schoolId ?? me.schoolId;
+
     // 2. Where to start: the beginning, or the bookmark from the last page
     let startKey: Record<string, any> | undefined = undefined;
     if (filters.cursor !== undefined) {
-        startKey = decodeCursor(filters.cursor, me.schoolId);
+        startKey = decodeCursor(filters.cursor, schoolId);
         if (startKey === undefined) {
             return { statusCode: 400, body: JSON.stringify({ message: "Invalid cursor" }) }
         }
@@ -43,7 +47,7 @@ export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2Wit
     const results: Profile[] = [];
     let reads = 0;
     do {
-        const page = await getProfilesBySchool(me.schoolId, READ_SIZE, startKey);
+        const page = await getProfilesBySchool(schoolId, READ_SIZE, startKey);
         for (const profile of page.profiles) {
             if (profile.id !== userId && !swiped.has(profile.id) && matchesFilters(profile, filters)) {
                 results.push(profile);
@@ -56,6 +60,7 @@ export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2Wit
     return {
         statusCode: 200,
         body: JSON.stringify({
+            school: { id: schoolId, name: getSchool(schoolId)?.name },
             profiles: await Promise.all(results.map(publicView)),
             // If there's more to read, hand the browser a bookmark for next time
             nextCursor: startKey === undefined ? null : encodeCursor(startKey)
@@ -84,6 +89,19 @@ function matchesFilters(profile: Profile, filters: DiscoverFilters) {
         return false;
     }
     if (filters.tag !== undefined && !profile.tags.includes(filters.tag)) {
+        return false;
+    }
+    if (filters.major !== undefined && !profile.major.toLowerCase().includes(filters.major.toLowerCase())) {
+        return false;
+    }
+    if (filters.minAge !== undefined && profile.age < filters.minAge) {
+        return false;
+    }
+    if (filters.maxAge !== undefined && profile.age > filters.maxAge) {
+        return false;
+    }
+    // Dates in YYYY-MM-DD format sort correctly as plain text
+    if (filters.moveInBy !== undefined && profile.moveInDate > filters.moveInBy) {
         return false;
     }
     return true;

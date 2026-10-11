@@ -17,6 +17,8 @@ provider:
             - dynamodb:DeleteItem
             - dynamodb:Query
             - dynamodb:BatchWriteItem
+            - dynamodb:BatchGetItem
+            - dynamodb:ConditionCheckItem
           Resource:
             - !GetAtt ProfilesTable.Arn
             - !Sub "${ProfilesTable.Arn}/index/*"
@@ -62,6 +64,19 @@ provider:
           - !Ref UserPoolClient
 
 functions:
+  messages:
+    handler: src/handlers/messages.handler
+    events:
+      - httpApi:
+          path: /matches/{userId}/messages
+          method: get
+          authorizer:
+            name: cognitoAuthorizer
+      - httpApi:
+          path: /matches/{userId}/messages
+          method: post
+          authorizer:
+            name: cognitoAuthorizer
   health:
     handler: src/handlers/health.handler
     events:
@@ -114,6 +129,38 @@ functions:
       - httpApi:
           path: /swipes
           method: post
+          authorizer:
+            name: cognitoAuthorizer
+  swipeHistory:
+    handler: src/handlers/swipeHistory.handler
+    events:
+      - httpApi:
+          path: /swipes
+          method: get
+          authorizer:
+            name: cognitoAuthorizer
+  undoSwipe:
+    handler: src/handlers/undoSwipe.handler
+    events:
+      - httpApi:
+          path: /swipes/{userId}
+          method: delete
+          authorizer:
+            name: cognitoAuthorizer
+  searchPeople:
+    handler: src/handlers/searchPeople.handler
+    events:
+      - httpApi:
+          path: /people
+          method: get
+          authorizer:
+            name: cognitoAuthorizer
+  getPerson:
+    handler: src/handlers/getPerson.handler
+    events:
+      - httpApi:
+          path: /people/{userId}
+          method: get
           authorizer:
             name: cognitoAuthorizer
   getMatches:

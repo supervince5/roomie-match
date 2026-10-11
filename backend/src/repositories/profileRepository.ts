@@ -1,5 +1,5 @@
 import { DynamoDBClient, ConditionalCheckFailedException } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand, PutCommand, DeleteCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, GetCommand, PutCommand, DeleteCommand, QueryCommand, BatchGetCommand, BatchGetCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { ProfileInput } from "../validation/profileSchemas.js";
 import { requireEnv } from "../lib/env.js";
 import { getSchool } from "../data/schools.js";
@@ -48,6 +48,28 @@ export async function getProfileByUserId(userId: string) {
         return undefined;
     }
     return toProfile(result.Item);
+}
+
+// Many profiles in one trip to the database instead of one trip each.
+// DynamoDB allows 100 keys per batch, and may hand some back as "unprocessed" to retry.
+export async function getProfilesByUserIds(userIds: string[]) {
+    const profiles = new Map<string, Profile>();
+    for (let i = 0; i < userIds.length; i += 100) {
+        let keys: Record<string, any>[] | undefined = userIds
+            .slice(i, i + 100)
+            .map(id => ({ PK: "USER#" + id, SK: "PROFILE" }));
+        while (keys !== undefined && keys.length > 0) {
+            const result: BatchGetCommandOutput = await docClient.send(new BatchGetCommand({
+                RequestItems: { [tableName]: { Keys: keys } }
+            }));
+            for (const item of result.Responses?.[tableName] ?? []) {
+                const profile = toProfile(item);
+                profiles.set(profile.id, profile);
+            }
+            keys = result.UnprocessedKeys?.[tableName]?.Keys;
+        }
+    }
+    return profiles;
 }
 
 // Returns undefined if this user already has a profile.

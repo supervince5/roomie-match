@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { TAGS } from "./profileSchemas.js";
+import { getSchool } from "../data/schools.js";
 
 // URL filters come in as text (?smoking=false&maxBudget=800), so "false" and "800"
 // have to be turned into a real boolean and number.
@@ -7,6 +8,12 @@ const booleanText = z.enum(["true", "false"]).transform(value => value === "true
 
 // Every filter is optional. Leave them all off to see everyone at your school.
 export const discoverFiltersSchema = z.object({
+    // Which school to browse. Leave it off to browse your own.
+    schoolId: z.coerce.number().int().refine(id => getSchool(id) !== undefined, "Pick a school from the list").optional(),
+    major: z.string().trim().min(1).max(100).optional(),       // matches any part of the major ("comp")
+    minAge: z.coerce.number().int().min(17).max(100).optional(),
+    maxAge: z.coerce.number().int().min(17).max(100).optional(),
+    moveInBy: z.iso.date("Use the format YYYY-MM-DD").optional(), // moving in on or before this date
     sleepSchedule: z.enum(["early_bird", "flexible", "night_owl"]).optional(),
     cleanliness: z.enum(["very_clean", "clean", "relaxed"]).optional(),
     smoking: booleanText.optional(),

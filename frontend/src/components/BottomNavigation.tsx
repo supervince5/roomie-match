@@ -1,46 +1,26 @@
-import { Heart, Search, UserRound } from "lucide-react";
+import { Compass, Heart, History, Search, UserRound } from "lucide-react";
 import { NavLink } from "react-router";
-
-function BottomNavigation() {
+export default function BottomNavigation() {
   return (
-    <nav className="bottom-navigation" aria-label="Main navigation">
-      <NavLink
-        to="/discover"
-        className={({ isActive }) =>
-          `bottom-navigation__link ${
-            isActive ? "bottom-navigation__link--active" : ""
-          }`
-        }
-      >
-        <Search size={23} strokeWidth={2.3} />
-        <span>Discover</span>
-      </NavLink>
-
-      <NavLink
-        to="/matches"
-        className={({ isActive }) =>
-          `bottom-navigation__link ${
-            isActive ? "bottom-navigation__link--active" : ""
-          }`
-        }
-      >
-        <Heart size={23} strokeWidth={2.3} />
-        <span>Matches</span>
-      </NavLink>
-
-      <NavLink
-        to="/profile"
-        className={({ isActive }) =>
-          `bottom-navigation__link ${
-            isActive ? "bottom-navigation__link--active" : ""
-          }`
-        }
-      >
-        <UserRound size={23} strokeWidth={2.3} />
-        <span>Profile</span>
-      </NavLink>
+    <nav className="app-navigation" aria-label="Main navigation">
+      {[
+        { to: "/discover", label: "Discover", Icon: Compass },
+        { to: "/matches", label: "Matches", Icon: Heart },
+        { to: "/search", label: "Search", Icon: Search },
+        { to: "/history", label: "History", Icon: History },
+        { to: "/profile", label: "My profile", Icon: UserRound },
+      ].map(({ to, label, Icon }) => (
+        <NavLink
+          key={to}
+          to={to}
+          className={({ isActive }) =>
+            `app-navigation__link ${isActive ? "is-active" : ""}`
+          }
+        >
+          <Icon size={18} />
+          <span>{label}</span>
+        </NavLink>
+      ))}
     </nav>
   );
 }
-
-export default BottomNavigation;

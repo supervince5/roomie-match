@@ -1,3 +1,4 @@
+import AuthLayout from "../components/AuthLayout";
 import { HeartHandshake } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
@@ -52,7 +53,7 @@ function SignupPage() {
   }
 
   return (
-    <main className="landing-page">
+    <AuthLayout>
       {step === "account" ? (
         <form className="landing-card auth-card" onSubmit={handleCreateAccount}>
           <div className="brand-icon">
@@ -98,7 +99,7 @@ function SignupPage() {
           </button>
         </form>
       )}
-    </main>
+    </AuthLayout>
   );
 }
 

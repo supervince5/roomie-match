@@ -1,3 +1,4 @@
+import AuthLayout from "../components/AuthLayout";
 import { HeartHandshake } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router";
@@ -34,7 +35,7 @@ function LoginPage() {
   }
 
   return (
-    <main className="landing-page">
+    <AuthLayout>
       <form className="landing-card auth-card" onSubmit={handleSubmit}>
         <div className="brand-icon">
           <HeartHandshake size={42} strokeWidth={2.2} />
@@ -61,7 +62,7 @@ function LoginPage() {
           New here? <Link to="/signup">Create an account</Link>
         </p>
       </form>
-    </main>
+    </AuthLayout>
   );
 }
 

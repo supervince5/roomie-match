@@ -1,3 +1,4 @@
+import AuthLayout from "../components/AuthLayout";
 import { KeyRound } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router";
@@ -47,7 +48,7 @@ function ForgotPasswordPage() {
   }
 
   return (
-    <main className="landing-page">
+    <AuthLayout>
       {step === "email" && (
         <form className="landing-card auth-card" onSubmit={handleSendCode}>
           <div className="brand-icon">
@@ -102,7 +103,7 @@ function ForgotPasswordPage() {
           <Link className="primary-button" to="/login">Log in</Link>
         </section>
       )}
-    </main>
+    </AuthLayout>
   );
 }
 

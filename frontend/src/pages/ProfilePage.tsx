@@ -2,7 +2,7 @@ import { LogOut, Pencil } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../auth/authContext";
 import ProfileCard from "../components/ProfileCard";
-import FormErrors from "../components/FormErrors";
+import ConfirmDialog from "../components/ConfirmDialog";
 import ProfileForm from "../components/ProfileForm";
 import { apiRequest } from "../lib/api";
 import { useApi } from "../lib/useApi";
@@ -20,13 +20,9 @@ function ProfilePage() {
   const [deleteError, setDeleteError] = useState<unknown>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   async function deleteAccount() {
-    const typed = window.prompt(
-      "This permanently deletes your profile, photos, matches, and login. Type DELETE to confirm.",
-    );
-    if (typed !== "DELETE") {
-      return;
-    }
     setDeleting(true);
     setDeleteError(null);
     try {
@@ -107,10 +103,24 @@ function ProfilePage() {
         <section className="danger-zone">
           <h2>Delete account</h2>
           <p>Removes your profile, photos, matches, and login for good.</p>
-          <FormErrors error={deleteError} />
-          <button className="small-button small-button--danger" type="button" disabled={deleting} onClick={deleteAccount}>
-            {deleting ? "Deleting..." : "Delete my account"}
+          <button className="small-button small-button--danger" type="button" onClick={() => setConfirmOpen(true)}>
+            Delete my account
           </button>
+          <ConfirmDialog
+            open={confirmOpen}
+            title="Delete your account?"
+            message="This permanently deletes your profile, photos, matches, and login. It can't be undone."
+            requireTyping="DELETE"
+            confirmLabel="Delete account"
+            busyLabel="Deleting..."
+            busy={deleting}
+            error={deleteError}
+            onConfirm={deleteAccount}
+            onCancel={() => {
+              setConfirmOpen(false);
+              setDeleteError(null);
+            }}
+          />
         </section>
       )}
     </main>

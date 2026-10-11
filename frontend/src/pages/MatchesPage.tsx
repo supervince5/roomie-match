@@ -60,13 +60,13 @@ function MatchesPage() {
       <header className="page-header">
         <div>
           <p className="eyebrow">Your connections</p>
-          <h1>Matches</h1>
+          <h1>A hello worth making.</h1>
         </div>
       </header>
 
       <section className="matches-introduction">
         <Heart size={23} />
-        <p>A match appears when two students both like each other. Tap one to see their profile.</p>
+        <p>A match appears when two students both like each other. Open a match to compare your living habits and start a conversation.</p>
       </section>
 
       {content}

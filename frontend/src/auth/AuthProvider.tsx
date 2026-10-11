@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { apiRequest, getToken, setToken } from "../lib/api";
+import { clearApiCache } from "../lib/useApi";
 import { AuthContext, isExpired, readTokenClaims } from "./authContext";
 
 function startingToken() {
@@ -17,6 +18,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
   // If any API call comes back 401, api.ts fires this event and we log out here.
   useEffect(() => {
     function handleLoggedOut() {
+      clearApiCache();
       setTokenState(null);
     }
     window.addEventListener("roomie:logged-out", handleLoggedOut);
@@ -28,11 +30,13 @@ function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: { email: email, password: password },
     });
+    clearApiCache();
     setToken(result.token);
     setTokenState(result.token);
   }
 
   function logout() {
+    clearApiCache();
     setToken(null);
     setTokenState(null);
   }
