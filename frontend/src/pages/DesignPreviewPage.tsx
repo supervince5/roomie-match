@@ -1,3 +1,4 @@
+import Blossoms from "../components/Blossoms";
 import { Link } from "react-router";
 import Brand from "../components/Brand";
 import DiscoverPage from "./DiscoverPage";
@@ -44,6 +45,7 @@ const profiles = [
 export default function DesignPreviewPage() {
   return (
     <div className="app-shell">
+      <Blossoms quiet />
       <header className="app-header">
         <Brand />
         <span className="eyebrow">SAMPLE PROFILES · LOCAL PREVIEW</span>

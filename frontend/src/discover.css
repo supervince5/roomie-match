@@ -34,7 +34,7 @@
   border-color: transparent;
 }
 .discover-tools .icon-button:hover {
-  background: #e6edf2;
+  background: #fff0d9;
 }
 .discover-filter-button {
   display: flex;
@@ -42,10 +42,10 @@
   gap: 9px;
   min-height: 38px;
   padding: 0 15px;
-  border: 1px solid #bfcfc7;
+  border: 1px solid #d0c7be;
   border-radius: 7px;
-  color: #36535e;
-  background: #e6edf2;
+  color: #684c43;
+  background: #fff0d9;
   font-size: 12px;
   cursor: pointer;
 }
@@ -55,8 +55,8 @@
   min-width: 19px;
   height: 19px;
   border-radius: 50%;
-  background: #36535e;
-  color: #fcfbfd;
+  background: #684c43;
+  color: #fffdf5;
   font-size: 10px;
 }
 .discover-page .discover-grid {
@@ -70,7 +70,7 @@
 }
 .discover-page .profile-card {
   grid-template-columns: minmax(250px, 0.94fr) minmax(0, 1.06fr);
-  box-shadow: 0 18px 55px #36535e08;
+  box-shadow: 0 18px 55px #684c4308;
   border-radius: 12px;
 }
 .discover-page .profile-card__photo-area {
@@ -156,7 +156,7 @@
 .discover-placeholder {
   height: min(580px, 65vh);
   border-radius: 12px;
-  background: linear-gradient(100deg, #c7d6dc33, #fcfbfd55);
+  background: linear-gradient(100deg, #ffdbb033, #fffdf555);
 }
 .discover-note-slot {
   position: absolute;
@@ -193,14 +193,14 @@
   width: min(680px, calc(100vw - 32px));
   max-height: min(90dvh, 860px);
   padding: 0;
-  border: 1px solid #d5ddd2;
+  border: 1px solid #ded8d1;
   border-radius: 16px;
-  color: #36535e;
-  background: #f1eff4;
-  box-shadow: 0 30px 100px #20373533;
+  color: #684c43;
+  background: #fffad3;
+  box-shadow: 0 30px 100px #372c2033;
 }
 .discover-filters-dialog::backdrop {
-  background: #30474450;
+  background: #473c3050;
   backdrop-filter: blur(7px);
 }
 .discover-filter-heading {
@@ -225,7 +225,7 @@
 }
 .discover-filter-heading p:last-child {
   font-size: 12px;
-  color: #657483;
+  color: #7e6a60;
   margin: 0;
 }
 .discover-filter-heading .icon-button {
@@ -256,7 +256,7 @@
 .discover-filters-dialog select {
   font-size: 12px;
   padding: 10px 12px;
-  background: #fcfbfd;
+  background: #fffdf5;
 }
 .discover-filter-actions {
   display: flex;
@@ -266,8 +266,8 @@
   padding: 20px 30px;
   position: sticky;
   bottom: 0;
-  background: #f1eff4f5;
-  border-top: 1px solid #d5ddd2;
+  background: #fffad3f5;
+  border-top: 1px solid #ded8d1;
 }
 .discover-filter-actions .text-link {
   margin-right: auto;
@@ -282,7 +282,7 @@
   font-size: 12px;
 }
 .filter-error {
-  color: #914659;
+  color: #a1404b;
   margin: 0 30px 15px;
   font-size: 12px;
 }
@@ -391,9 +391,9 @@
 
 .discover-page .avatar-caption { display: none; }
 .discover-page .match-banner {
-  background: #e6edf2;
-  border: 1px solid #c7d6dc;
+  background: #fff0d9;
+  border: 1px solid #ffdbb0;
   box-shadow: none;
-  color: #36535e;
+  color: #684c43;
 }
-.discover-page .match-banner a { color: #36535e; }
+.discover-page .match-banner a { color: #684c43; }

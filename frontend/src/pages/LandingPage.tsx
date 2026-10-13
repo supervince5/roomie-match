@@ -1,6 +1,7 @@
 import { ArrowRight, Pause, Play } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
+import Blossoms from "../components/Blossoms";
 import BrandMark from "../components/BrandMark";
 import CampusMarquee from "../components/CampusMarquee";
 import { SwipePreview, ScrollPreview } from "../components/LandingDemos";
@@ -11,12 +12,7 @@ export default function LandingPage() {
 
   return (
     <main className={`minimal-landing ${paused ? "is-paused" : ""}`}>
-      <div className="pond-atmosphere" aria-hidden="true">
-        <div className="pond-painting" />
-        <i className="pond-ripple pond-ripple--one" />
-        <i className="pond-ripple pond-ripple--two" />
-        <i className="pond-ripple pond-ripple--three" />
-      </div>
+      <Blossoms paused={paused} />
 
       <header className="minimal-topbar">
         <Link className="minimal-monogram" to="/" aria-label="RoomieMatch home">

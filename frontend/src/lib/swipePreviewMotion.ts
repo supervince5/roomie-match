@@ -20,6 +20,8 @@ export type SwipeMotion = {
   selected: number;
   dragBase: CardPose;
   distance: number;
+  dragIntent: number;
+  maxDistance: number;
 };
 const CYCLE = 9000;
 const HANDOFF = 5670;
@@ -76,6 +78,8 @@ export function createSwipeMotion(count: number): SwipeMotion {
     selected: 0,
     dragBase: { ...poses[0] },
     distance: 0,
+    dragIntent: 0,
+    maxDistance: 0,
   };
 }
 export function frontCard(m: SwipeMotion) {
@@ -142,22 +146,28 @@ function normalizeVisibleOrder(m: SwipeMotion) {
   m.selected = front;
 }
 export function beginSwipeDrag(m: SwipeMotion) {
-  if (m.mode !== "auto") return false;
+  if (m.mode !== "auto" && m.mode !== "settle") return false;
   normalizeVisibleOrder(m);
   m.mode = "drag";
   m.dragBase = { ...m.poses[m.selected] };
   m.distance = 0;
+  m.dragIntent = 0;
+  m.maxDistance = 0;
   return true;
 }
 export function moveSwipeDrag(m: SwipeMotion, distance: number) {
   if (m.mode !== "drag") return;
   m.distance = distance;
+  m.maxDistance = Math.max(m.maxDistance, Math.abs(distance));
+  // Latch the gesture as soon as it crosses the threshold. Releasing with a
+  // slight rebound must not turn a completed flick into a cancelled drag.
+  if (Math.abs(distance) >= 12) m.dragIntent = distance < 0 ? -1 : 1;
   const base = m.dragBase;
   m.poses[m.selected] = {
     ...base,
     x: base.x + distance,
     angle: base.angle + distance / 16,
-    badge: clamp(Math.abs(distance) / 55),
+    badge: clamp(Math.abs(distance) / 6),
     direction: distance < 0 ? -1 : 1,
   };
 }
@@ -183,10 +193,26 @@ export function triggerSwipe(
   m.mode = "out";
   m.elapsed = 0;
   m.duration = reduced ? 0 : 750;
+  // Confirm immediately, even when pointer-up follows the first movement.
+  m.poses[m.selected] = {
+    ...m.poses[m.selected],
+    badge: 1,
+    direction: m.direction,
+  };
   m.from = clone(m.poses);
   // Width is sampled by advanceSwipe; finish synchronously for reduced motion.
   if (reduced) advanceSwipe(m, 0, width, false);
   return true;
+}
+export function releaseSwipeDrag(m: SwipeMotion, width: number, reduced = false, allowClick = true) {
+  if (m.mode !== "drag") return null;
+  const direction = m.dragIntent || (allowClick && m.maxDistance <= 5 ? 1 : 0);
+  if (!direction) {
+    cancelSwipeDrag(m, reduced);
+    return null;
+  }
+  triggerSwipe(m, direction, width, reduced);
+  return direction;
 }
 export function cancelSwipeDrag(m: SwipeMotion, reduced = false) {
   if (m.mode === "drag") settle(m, reduced ? 0 : 450);
@@ -214,7 +240,7 @@ export function advanceSwipe(
       y: -width * 0.165,
       angle: m.direction * 22,
       opacity: 0,
-      badge: 0,
+      badge: 1,
       direction: m.direction,
     };
     m.poses[m.selected] = blend(
@@ -231,7 +257,9 @@ export function advanceSwipe(
   } else {
     const target = resting(m.order);
     const progress = ease(m.duration ? m.elapsed / m.duration : 1);
-    m.poses = m.from.map((pose, id) => blend(pose, target[id], progress));
+    m.poses = m.from.map((pose, id) =>
+      blend(pose, { ...target[id], direction: pose.direction }, progress),
+    );
     if (m.elapsed >= m.duration) {
       m.poses = target;
       m.mode = "auto";

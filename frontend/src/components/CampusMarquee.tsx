@@ -13,9 +13,9 @@ export default function CampusMarquee() {
     <div
       className="campus-marquee"
       role="group"
-      aria-label="Users from these campuses"
+      aria-label="Explore roomies from these campuses"
     >
-      <p>users from:</p>
+      <p>explore roomies from:</p>
       <div className="campus-marquee__window">
         <div className="campus-marquee__track">
           {[0, 1].map((copy) => (

@@ -7,6 +7,7 @@ import {
   createSwipeMotion,
   frontCard,
   moveSwipeDrag,
+  releaseSwipeDrag,
   swipeFrame,
   triggerSwipe,
 } from "../src/lib/swipePreviewMotion.ts";
@@ -116,4 +117,78 @@ test("reduced motion completes a manual swipe without an animated interval", () 
   triggerSwipe(m, -1, 220, true);
   assert.equal(m.mode, "auto");
   assert.deepEqual(m.order, [1, 2, 3, 4, 5, 0]);
+});
+
+for (const direction of [-1, 1]) {
+  test(`quick ${direction > 0 ? "like" : "pass"} shows feedback before release and commits without waiting`, () => {
+    const m = createSwipeMotion(6);
+    beginSwipeDrag(m);
+    moveSwipeDrag(m, direction * 6);
+    assert.equal(m.poses[0].badge, 1);
+    assert.equal(m.poses[0].direction, direction);
+    // No elapsed time between starting, moving, and releasing the gesture.
+    moveSwipeDrag(m, direction * 12);
+    assert.equal(releaseSwipeDrag(m, 220), direction);
+    assert.equal(m.mode, "out");
+    assert.equal(m.poses[0].badge, 1);
+    advanceSwipe(m, 16, 220, false);
+    assert.equal(m.poses[0].badge, 1);
+    assert.equal(m.poses[0].direction, direction);
+    advanceSwipe(m, 734, 220, false);
+    assert.equal(m.order.at(-1), 0);
+    assert.equal(m.mode, "settle");
+  });
+}
+
+test("a cancelled left drag keeps its X until the badge has faded away", () => {
+  const m = createSwipeMotion(6);
+  beginSwipeDrag(m);
+  moveSwipeDrag(m, -8);
+  cancelSwipeDrag(m);
+  for (let t = 0; t < 450; t += 10) {
+    if (m.poses[0].badge > 0) assert.equal(m.poses[0].direction, -1);
+    advanceSwipe(m, 10, 220, false);
+  }
+  assert.equal(m.poses[0].badge, 0);
+  assert.equal(m.poses[0].x, 0);
+  assert.deepEqual(m.order, [0, 1, 2, 3, 4, 5]);
+});
+test("the next card can be grabbed during the gentle return animation", () => {
+  const m = createSwipeMotion(6);
+  beginSwipeDrag(m);
+  moveSwipeDrag(m, 12);
+  triggerSwipe(m, 1, 220);
+  advanceSwipe(m, 16, 220, false);
+  assert.equal(m.duration, 750);
+  advanceSwipe(m, 734, 220, false);
+  assert.equal(m.duration, 1100);
+  const before = swipeFrame(m).poses;
+  assert.equal(beginSwipeDrag(m), true);
+  assert.equal(m.selected, 1);
+  assertSamePicture(before, m.poses);
+});
+
+for (const direction of [-1, 1]) {
+  test(`a quick ${direction > 0 ? "right" : "left"} flick remains committed after release rebounds`, () => {
+    const m = createSwipeMotion(6);
+    beginSwipeDrag(m);
+    moveSwipeDrag(m, direction * 18);
+    moveSwipeDrag(m, direction * 7);
+    // Mouse-up reports near the origin. No waiting or animation ticks.
+    moveSwipeDrag(m, direction * 2);
+    assert.equal(releaseSwipeDrag(m, 220), direction);
+    assert.equal(m.mode, "out");
+    assert.equal(m.elapsed, 0);
+    assert.equal(m.poses[0].direction, direction);
+    assert.equal(m.duration, 750);
+  });
+}
+test("a subthreshold drag is cancelled rather than mistaken for a click", () => {
+  const m = createSwipeMotion(6);
+  beginSwipeDrag(m);
+  moveSwipeDrag(m, -8);
+  moveSwipeDrag(m, 0);
+  assert.equal(releaseSwipeDrag(m, 220), null);
+  assert.equal(m.mode, "settle");
+  assert.deepEqual(m.order, [0, 1, 2, 3, 4, 5]);
 });

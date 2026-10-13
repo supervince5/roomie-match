@@ -1,3 +1,4 @@
+import Blossoms from "./Blossoms";
 import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router";
 import { prefetch } from "../lib/useApi";
@@ -16,6 +17,7 @@ export default function AppLayout() {
   }, [pathname]);
   return (
     <div className="app-shell">
+      <Blossoms quiet />
       <a className="skip-link" href="#app-content">
         Skip to content
       </a>

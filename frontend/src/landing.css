@@ -17,9 +17,9 @@ body:has(.minimal-landing) #root {
   height: 100dvh;
   overflow: hidden;
   background:
-    radial-gradient(ellipse at 16% 58%, #c7d6dc22, transparent 31%),
-    radial-gradient(ellipse at 84% 45%, #ded1e731, transparent 28%), #f1eff4;
-  color: #36535e;
+    radial-gradient(ellipse at 16% 58%, #ffdbb022, transparent 31%),
+    radial-gradient(ellipse at 84% 45%, #ffccb831, transparent 28%), #fffad3;
+  color: #684c43;
 }
 .minimal-topbar {
   position: absolute;
@@ -45,7 +45,7 @@ body:has(.minimal-landing) #root {
   text-decoration: none;
 }
 .minimal-login:hover {
-  color: #735780;
+  color: #91454d;
 }
 .minimal-center {
   position: absolute;
@@ -59,7 +59,7 @@ body:has(.minimal-landing) #root {
 }
 .minimal-kicker {
   margin: 0 0 13px;
-  color: #657483;
+  color: #7e6a60;
   font-size: 10px;
   letter-spacing: 0.19em;
 }
@@ -73,10 +73,10 @@ body:has(.minimal-landing) #root {
   white-space: nowrap;
 }
 .minimal-center h1 > span:first-child {
-  color: #8a6b98;
+  color: #ab565c;
 }
 .minimal-center h1 .wordmark-dot {
-  color: #8a6b98;
+  color: #ab565c;
 }
 .minimal-cta {
   display: inline-flex;
@@ -85,10 +85,10 @@ body:has(.minimal-landing) #root {
   gap: 27px;
   min-height: 48px;
   padding: 0 24px;
-  border: 1px solid #36535e;
+  border: 1px solid #684c43;
   border-radius: 5px;
-  background: #36535e;
-  color: #fcfbfd;
+  background: #684c43;
+  color: #fffdf5;
   text-decoration: none;
   font-size: 12px;
   transition:
@@ -96,7 +96,7 @@ body:has(.minimal-landing) #root {
     transform 0.2s;
 }
 .minimal-cta:hover {
-  background: #293f50;
+  background: #4f3934;
   transform: translateY(-2px);
 }
 .minimal-cta svg {
@@ -128,15 +128,15 @@ body:has(.minimal-landing) #root {
 .demo-card {
   position: absolute;
   inset: 0;
-  border: 1px solid #d7dcd0;
-  background: #fcfbfd;
+  border: 1px solid #ddd6cf;
+  background: #fffdf5;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 8px 25px #36535e07;
+  box-shadow: 0 8px 25px #684c4307;
 }
 .demo-card--back {
   transform: translate(-12px, 9px) rotate(-7deg);
-  background: #e6edf2;
+  background: #fff0d9;
 }
 .demo-card--under {
   transform: translate(5px, 3px) rotate(4deg);
@@ -149,10 +149,10 @@ body:has(.minimal-landing) #root {
   place-items: center;
 }
 .demo-portrait--peach {
-  background: #ded1e7;
+  background: #ffccb8;
 }
 .demo-portrait--sage {
-  background: #c7d6dc;
+  background: #ffdbb0;
 }
 .demo-portrait > span {
   position: relative;
@@ -160,11 +160,11 @@ body:has(.minimal-landing) #root {
   font-family: "Noto Serif JP", Georgia, serif;
   font-size: clamp(58px, 6vw, 95px);
   font-weight: 400;
-  color: #8e779c8c;
+  color: #9c7f778c;
   transform: translateY(-5px);
 }
 .demo-portrait--sage > span {
-  color: #6d9285a3;
+  color: #94806ba3;
 }
 .demo-portrait > i {
   position: absolute;
@@ -191,7 +191,7 @@ body:has(.minimal-landing) #root {
 }
 .demo-card-copy > span {
   font-size: 8px;
-  color: #859088;
+  color: #9d8b78;
   white-space: nowrap;
 }
 .demo-swipe-feedback {
@@ -204,8 +204,8 @@ body:has(.minimal-landing) #root {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #fcfbfdd9;
-  color: #8b729a;
+  background: #fffdf5d9;
+  color: #9a7a72;
 }
 .demo-caption {
   margin: 25px 0 0;
@@ -214,7 +214,7 @@ body:has(.minimal-landing) #root {
   justify-content: center;
   gap: 8px;
   font-size: 10px;
-  color: #8a958a;
+  color: #a1907e;
   letter-spacing: 0.035em;
 }
 .demo-feed-window {
@@ -236,8 +236,8 @@ body:has(.minimal-landing) #root {
   gap: 11px;
   min-height: 78px;
   padding: 13px;
-  background: #fcfbfd;
-  border: 1px solid #d9dfd5;
+  background: #fffdf5;
+  border: 1px solid #e0dad4;
   border-radius: 8px;
 }
 .demo-feed-avatar {
@@ -249,17 +249,17 @@ body:has(.minimal-landing) #root {
   border-radius: 5px;
   font-family: "Noto Serif JP", Georgia, serif;
   font-size: 24px;
-  color: #7d6e86;
+  color: #8e6f66;
 }
 .demo-feed-avatar--peach {
-  background: #ded1e7;
+  background: #ffccb8;
 }
 .demo-feed-avatar--sage {
-  background: #c7d6dc;
-  color: #638178;
+  background: #ffdbb0;
+  color: #847260;
 }
 .demo-feed-avatar--rose {
-  background: #c9bddb;
+  background: #ffb1b1;
 }
 .demo-feed-person > div {
   display: flex;
@@ -276,11 +276,11 @@ body:has(.minimal-landing) #root {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 8px;
-  color: #849086;
+  color: #9d8a77;
   white-space: nowrap;
 }
 .demo-feed-person > svg {
-  color: #b4bdae;
+  color: #c1b6aa;
   margin-left: auto;
   flex-shrink: 0;
 }
@@ -300,7 +300,7 @@ body:has(.minimal-landing) #root {
   width: 6px;
   height: 11px;
   opacity: 0.5;
-  background: #bca2cc55;
+  background: #ccaba255;
 }
 .minimal-footnote {
   position: absolute;
@@ -308,7 +308,7 @@ body:has(.minimal-landing) #root {
   left: 42px;
   font-family: "Noto Serif JP", Georgia, serif;
   font-size: 11px;
-  color: #8c978a;
+  color: #a2917f;
 }
 .minimal-motion {
   position: absolute;
@@ -321,7 +321,7 @@ body:has(.minimal-landing) #root {
   border: 0;
   background: transparent;
   padding: 10px;
-  color: #7a887c;
+  color: #95816d;
   font-size: 9px;
   cursor: pointer;
 }
@@ -576,7 +576,7 @@ body:has(.minimal-landing) #root {
 }
 .campus-marquee > p {
   margin: 0 0 16px;
-  color: #75817a;
+  color: #8f7b67;
   font-size: 9px;
   letter-spacing: 0.11em;
 }
@@ -606,7 +606,7 @@ body:has(.minimal-landing) #root {
   align-items: center;
   gap: 9px;
   padding-right: 35px;
-  color: #63736e;
+  color: #7c6b5a;
   font-family: Georgia, serif;
   font-size: 15px;
   white-space: nowrap;
@@ -674,7 +674,7 @@ body:has(.minimal-landing) #root {
   cursor: grabbing;
 }
 .demo-deck--interactive:focus-visible {
-  outline: 2px solid #8a6b98;
+  outline: 2px solid #ab565c;
   outline-offset: 8px;
   border-radius: 10px;
 }
@@ -685,8 +685,18 @@ body:has(.minimal-landing) #root {
   animation: none;
   backface-visibility: hidden;
 }
+/* The visible front card remains a hit target outside the resting deck box. */
+.demo-card--stacked:not([aria-hidden="true"]) {
+  pointer-events: auto;
+  touch-action: none;
+}
+.landing-swipe-demo:has(.demo-deck--interactive:hover),
+.landing-swipe-demo:has(.demo-deck--interactive:focus-visible),
+.landing-swipe-demo:has(.demo-deck--interactive.is-dragging) {
+  z-index: 6;
+}
 .demo-portrait--rose {
-  background: #c9bddb;
+  background: #ffb1b1;
 }
 .demo-feed-window--interactive {
   overflow-y: auto;
@@ -698,6 +708,6 @@ body:has(.minimal-landing) #root {
   display: none;
 }
 .demo-feed-window--interactive:focus-visible {
-  outline: 2px solid #8a6b98;
+  outline: 2px solid #ab565c;
   outline-offset: 5px;
 }

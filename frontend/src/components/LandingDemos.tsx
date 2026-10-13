@@ -10,13 +10,15 @@ import {
 import {
   advanceSwipe,
   beginSwipeDrag,
-  cancelSwipeDrag,
   createSwipeMotion,
   frontCard,
   moveSwipeDrag,
+  releaseSwipeDrag,
   swipeFrame,
   triggerSwipe,
 } from "../lib/swipePreviewMotion";
+
+import { trackSwipePointer } from "../lib/swipePointerSession";
 
 const people = [
   { name: "Mina", initial: "m", habit: "early mornings", tone: "peach" },
@@ -90,7 +92,8 @@ export function SwipePreview({ paused }: { paused: boolean }) {
     swipeFrame(createSwipeMotion(people.length)),
   );
   const [announcement, setAnnouncement] = useState("");
-  const pointerStart = useRef<number | null>(null);
+  const stopPointer = useRef<(() => void) | null>(null);
+  useEffect(() => () => stopPointer.current?.(), []);
   const width = () => deckRef.current?.clientWidth ?? 220;
   const reduced = () =>
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -119,18 +122,6 @@ export function SwipePreview({ paused }: { paused: boolean }) {
       publish();
     }
   }
-  function finish(event: PointerEvent<HTMLDivElement>, cancelled = false) {
-    if (pointerStart.current === null) return;
-    pointerStart.current = null;
-    const distance = motion.current.distance;
-    if (cancelled || (Math.abs(distance) > 5 && Math.abs(distance) < 35)) {
-      cancelSwipeDrag(motion.current, reduced());
-      publish();
-    } else swipe(distance < -5 ? -1 : 1);
-    idle.release();
-    if (event.currentTarget.hasPointerCapture(event.pointerId))
-      event.currentTarget.releasePointerCapture(event.pointerId);
-  }
   return (
     <div
       className="landing-swipe-demo"
@@ -158,30 +149,44 @@ export function SwipePreview({ paused }: { paused: boolean }) {
             !beginSwipeDrag(motion.current)
           )
             return;
-          pointerStart.current = event.clientX;
+          event.preventDefault();
+          stopPointer.current?.();
+          const deck = event.currentTarget;
+          const pointerId = event.pointerId;
+          const person = people[frontCard(motion.current)];
+          // Listen at the document, not just the animated card. Losing capture
+          // must not cancel a swipe when the cursor leaves the stack.
+          stopPointer.current = trackSwipePointer({
+            target: document,
+            blurTarget: window,
+            pointerId,
+            originX: event.clientX,
+            onMove: (distance) => {
+              moveSwipeDrag(motion.current, distance);
+              publish();
+            },
+            onEnd: (interrupted) => {
+              stopPointer.current = null;
+              const direction = releaseSwipeDrag(
+                motion.current, width(), reduced(), !interrupted,
+              );
+              if (direction !== null)
+                setAnnouncement(`${direction > 0 ? "Liked" : "Passed"} ${person.name}. Moving this sample to the bottom.`);
+              publish();
+              idle.release();
+              if (deck.hasPointerCapture(pointerId)) deck.releasePointerCapture(pointerId);
+            },
+          });
           idle.hold();
           publish();
-          event.currentTarget.setPointerCapture(event.pointerId);
+          event.currentTarget.setPointerCapture(pointerId);
         }}
-        onPointerMove={(event) => {
-          if (pointerStart.current === null) return;
-          moveSwipeDrag(motion.current, event.clientX - pointerStart.current);
-          publish();
-        }}
-        onPointerUp={(event) => finish(event)}
-        onPointerCancel={(event) => finish(event, true)}
-        onLostPointerCapture={() => {
-          if (pointerStart.current === null) return;
-          pointerStart.current = null;
-          cancelSwipeDrag(motion.current, reduced());
-          idle.release();
-          publish();
-        }}
+        onDragStart={(event) => event.preventDefault()}
         onKeyDown={(event) => {
-          if (["ArrowLeft", "ArrowRight", "Enter", " "].includes(event.key)) {
+          if (["Enter", " "].includes(event.key) && !event.repeat) {
             event.preventDefault();
             idle.focus();
-            swipe(event.key === "ArrowLeft" ? -1 : 1);
+            swipe(1);
           }
         }}
       >
@@ -219,8 +224,8 @@ export function SwipePreview({ paused }: { paused: boolean }) {
         <MoveHorizontal size={15} /> try a swipe.
       </span>
       <span id="swipe-preview-help" className="sr-only">
-        Interactive sample only. Drag left to pass, right to like, or use the
-        arrow keys. Click for the next profile. Cards return to the bottom; no
+        Interactive sample only. Drag left to pass or right to like.
+        Click for the next profile. Cards return to the bottom; no
         real likes are sent.
       </span>
       <span className="sr-only" role="status">
