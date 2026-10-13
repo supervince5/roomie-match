@@ -36,9 +36,7 @@ export default function ProfileCard({ profile, animation = null }: Props) {
           />
         ) : (
           <>
-            <span className="avatar-flower" aria-hidden="true">
-              ✳
-            </span>
+            <span className="avatar-doorway" aria-hidden="true" />
             <span className="profile-card__initial" aria-hidden="true">
               {profile.name.charAt(0).toUpperCase()}
             </span>

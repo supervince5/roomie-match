@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router";
 import { prefetch } from "../lib/useApi";
 import BottomNavigation from "./BottomNavigation";
 import Brand from "./Brand";
+import BrandMark from "./BrandMark";
 export default function AppLayout() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function AppLayout() {
       <footer className="app-footer">
         <span>ROOMIEMATCH</span>
         <p>A thoughtful start to living together.</p>
-        <span>✳</span>
+        <BrandMark />
       </footer>
     </div>
   );

@@ -17,8 +17,8 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             <br />A better roommate connection begins here.
           </p>
           <img
-            src="/images/campus-editorial.png"
-            alt="An illustrated collection of university architecture"
+            src="/images/water-lilies.png"
+            alt="A softly painted water-lily pond in lilac and blue"
           />
         </div>
         <small>Good company makes all the difference.</small>

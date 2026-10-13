@@ -1,4 +1,3 @@
-import CompatibilityPanel from "../components/CompatibilityPanel";
 import SwipeSurface from "../components/SwipeSurface";
 import InviteButton from "../components/InviteButton";
 import {
@@ -9,6 +8,8 @@ import {
   Search,
   SlidersHorizontal,
   X,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
@@ -16,6 +17,13 @@ import FormErrors from "../components/FormErrors";
 import ProfileCard, { InstagramLink } from "../components/ProfileCard";
 import SchoolPicker, { type SchoolOption } from "../components/SchoolPicker";
 import { ApiError, apiRequest } from "../lib/api";
+import { useAuth } from "../auth/authContext";
+import {
+  pickDiscoverNote,
+  type DiscoverFeedbackKind,
+} from "../lib/discoverFeedback";
+import { useDiscoverSound } from "../lib/useDiscoverSound";
+import "../discover.css";
 import {
   invalidateApiCache,
   readApiCache,
@@ -66,13 +74,6 @@ const NO_FILTERS: Filters = {
 
 const THIS_YEAR = new Date().getFullYear();
 const CLASS_YEARS = Array.from({ length: 8 }, (_, i) => THIS_YEAR + i);
-const TYPED_FILTERS: (keyof Filters)[] = [
-  "major",
-  "minAge",
-  "maxAge",
-  "maxBudget",
-];
-
 function toQueryString(filters: Filters, cursor?: string) {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(filters)) {
@@ -110,16 +111,105 @@ function asApiError(caught: unknown) {
     : new ApiError(0, "Something went wrong.");
 }
 
-function DiscoverPage() {
-  // `draft` is what the filter boxes show; `filters` is what's actually been searched.
-  // Typed filters wait until you pause typing, so we don't search on every keystroke.
-  const [filters, setFilters] = useState<Filters>(NO_FILTERS);
-  const [draft, setDraft] = useState<Filters>(NO_FILTERS);
-  const [filterSchool, setFilterSchool] = useState<SchoolOption | null>(null);
-  const typingTimer = useRef<number | undefined>(undefined);
-  const [showFilters, setShowFilters] = useState(
-    () => window.matchMedia("(min-width: 960px)").matches,
+function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
+  const { userId } = useAuth();
+  const preview = import.meta.env.DEV && previewProfiles !== undefined;
+  const preferenceKey = `roomie.discover.preferences.${preview ? "design-preview-v2" : userId}`;
+  const [initial] = useState(() => {
+    try {
+      const raw = localStorage.getItem(preferenceKey);
+      if (!raw) return null;
+      const stored = JSON.parse(raw);
+      const filters = { ...NO_FILTERS };
+      for (const key of Object.keys(filters) as (keyof Filters)[]) {
+        if (typeof stored.filters?.[key] === "string")
+          filters[key] = stored.filters[key];
+      }
+      const school =
+        typeof stored.school?.id === "number" &&
+        typeof stored.school?.name === "string"
+          ? (stored.school as SchoolOption)
+          : null;
+      return { filters, school };
+    } catch {
+      return null;
+    }
+  });
+  const [filters, setFilters] = useState<Filters>(
+    initial?.filters ?? NO_FILTERS,
   );
+  const [draft, setDraft] = useState<Filters>(initial?.filters ?? NO_FILTERS);
+  const [filterSchool, setFilterSchool] = useState<SchoolOption | null>(
+    initial?.school ?? null,
+  );
+  const [appliedSchool, setAppliedSchool] = useState<SchoolOption | null>(
+    initial?.school ?? null,
+  );
+  const [ready, setReady] = useState(initial !== null);
+  const [showFilters, setShowFilters] = useState(initial === null);
+  const [filterError, setFilterError] = useState("");
+  const filterDialog = useRef<HTMLDialogElement>(null);
+  const sound = useDiscoverSound();
+  const [note, setNote] = useState<{
+    text: string;
+    kind: DiscoverFeedbackKind;
+    id: number;
+  } | null>(null);
+  const noteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastNote = useRef("");
+  useEffect(
+    () => () => {
+      if (noteTimer.current) clearTimeout(noteTimer.current);
+    },
+    [],
+  );
+  useEffect(() => {
+    const dialog = filterDialog.current;
+    if (!dialog) return;
+    if (showFilters && !dialog.open) dialog.showModal();
+    else if (!showFilters && dialog.open) dialog.close();
+  }, [showFilters]);
+  function remember(next: Filters, school: SchoolOption | null) {
+    try {
+      localStorage.setItem(
+        preferenceKey,
+        JSON.stringify({ filters: next, school }),
+      );
+    } catch {
+      /* Keep working without storage. */
+    }
+  }
+  function closeFilters() {
+    setDraft(filters);
+    setFilterSchool(appliedSchool);
+    setFilterError("");
+    remember(filters, appliedSchool);
+    setReady(true);
+    setShowFilters(false);
+  }
+  function applyFilters() {
+    if (
+      draft.minAge &&
+      draft.maxAge &&
+      Number(draft.minAge) > Number(draft.maxAge)
+    ) {
+      setFilterError("Minimum age must be no greater than maximum age.");
+      return;
+    }
+    setFilters(draft);
+    setAppliedSchool(filterSchool);
+    remember(draft, filterSchool);
+    setFilterError("");
+    setReady(true);
+    setShowFilters(false);
+  }
+  function showNote(kind: DiscoverFeedbackKind) {
+    const text = pickDiscoverNote(kind, lastNote.current);
+    lastNote.current = text;
+    if (noteTimer.current) clearTimeout(noteTimer.current);
+    setNote({ text, kind, id: Date.now() });
+    noteTimer.current = setTimeout(() => setNote(null), 3300);
+  }
   const [version, setVersion] = useState(0); // bump to refresh
   const [feed, setFeed] = useState<Feed | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -131,11 +221,24 @@ function DiscoverPage() {
   const feedKey = toQueryString(filters) + "#" + version;
   const path = "/discover" + toQueryString(filters);
   useEffect(() => {
+    if (!ready) return;
     let cancelled = false;
     activeFeedKey.current = feedKey;
-    apiRequest<DiscoverResponse>(path).then(
+    const request = preview
+      ? Promise.resolve({
+          school: { id: 1, name: "Sample university" },
+          profiles: (previewProfiles ?? []).filter(
+            (p) =>
+              (!filters.major ||
+                p.major.toLowerCase().includes(filters.major.toLowerCase())) &&
+              (!filters.maxBudget || p.budget.min <= Number(filters.maxBudget)),
+          ),
+          nextCursor: null,
+        })
+      : apiRequest<DiscoverResponse>(path);
+    request.then(
       (data) => {
-        writeApiCache(path, data);
+        if (!preview) writeApiCache(path, data);
         if (!cancelled)
           setFeed({
             key: feedKey,
@@ -158,10 +261,10 @@ function DiscoverPage() {
     return () => {
       cancelled = true;
     };
-  }, [feedKey, path]);
+  }, [feedKey, path, ready, preview, previewProfiles, filters]);
 
   // Show the remembered deck instantly while the fresh one loads
-  const remembered = readApiCache<DiscoverResponse>(path);
+  const remembered = preview ? undefined : readApiCache<DiscoverResponse>(path);
   const current: Feed | null =
     feed?.key === feedKey
       ? feed
@@ -200,6 +303,8 @@ function DiscoverPage() {
       });
     } catch (caught) {
       setSwipeError(caught);
+      if (noteTimer.current) clearTimeout(noteTimer.current);
+      setNote(null);
     } finally {
       loadingMoreRef.current = false;
       setLoadingMore(false);
@@ -223,26 +328,18 @@ function DiscoverPage() {
   ).length;
 
   function updateFilter(key: keyof Filters, value: string) {
-    const next = { ...draft, [key]: value };
-    setDraft(next);
-    window.clearTimeout(typingTimer.current);
-    if (TYPED_FILTERS.includes(key)) {
-      typingTimer.current = window.setTimeout(() => setFilters(next), 450);
-    } else {
-      setFilters(next);
-    }
+    setDraft((current) => ({ ...current, [key]: value }));
   }
-
   function pickSchool(school: SchoolOption | null) {
     setFilterSchool(school);
     updateFilter("schoolId", school === null ? "" : String(school.id));
   }
-
   function clearFilters() {
-    window.clearTimeout(typingTimer.current);
     setFilterSchool(null);
+    setAppliedSchool(null);
     setDraft(NO_FILTERS);
     setFilters(NO_FILTERS);
+    remember(NO_FILTERS, null);
   }
 
   async function handleDecision(action: SwipeAction) {
@@ -251,34 +348,54 @@ function DiscoverPage() {
     }
     decisionInFlight.current = true;
     setSwipeError(null);
+    sound.prime();
     setAnimation(action);
+    showNote(action);
+    if (action === "pass") void sound.play("pass");
     try {
       const [result] = await Promise.all([
-        apiRequest<{ matched: boolean; match?: Profile }>("/swipes", {
-          method: "POST",
-          body: { targetId: currentProfile.id, direction: action },
-        }),
-        new Promise<void>((resolve) => window.setTimeout(resolve, 280)),
+        preview
+          ? Promise.resolve({
+              matched: action === "like" && currentProfile.id === "preview-2",
+              match: currentProfile,
+            })
+          : apiRequest<{ matched: boolean; match?: Profile }>("/swipes", {
+              method: "POST",
+              body: { targetId: currentProfile.id, direction: action },
+            }),
+        new Promise<void>((resolve) =>
+          window.setTimeout(
+            resolve,
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+              ? 0
+              : 520,
+          ),
+        ),
       ]);
       const swipedId = currentProfile.id;
-      invalidateApiCache("/swipes"); // history changed
+      if (!preview) invalidateApiCache("/swipes"); // history changed
       // Keep the remembered deck in sync, so they don't reappear next time you open Discover
-      updateApiCache<DiscoverResponse>(path, (deckData) => ({
-        ...deckData,
-        profiles: deckData.profiles.filter((p) => p.id !== swipedId),
-      }));
+      if (!preview)
+        updateApiCache<DiscoverResponse>(path, (deckData) => ({
+          ...deckData,
+          profiles: deckData.profiles.filter((p) => p.id !== swipedId),
+        }));
       if (result.matched) {
         // The match version of their profile includes their Instagram
         const matched = result.match ?? currentProfile;
         setNewMatch(matched);
+        void sound.play("match");
+        showNote("match");
         // Put them at the top of the remembered Matches list right away
-        updateApiCache<{ matches: MatchedProfile[] }>("/matches", (list) => ({
-          matches: [
-            { ...matched, matchedAt: new Date().toISOString() },
-            ...list.matches,
-          ],
-        }));
+        if (!preview)
+          updateApiCache<{ matches: MatchedProfile[] }>("/matches", (list) => ({
+            matches: [
+              { ...matched, matchedAt: new Date().toISOString() },
+              ...list.matches,
+            ],
+          }));
       }
+
       setLastDecision(
         action === "like"
           ? `You liked ${currentProfile.name}.`
@@ -290,6 +407,8 @@ function DiscoverPage() {
       }
     } catch (caught) {
       setSwipeError(caught);
+      if (noteTimer.current) clearTimeout(noteTimer.current);
+      setNote(null);
     } finally {
       decisionInFlight.current = false;
       setAnimation(null);
@@ -330,14 +449,16 @@ function DiscoverPage() {
   } else if (currentProfile) {
     content = (
       <>
-        <SwipeSurface
-          disabled={animation !== null}
-          onSwipe={handleDecision}
-          name={currentProfile.name}
-        >
-          <ProfileCard profile={currentProfile} animation={animation} />
-        </SwipeSurface>
-        <CompatibilityPanel profile={currentProfile} />
+        <div className="discover-card-entry" key={currentProfile.id}>
+          <SwipeSurface
+            disabled={animation !== null}
+            onSwipe={handleDecision}
+            name={currentProfile.name}
+            decision={animation}
+          >
+            <ProfileCard profile={currentProfile} />
+          </SwipeSurface>
+        </div>
         <FormErrors error={swipeError} />
         <div className="swipe-controls">
           <button
@@ -350,11 +471,6 @@ function DiscoverPage() {
             <X size={22} strokeWidth={1.8} />
             <span>Pass</span>
           </button>
-          <span className="swipe-hint">
-            {animation
-              ? "Saving your choice…"
-              : "Your next chapter starts here"}
-          </span>
           <button
             className="swipe-button swipe-button--like"
             type="button"
@@ -366,10 +482,6 @@ function DiscoverPage() {
             <span>Like</span>
           </button>
         </div>
-        <p className="swipe-help">
-          Scroll to explore · Drag left to pass, right to like · Or focus the
-          card and use ← / →
-        </p>
       </>
     );
   } else if (hasMore) {
@@ -394,7 +506,7 @@ function DiscoverPage() {
     content = (
       <section className="empty-state">
         <div className="empty-state__icon">
-          <Heart size={40} />
+          <Heart size={28} />
         </div>
         <h2>
           {activeFilterCount > 0
@@ -404,7 +516,7 @@ function DiscoverPage() {
         <p>
           {activeFilterCount > 0
             ? "Try loosening a filter or two."
-            : `You've seen everyone at ${current?.school?.name ?? "this school"} for now. Check back as more students join.`}
+            : "New people will appear here. Check back soon."}
         </p>
         <div className="empty-actions">
           {activeFilterCount > 0 ? (
@@ -435,49 +547,83 @@ function DiscoverPage() {
 
   return (
     <main className="page page--with-navigation discover-page">
-      <header className="page-header">
-        <div>
-          <p className="eyebrow">Roomie Match</p>
-          <h1>Find your kind of company.</h1>
-          <p className="page-subtitle">
-            A shared space starts with the little things you have in common.
-          </p>
-        </div>
-        <div className="page-header__actions">
+      <header className="discover-toolbar">
+        <h1>Discover</h1>
+        <div className="discover-tools">
+          <button
+            className="icon-button"
+            type="button"
+            onClick={sound.toggle}
+            aria-label={
+              sound.enabled ? "Mute swipe sounds" : "Enable swipe sounds"
+            }
+            aria-pressed={!sound.enabled}
+            title={sound.enabled ? "Sound on" : "Sound off"}
+          >
+            {sound.enabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+          </button>
           <Link className="icon-button" to="/search" aria-label="Search people">
-            <Search size={22} />
+            <Search size={18} />
           </Link>
           <Link
             className="icon-button"
             to="/history"
             aria-label="Swipe history"
           >
-            <History size={22} />
+            <History size={18} />
           </Link>
           <button
-            className="icon-button filter-button"
+            className="discover-filter-button"
             type="button"
-            aria-label="Filters"
+            aria-haspopup="dialog"
+            aria-controls="discover-filters"
             aria-expanded={showFilters}
-            onClick={() => setShowFilters(!showFilters)}
+            disabled={animation !== null}
+            onClick={() => setShowFilters(true)}
           >
-            <SlidersHorizontal size={22} />
-            {activeFilterCount > 0 && (
-              <span className="filter-button__count">{activeFilterCount}</span>
-            )}
+            <SlidersHorizontal size={17} /> Filters{" "}
+            {activeFilterCount > 0 && <span>{activeFilterCount}</span>}
           </button>
         </div>
       </header>
 
-      <div
-        className={`discover-grid ${showFilters ? "" : "discover-grid--no-filters"}`}
+      <dialog
+        ref={filterDialog}
+        id="discover-filters"
+        className="discover-filters-dialog"
+        aria-labelledby="discover-filter-title"
+        onCancel={(event) => {
+          event.preventDefault();
+          closeFilters();
+        }}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) closeFilters();
+        }}
       >
-        {showFilters && (
+        <div className="discover-filter-heading">
+          <div>
+            <p className="eyebrow">
+              {ready ? "YOUR PREFERENCES" : "BEFORE YOU MEET YOUR ROOMIE"}
+            </p>
+            <h2 id="discover-filter-title">Your kind of everyday.</h2>
+            <p>A few preferences, then it’s all about the people.</p>
+          </div>
+          <button
+            type="button"
+            className="icon-button"
+            aria-label="Close filters"
+            onClick={closeFilters}
+          >
+            <X size={19} />
+          </button>
+        </div>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            applyFilters();
+          }}
+        >
           <section className="filter-panel" aria-label="Filters">
-            <div className="filter-heading">
-              <SlidersHorizontal size={16} />
-              <h2>Your preferences</h2>
-            </div>
             <div className="field filter-panel__wide">
               <span>School</span>
               {filterSchool === null ? (
@@ -615,25 +761,39 @@ function DiscoverPage() {
                 ))}
               </select>
             </label>
-            {activeFilterCount > 0 && (
-              <button
-                className="small-button"
-                type="button"
-                onClick={clearFilters}
-              >
-                Clear all
-              </button>
-            )}
           </section>
-        )}
-
-        <div className="discover-main">
-          {current?.school && (
-            <p className="discover-school">
-              Showing students at {current.school.name}
+          {filterError && (
+            <p className="filter-error" role="alert">
+              {filterError}
             </p>
           )}
+          <div className="discover-filter-actions">
+            <button
+              className="text-link"
+              type="button"
+              onClick={() => {
+                setDraft(NO_FILTERS);
+                setFilterSchool(null);
+              }}
+            >
+              Reset
+            </button>
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={closeFilters}
+            >
+              {ready ? "Cancel" : "Skip for now"}
+            </button>
+            <button className="primary-button" type="submit">
+              Show people
+            </button>
+          </div>
+        </form>
+      </dialog>
 
+      <div className="discover-grid discover-grid--no-filters">
+        <div className="discover-main">
           {newMatch && (
             <section className="match-banner" role="status">
               {newMatch.photoUrl ? (
@@ -669,25 +829,23 @@ function DiscoverPage() {
             </section>
           )}
 
-          {lastDecision && !newMatch && (
-            <p className="decision-message" role="status">
-              {lastDecision}
-            </p>
-          )}
-
-          {content}
-          {!currentProfile && !loading && !error && (
-            <div className="empty-illustration">
-              <div>
-                <p className="eyebrow">MAKE ROOM FOR A NEW CHAPTER</p>
-                <h3>Good company is worth finding.</h3>
-                <p>
-                  Your next roomie may be just one introduction away. Invite
-                  someone from your campus to join.
-                </p>
-              </div>
-              <img src="/images/campus-editorial.png" alt="" />
-            </div>
+          <p className="sr-only" role="status">
+            {lastDecision}
+          </p>
+          <div className="discover-note-slot" aria-live="polite">
+            {note && (
+              <p
+                key={note.id}
+                className={`discover-note discover-note--${note.kind}`}
+              >
+                {note.text}
+              </p>
+            )}
+          </div>
+          {ready ? (
+            content
+          ) : (
+            <div className="discover-placeholder" aria-hidden="true" />
           )}
         </div>
       </div>

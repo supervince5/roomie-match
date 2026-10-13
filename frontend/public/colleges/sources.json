@@ -1,0 +1,12 @@
+{
+  "note": "Public institutional marks sourced from official university websites. The campus list and users-from caption are manually curated by the site owner, not derived from live signup data. No institutional affiliation is claimed.",
+  "assets": {
+    "harvard.png": "https://www.harvard.edu/wp-content/uploads/2020/10/cropped-logo-branding-compressed.png?w=192",
+    "stanford.png": "https://www.stanford.edu/icon1.png",
+    "mit.svg": "https://www.mit.edu/themes/mit/assets/favicon/favicon.svg",
+    "yale.png": "https://www.yale.edu/sites/all/themes/yale_blue/images/favicons/android-chrome-192x192.png",
+    "virginia-tech.svg": "https://www.assets.cms.vt.edu/images/whiteVTonTransparent.svg",
+    "duke.png": "https://www.duke.edu/wp-content/uploads/2025/12/cropped-dfavicon-1-192x192.png",
+    "unc.png": "https://www.unc.edu/wp-content/themes/unc/assets/images/favicon/apple-touch-icon.png?v=jwLzlQrBRl"
+  }
+}

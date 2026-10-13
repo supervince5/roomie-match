@@ -5,6 +5,7 @@ import App from "./App";
 import AuthProvider from "./auth/AuthProvider";
 import "./index.css";
 import "./theme.css";
+import "./water-lilies.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

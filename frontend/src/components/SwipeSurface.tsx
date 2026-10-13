@@ -10,12 +10,14 @@ type Props = {
   disabled: boolean;
   onSwipe: (direction: "like" | "pass") => void;
   name: string;
+  decision?: "like" | "pass" | null;
 };
 export default function SwipeSurface({
   children,
   disabled,
   onSwipe,
   name,
+  decision = null,
 }: Props) {
   const origin = useRef<{
     x: number;
@@ -66,7 +68,7 @@ export default function SwipeSurface({
   }
   return (
     <div
-      className={`swipe-surface ${offset ? "is-dragging" : ""}`}
+      className={`swipe-surface ${offset ? "is-dragging" : ""} ${decision ? "is-leaving" : ""}`}
       tabIndex={disabled ? -1 : 0}
       role="group"
       aria-label={
@@ -91,8 +93,17 @@ export default function SwipeSurface({
       }}
       style={
         {
-          "--swipe-x": `${offset}px`,
-          "--swipe-rotation": `${offset / 28}deg`,
+          "--swipe-x": decision
+            ? decision === "like"
+              ? "115%"
+              : "-115%"
+            : `${offset}px`,
+          "--swipe-rotation": decision
+            ? decision === "like"
+              ? "10deg"
+              : "-10deg"
+            : `${offset / 28}deg`,
+          opacity: decision ? 0 : 1,
         } as CSSProperties
       }
     >

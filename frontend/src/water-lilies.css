@@ -1,0 +1,75 @@
+/* Water Lilies: lavender paper, pond blue, muted sage, and painted texture. */
+:root {
+  --lily-paper: #f1eff4;
+  --lily-lilac: #b59bc2;
+  --lily-periwinkle: #a6b4d5;
+  --lily-water: #c7d6dc;
+  --lily-sage: #91ac96;
+  --lily-ink: #36535e;
+}
+body {
+  background-image: url('/images/paper-grain.svg');
+}
+.app-shell {
+  background: radial-gradient(ellipse at 0 0, #dce4ef85, transparent 50%),
+    radial-gradient(ellipse at 100% 100%, #dfd5e66b, transparent 55%);
+}
+.app-header { background: #f1eff4ed; backdrop-filter: blur(14px); }
+.auth-layout { background: var(--lily-paper); }
+.auth-story {
+  background: #e5e7ef url('/images/paper-grain.svg');
+}
+.auth-story img { border-radius: 3px; mix-blend-mode: multiply; }
+.profile-card__photo-area--avatar {
+  background-image: url('/images/paper-grain.svg'), linear-gradient(145deg, #e5e1ee, #b7cad6 65%, #a9c0b7);
+}
+.demo-portrait, .demo-feed-avatar { background-image: url('/images/paper-grain.svg'); }
+.minimal-landing { background: var(--lily-paper); }
+.pond-atmosphere { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.pond-painting {
+  position: absolute;
+  inset: -2%;
+  background: url('/images/water-lilies.png') center / cover no-repeat;
+  animation: pond-breathe 32s ease-in-out infinite alternate;
+}
+.pond-atmosphere::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 48%, #f4f0f6b8 0%, #f1eff46b 31%, #eef0f41c 68%),
+    linear-gradient(#f1eff44d, transparent 20%, transparent 78%, #f1eff475);
+}
+.pond-ripple {
+  position: absolute; z-index: 1; width: 180px; height: 30px;
+  border: 1px solid #fdfbf8b0; border-radius: 50%;
+  box-shadow: 0 0 0 8px #e5e3f026, 0 0 0 16px #fcfbfd20;
+  animation: pond-ripple 12s ease-out infinite;
+}
+.pond-ripple--one { left: 13%; bottom: 16%; }
+.pond-ripple--two { right: 11%; top: 22%; animation-delay: -4s; }
+.pond-ripple--three { right: 29%; bottom: 10%; width: 110px; animation-delay: -8s; }
+.minimal-center h1 { color: #36535e; text-shadow: 0 2px 28px #f8f6f5b3; }
+.minimal-center h1 > span:first-child, .minimal-center h1 .wordmark-dot { color: #846790; }
+.minimal-kicker, .campus-marquee > p { color: #526373; }
+.minimal-login, .minimal-footnote, .minimal-motion, .demo-caption { color: #344c59; }
+.minimal-login, .minimal-footnote, .minimal-motion { text-shadow: 0 1px 8px #f8f6f4; }
+.minimal-cta { background: #36535e; border-color: #36535e; box-shadow: 0 6px 24px #36535e12; }
+.minimal-cta:hover { background: #293f50; }
+.demo-card { border-color: #d7dae5; box-shadow: 0 12px 32px #34445914; }
+.demo-feed-person { background: #fcfbfdf0; border-color: #d7dae5; box-shadow: 0 5px 16px #34445905; }
+.demo-portrait--peach { background-color: #ded1e7; }
+.demo-portrait--sage { background-color: #c3d4d9; }
+.demo-portrait > span { color: #937da2; }
+.demo-portrait--sage > span { color: #789999; }
+.demo-feed-avatar--peach { color: #806a90; }
+.demo-feed-avatar--rose { background-color: #c4c8e0; color: #67759b; }
+.campus-marquee__school { color: #4e6473; }
+@keyframes pond-breathe { from { transform: scale(1); } to { transform: scale(1.025) translateY(-.4%); } }
+@keyframes pond-ripple { 0% { opacity: 0; transform: scale(.55); } 20% { opacity: .55; } 100% { opacity: 0; transform: scale(1.6); } }
+@media (max-width: 760px) {
+  .pond-painting { background-position: 47% center; }
+  .pond-atmosphere::after { background: linear-gradient(#f1eff461, #f1eff4b0 34%, #f1eff421 80%, #f1eff475); }
+  .pond-ripple { width: 100px; height: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pond-painting, .pond-ripple { animation: none; }
+  .pond-ripple { display: none; }
+}

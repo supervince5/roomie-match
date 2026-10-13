@@ -1,0 +1,329 @@
+import { Heart, MoveDown, MoveHorizontal, X } from "lucide-react";
+import {
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+  type PointerEvent,
+} from "react";
+
+import {
+  advanceSwipe,
+  beginSwipeDrag,
+  cancelSwipeDrag,
+  createSwipeMotion,
+  frontCard,
+  moveSwipeDrag,
+  swipeFrame,
+  triggerSwipe,
+} from "../lib/swipePreviewMotion";
+
+const people = [
+  { name: "Mina", initial: "m", habit: "early mornings", tone: "peach" },
+  { name: "Alex", initial: "a", habit: "quiet evenings", tone: "sage" },
+  { name: "Jules", initial: "j", habit: "shared dinners", tone: "rose" },
+  { name: "Kai", initial: "k", habit: "weekend adventures", tone: "sage" },
+  { name: "Sofia", initial: "s", habit: "a tidy space", tone: "peach" },
+  { name: "Noah", initial: "n", habit: "coffee & good company", tone: "rose" },
+];
+
+// Hover pauses in place; leaving resumes on the next frame, without a cooldown.
+function usePreviewIdle(paused: boolean) {
+  const [hovered, setHovered] = useState(false);
+  const [held, setHeld] = useState(false);
+  const [keyboard, setKeyboard] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const [visible, setVisible] = useState(() => !document.hidden);
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotion = () => setReducedMotion(preference.matches);
+    const updateVisibility = () => setVisible(!document.hidden);
+    preference.addEventListener("change", updateMotion);
+    document.addEventListener("visibilitychange", updateVisibility);
+    return () => {
+      preference.removeEventListener("change", updateMotion);
+      document.removeEventListener("visibilitychange", updateVisibility);
+    };
+  }, []);
+  return {
+    running:
+      !paused && !hovered && !held && !keyboard && !reducedMotion && visible,
+    enter: (event: PointerEvent) => {
+      if (event.pointerType !== "touch") setHovered(true);
+    },
+    leave: () => {
+      setHovered(false);
+      setKeyboard(false);
+    },
+    hold: () => {
+      setHeld(true);
+      setKeyboard(false);
+    },
+    release: () => setHeld(false),
+    focus: () => setKeyboard(true),
+    blur: () => setKeyboard(false),
+  };
+}
+
+function PreviewCard({ person }: { person: (typeof people)[number] }) {
+  return (
+    <>
+      <div className={`demo-portrait demo-portrait--${person.tone}`}>
+        <span>{person.initial}</span>
+        <i />
+      </div>
+      <div className="demo-card-copy">
+        <strong>{person.name}</strong>
+        <span>{person.habit}</span>
+      </div>
+    </>
+  );
+}
+
+export function SwipePreview({ paused }: { paused: boolean }) {
+  const idle = usePreviewIdle(paused);
+  const deckRef = useRef<HTMLDivElement>(null);
+  const motion = useRef(createSwipeMotion(people.length));
+  const [frame, setFrame] = useState(() =>
+    swipeFrame(createSwipeMotion(people.length)),
+  );
+  const [announcement, setAnnouncement] = useState("");
+  const pointerStart = useRef<number | null>(null);
+  const width = () => deckRef.current?.clientWidth ?? 220;
+  const reduced = () =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const publish = () => setFrame(swipeFrame(motion.current));
+  const tick = useEffectEvent((delta: number) => {
+    if (advanceSwipe(motion.current, delta, width(), idle.running)) publish();
+  });
+  useEffect(() => {
+    let animation = 0;
+    let previous = 0;
+    const animate = (now: number) => {
+      if (previous) tick(Math.min(now - previous, 50));
+      previous = now;
+      animation = requestAnimationFrame(animate);
+    };
+    animation = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animation);
+  }, []);
+
+  function swipe(direction: number) {
+    const person = people[frontCard(motion.current)];
+    if (triggerSwipe(motion.current, direction, width(), reduced())) {
+      setAnnouncement(
+        `${direction > 0 ? "Liked" : "Passed"} ${person.name}. Moving this sample to the bottom.`,
+      );
+      publish();
+    }
+  }
+  function finish(event: PointerEvent<HTMLDivElement>, cancelled = false) {
+    if (pointerStart.current === null) return;
+    pointerStart.current = null;
+    const distance = motion.current.distance;
+    if (cancelled || (Math.abs(distance) > 5 && Math.abs(distance) < 35)) {
+      cancelSwipeDrag(motion.current, reduced());
+      publish();
+    } else swipe(distance < -5 ? -1 : 1);
+    idle.release();
+    if (event.currentTarget.hasPointerCapture(event.pointerId))
+      event.currentTarget.releasePointerCapture(event.pointerId);
+  }
+  return (
+    <div
+      className="landing-swipe-demo"
+      onPointerEnter={idle.enter}
+      onPointerLeave={idle.leave}
+    >
+      <div
+        ref={deckRef}
+        className={`demo-deck demo-deck--interactive ${frame.mode === "drag" ? "is-dragging" : ""}`}
+        role="button"
+        tabIndex={0}
+        aria-label={`Sample profile: ${people[frame.front].name}. Swipe left to pass or right to like.`}
+        aria-describedby="swipe-preview-help"
+        data-running={idle.running}
+        data-phase={frame.mode}
+        data-direction={frame.direction}
+        onFocus={(event) => {
+          if (event.currentTarget.matches(":focus-visible")) idle.focus();
+        }}
+        onBlur={idle.blur}
+        onPointerDown={(event) => {
+          if (
+            !event.isPrimary ||
+            event.button !== 0 ||
+            !beginSwipeDrag(motion.current)
+          )
+            return;
+          pointerStart.current = event.clientX;
+          idle.hold();
+          publish();
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }}
+        onPointerMove={(event) => {
+          if (pointerStart.current === null) return;
+          moveSwipeDrag(motion.current, event.clientX - pointerStart.current);
+          publish();
+        }}
+        onPointerUp={(event) => finish(event)}
+        onPointerCancel={(event) => finish(event, true)}
+        onLostPointerCapture={() => {
+          if (pointerStart.current === null) return;
+          pointerStart.current = null;
+          cancelSwipeDrag(motion.current, reduced());
+          idle.release();
+          publish();
+        }}
+        onKeyDown={(event) => {
+          if (["ArrowLeft", "ArrowRight", "Enter", " "].includes(event.key)) {
+            event.preventDefault();
+            idle.focus();
+            swipe(event.key === "ArrowLeft" ? -1 : 1);
+          }
+        }}
+      >
+        {people.map((person, id) => {
+          const pose = frame.poses[id];
+          return (
+            <div
+              key={person.name}
+              className="demo-card demo-card--stacked"
+              aria-hidden={id !== frame.front ? true : undefined}
+              data-card={person.name}
+              style={{
+                zIndex: pose.z,
+                opacity: pose.opacity,
+                transform: `translate(${pose.x}px, ${pose.y}px) rotate(${pose.angle}deg) scale(${pose.scale})`,
+              }}
+            >
+              <PreviewCard person={person} />
+              <div
+                className="demo-swipe-feedback"
+                aria-hidden="true"
+                style={{ opacity: pose.badge }}
+              >
+                {pose.direction > 0 ? (
+                  <Heart size={20} fill="currentColor" />
+                ) : (
+                  <X size={20} />
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <span className="demo-caption">
+        <MoveHorizontal size={15} /> try a swipe.
+      </span>
+      <span id="swipe-preview-help" className="sr-only">
+        Interactive sample only. Drag left to pass, right to like, or use the
+        arrow keys. Click for the next profile. Cards return to the bottom; no
+        real likes are sent.
+      </span>
+      <span className="sr-only" role="status">
+        {announcement}
+      </span>
+    </div>
+  );
+}
+
+export function ScrollPreview({ paused }: { paused: boolean }) {
+  const windowRef = useRef<HTMLDivElement>(null);
+  const cycleRef = useRef<HTMLDivElement>(null);
+  const idle = usePreviewIdle(paused);
+
+  useEffect(() => {
+    const viewport = windowRef.current;
+    const cycle = cycleRef.current;
+    if (!viewport || !cycle) return;
+    viewport.scrollTop = cycle.offsetHeight;
+  }, []);
+
+  useEffect(() => {
+    if (!idle.running) return;
+    let frame = 0;
+    let previous = 0;
+    let position = windowRef.current?.scrollTop ?? 0;
+    function tick(now: number) {
+      const viewport = windowRef.current;
+      const height = cycleRef.current?.offsetHeight ?? 0;
+      if (viewport && previous && height) {
+        position += Math.min(now - previous, 50) * 0.018;
+        if (position >= height * 2) position -= height;
+        viewport.scrollTop = position;
+      }
+      previous = now;
+      frame = requestAnimationFrame(tick);
+    }
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [idle.running]);
+
+  return (
+    <div
+      className="landing-scroll-demo"
+      onPointerEnter={idle.enter}
+      onPointerLeave={idle.leave}
+    >
+      <div
+        className="demo-feed-window demo-feed-window--interactive"
+        ref={windowRef}
+        tabIndex={0}
+        role="region"
+        aria-label="Scrollable sample roommate profiles"
+        onPointerDown={(event) => {
+          idle.hold();
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }}
+        onPointerUp={idle.release}
+        onPointerCancel={idle.release}
+        onLostPointerCapture={idle.release}
+        data-running={idle.running}
+        onKeyDown={idle.focus}
+        onFocus={(event) => {
+          if (event.currentTarget.matches(":focus-visible")) idle.focus();
+        }}
+        onBlur={idle.blur}
+        onScroll={() => {
+          const viewport = windowRef.current;
+          const height = cycleRef.current?.offsetHeight ?? 0;
+          if (!viewport || !height) return;
+          // Identical cycles preserve the visible content while wrapping either way.
+          if (viewport.scrollTop >= height * 2) viewport.scrollTop -= height;
+          else if (viewport.scrollTop < 1) viewport.scrollTop += height;
+        }}
+      >
+        {[0, 1, 2].map((copy) => (
+          <div
+            className="demo-feed-cycle"
+            key={copy}
+            ref={copy === 0 ? cycleRef : undefined}
+            aria-hidden={copy !== 1 ? true : undefined}
+          >
+            {people.map((person) => (
+              <div className="demo-feed-person" key={person.name}>
+                <span
+                  className={`demo-feed-avatar demo-feed-avatar--${person.tone}`}
+                  aria-hidden="true"
+                >
+                  {person.initial}
+                </span>
+                <div>
+                  <strong>{person.name}</strong>
+                  <span>{person.habit}</span>
+                </div>
+                <Heart size={12} aria-hidden="true" />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <span className="demo-caption">
+        <MoveDown size={14} /> scroll to explore.
+      </span>
+    </div>
+  );
+}

@@ -1,6 +1,5 @@
-import { useState, type CSSProperties } from "react";
-export default function Blossoms() {
-  const [paused, setPaused] = useState(false);
+import type { CSSProperties } from "react";
+export default function Blossoms({ paused = false }: { paused?: boolean }) {
   return (
     <>
       <div
@@ -26,7 +25,7 @@ export default function Blossoms() {
             <g
               key={i}
               transform={`translate(${x} ${y})`}
-              fill={i % 2 ? "#E09789" : "#F5D4C3"}
+              fill={i % 2 ? "#b59bc2" : "#ded1e7"}
             >
               {[0, 72, 144, 216, 288].map((a) => (
                 <ellipse
@@ -37,17 +36,17 @@ export default function Blossoms() {
                   transform={`rotate(${a})`}
                 />
               ))}
-              <circle r="3" fill="#F6EFE7" />
+              <circle r="3" fill="#f1eff4" />
             </g>
           ))}
         </svg>
-        {Array.from({ length: 11 }, (_, i) => (
+        {Array.from({ length: 5 }, (_, i) => (
           <i
             key={i}
             className="falling-petal"
             style={
               {
-                "--left": `${14 + i * 7}%`,
+                "--left": `${14 + i * 17}%`,
                 "--delay": `${-i * 2.7}s`,
                 "--duration": `${16 + (i % 4) * 3}s`,
                 "--drift": `${i % 2 ? 130 : -90}px`,
@@ -56,15 +55,6 @@ export default function Blossoms() {
           />
         ))}
       </div>
-      <button
-        className="motion-toggle"
-        type="button"
-        onClick={() => setPaused(!paused)}
-        aria-pressed={paused}
-      >
-        {paused ? "Play petals" : "Pause petals"}
-        <span aria-hidden="true"> {paused ? "▷" : "Ⅱ"}</span>
-      </button>
     </>
   );
 }
