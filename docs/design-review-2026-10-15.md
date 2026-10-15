@@ -24,4 +24,23 @@ Response and direct manipulation: motion follows the pointer, and release does n
 
 This is an interface review, not a backend security audit or a claim of full accessibility certification. Local sample profiles support safe interaction testing. Real likes, messages, account deletion, and profile changes are not needed for this review.
 
-Implementation and validation results will be recorded below as the fixes land.
+## Implementation results
+
+All seven items in the fix list have been addressed. The landing animation timing and palette remain intact. Discover now uses an analytic, critically damped spring; the decision request waits for actual exit completion rather than an arbitrary timer. Its 48px distance threshold also accepts intentional short flicks using release velocity. The landing demo keeps its existing 12px threshold.
+
+School search now provides a combobox, arrow/Enter/Escape interaction, current-query results, loading and retry feedback. Typography and targets are larger, dialogs distinguish interior space from backdrop clicks, routes update their titles and keyboard focus, and profile budgets validate inline. The photo picker is keyboard reachable. Preference styles are placed after the brand stylesheet so theme colors cannot override their accessible alternatives.
+
+## Validation
+
+- Production build and full frontend lint passed.
+- All 42 regression tests passed, covering gesture direction, capture loss, fast release, vertical scroll intent, spring continuity and frame-rate independence, landing layer order, and dialog hit testing.
+- Chrome: 60px left and right Discover drags committed, the next profile appeared, and the sample match banner appeared after liking Alex. Keyboard school search selected Virginia Tech using ArrowDown and Enter.
+- Local profile form: a $500 maximum against a $650 minimum displayed an inline error and failed native validity; correcting it to $950 allowed a sample save. No real profile was changed.
+- Responsive inspection: landing at 390×844 and 900×520 remained one viewport; the 390px Discover page had no horizontal overflow. Filters adapted to one column with sticky actions, and Escape restored focus to the Filters button.
+- Reduced-motion spring handling and contrast/transparency stylesheet order were reviewed in code. OS-level preference switching, physical touch-device behavior, and a full screen-reader session remain manual follow-up checks; browser viewport emulation does not certify these.
+
+## Rechecking locally
+
+From `frontend`, run `npm run build`, `npm run lint`, and `node --test tests/*.test.mjs` (Node with TypeScript stripping support). `npm run dev` exposes `/design-preview` for sample Discover cards and `/design-preview?view=profile` for a local-only profile form. These routes are development-only; sample saves and photo previews do not write to an account.
+
+The signed-in account routes were unavailable in this browser session, so account-specific layout code was inspected and shared components were exercised in the local preview. No real likes, messages, account deletion, or backend data changes were made.
