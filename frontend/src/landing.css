@@ -96,7 +96,7 @@
 /* A single desktop canvas. Demos are real interactions, not decorative artwork. */
 html:has(.minimal-landing), body:has(.minimal-landing) { height: 100%; min-height: 0; overflow: hidden; }
 body:has(.minimal-landing) #root { height: 100%; min-height: 0; }
-.minimal-landing { position: relative; isolation: isolate; height: 100vh; height: 100dvh; width: 100%; overflow: hidden; background: var(--background); color: var(--text); display: grid; grid-template-rows: 104px 1fr 132px 62px; }
+.minimal-landing { position: relative; isolation: isolate; height: 100vh; height: 100dvh; width: 100%; overflow: hidden; background: var(--background); color: var(--text); display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 104px 1fr 132px 62px; }
 .minimal-topbar { position: relative; z-index: 5; display: flex; align-items: center; justify-content: space-between; margin: 0 5%; border-bottom: 1px solid var(--border); }
 .minimal-topbar__note { color: var(--muted); font-size: 13px; margin-right: auto; margin-left: 30px; padding-left: 30px; border-left: 1px solid var(--border); }
 .minimal-login { display: inline-flex; align-items: center; gap: 18px; font-size: 14px; text-decoration: none; min-height: 44px; }
@@ -277,3 +277,6 @@ body:has(.minimal-landing) #root { height: 100%; min-height: 0; }
  .minimal-landing *, .minimal-landing *::before, .minimal-landing *::after { animation: none !important; transition: none !important; }
  .minimal-motion, .minimal-landing .falling-petal { display: none; }
 }
+
+/* The marquee track must not contribute its full loop width to the page grid. */
+.landing-campus-band, .landing-campus-band .campus-marquee, .campus-marquee__window, .landing-composition { min-width: 0; }
