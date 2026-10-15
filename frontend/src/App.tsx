@@ -1,3 +1,4 @@
+import RouteFocus from "./components/RouteFocus";
 import DesignPreviewPage from "./pages/DesignPreviewPage";
 import { Route, Routes } from "react-router";
 import RequireAuth from "./auth/RequireAuth";
@@ -17,6 +18,8 @@ import SignupPage from "./pages/SignupPage";
 
 function App() {
   return (
+    <>
+    <RouteFocus />
     <Routes>
       {import.meta.env.DEV && <Route path="/design-preview" element={<DesignPreviewPage />} />}
       <Route path="/" element={<LandingPage />} />
@@ -39,6 +42,7 @@ function App() {
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
+    </>
   );
 }
 

@@ -1,3 +1,4 @@
+import { isOutsideDialog } from "../lib/dialog";
 import SwipeSurface from "../components/SwipeSurface";
 import InviteButton from "../components/InviteButton";
 import {
@@ -594,7 +595,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
           closeFilters();
         }}
         onClick={(event) => {
-          if (event.target === event.currentTarget) closeFilters();
+          if (event.target === event.currentTarget && isOutsideDialog(event, event.currentTarget.getBoundingClientRect())) closeFilters();
         }}
       >
         <div className="discover-filter-heading">

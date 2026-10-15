@@ -2342,3 +2342,7 @@ button:disabled:hover { transform: none; }
 .school-picker__results > [role="option"] span { color: var(--muted); font-size: .8125rem; }
 .school-picker__results > [role="option"]:hover,
 .school-picker__results > [aria-selected="true"] { background: var(--primary-soft); outline: 2px solid var(--primary); outline-offset: -2px; }
+
+main[tabindex="-1"]:focus { outline: none; }
+body:has(dialog[open]) { overflow: hidden; }
+.confirm-dialog { max-height: calc(100dvh - 32px); overflow-y: auto; }

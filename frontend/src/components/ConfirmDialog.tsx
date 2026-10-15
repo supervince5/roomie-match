@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { isOutsideDialog } from "../lib/dialog";
 import FormErrors from "./FormErrors";
 
 type ConfirmDialogProps = {
@@ -30,6 +31,7 @@ function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const id = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [typed, setTyped] = useState("");
 
@@ -56,16 +58,19 @@ function ConfirmDialog({
     <dialog
       ref={dialogRef}
       className="confirm-dialog"
+      aria-labelledby={`${id}-title`}
+      aria-describedby={`${id}-description`}
+      onClose={() => setTyped("")}
       onCancel={(event) => {
         event.preventDefault(); // Escape key: close through React state instead
         if (!busy) cancel();
       }}
       onClick={(event) => {
-        if (event.target === dialogRef.current && !busy) cancel(); // click on the dark backdrop
+        if (event.target === event.currentTarget && !busy && isOutsideDialog(event, event.currentTarget.getBoundingClientRect())) cancel(); // click on the dark backdrop
       }}
     >
-      <h2>{title}</h2>
-      <p>{message}</p>
+      <h2 id={`${id}-title`}>{title}</h2>
+      <p id={`${id}-description`}>{message}</p>
 
       {requireTyping !== undefined && (
         <label className="field">
@@ -77,7 +82,7 @@ function ConfirmDialog({
       <FormErrors error={error} />
 
       <div className="confirm-dialog__buttons">
-        <button className="secondary-button" type="button" disabled={busy} onClick={cancel}>
+        <button className="secondary-button" type="button" autoFocus disabled={busy} onClick={cancel}>
           Cancel
         </button>
         <button className="danger-button" type="button" disabled={!canConfirm} onClick={onConfirm}>
