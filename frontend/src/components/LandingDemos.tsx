@@ -74,7 +74,7 @@ function PreviewCard({ person }: { person: (typeof people)[number] }) {
     <>
       <div className={`demo-portrait demo-portrait--${person.tone}`}>
         <span>{person.initial}</span>
-        <i />
+        <small>roommate notes</small>
       </div>
       <div className="demo-card-copy">
         <strong>{person.name}</strong>

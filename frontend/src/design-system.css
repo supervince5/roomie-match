@@ -4,8 +4,8 @@
   --sakura-apricot: #ffdbb0;
   --sakura-peach: #ffccb8;
   --sakura-pink: #ffb1b1;
-  --primary: #5c4139;
-  --primary-dark: #49342e;
+  --primary: #283e34;
+  --primary-dark: #192a22;
   --primary-soft: #fff0d9;
   --accent: #9e4a50;
   --background: #fffdf5;
@@ -112,5 +112,5 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .auth-story .blossom-branch--lower { display: none; }
 .blossom-branch { color: #a47e65; }
 .falling-petal { background: #ffb1b1; }
-.primary-button, .button--dark { color: #543d37; background: var(--sakura-pink); border-color: #e9a09a; }
-.primary-button:hover, .button--dark:hover { background: #ffa5a7; }
+.primary-button, .button--dark { color: #fffef8; background: var(--primary); border-color: var(--primary); }
+.primary-button:hover, .button--dark:hover { background: var(--primary-dark); }

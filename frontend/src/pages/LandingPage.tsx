@@ -2,7 +2,7 @@ import { ArrowRight, Pause, Play } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 import Blossoms from "../components/Blossoms";
-import BrandMark from "../components/BrandMark";
+import Brand from "../components/Brand";
 import CampusMarquee from "../components/CampusMarquee";
 import { SwipePreview, ScrollPreview } from "../components/LandingDemos";
 import "../landing.css";
@@ -15,29 +15,31 @@ export default function LandingPage() {
       <Blossoms paused={paused} />
 
       <header className="minimal-topbar">
-        <Link className="minimal-monogram" to="/" aria-label="RoomieMatch home">
-          <BrandMark />
-        </Link>
+        <Brand />
+        <span className="minimal-topbar__note">A little more at home.</span>
         <Link className="minimal-login" to="/login">
           Log in <ArrowRight size={14} />
         </Link>
       </header>
 
-      <SwipePreview paused={paused} />
-
+      <div className="landing-composition">
       <section className="minimal-center" aria-label="Find your roommate">
-        <p className="minimal-kicker">find the roommate of your life.</p>
         <h1>
           roomie<span>match</span>
           <span className="wordmark-dot">.</span>
         </h1>
+        <p className="minimal-kicker">find the roommate of your life.</p>
         <Link className="minimal-cta" to="/signup">
           Find your roomie <ArrowRight size={17} />
         </Link>
-        <CampusMarquee />
       </section>
-
-      <ScrollPreview paused={paused} />
+      <div className="landing-playground">
+        <div className="landing-playground__heading"><span>A little chemistry. Give it a try.</span><span>Sample profiles</span></div>
+        <SwipePreview paused={paused} />
+        <ScrollPreview paused={paused} />
+      </div>
+      </div>
+      <div className="landing-campus-band"><CampusMarquee /></div>
 
       <span className="minimal-footnote">
         one’s a roomie. two’s a triplie.
