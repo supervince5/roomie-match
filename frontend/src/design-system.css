@@ -1,18 +1,22 @@
-/* RoomieMatch — paper, ink, and a little cherry. Shared product foundations. */
+/* RoomieMatch — butter, apricot, peach, and sakura pink. Shared product foundations. */
 :root {
-  --primary: #283e34;
-  --primary-dark: #192a22;
-  --primary-soft: #e9eee7;
-  --accent: #b44738;
-  --background: #f7f7f2;
-  --surface: #fffefa;
-  --text: #252d28;
-  --muted: #646d65;
-  --border: #d9ddd3;
-  --danger: #a43d31;
-  --danger-soft: #f9e9e3;
-  --success: #3e6244;
-  --shadow: 0 8px 28px #1f352508;
+  --sakura-butter: #fffad3;
+  --sakura-apricot: #ffdbb0;
+  --sakura-peach: #ffccb8;
+  --sakura-pink: #ffb1b1;
+  --primary: #5c4139;
+  --primary-dark: #49342e;
+  --primary-soft: #fff0d9;
+  --accent: #9e4a50;
+  --background: #fffdf5;
+  --surface: #fffef8;
+  --text: #543d37;
+  --muted: #80685f;
+  --border: #e8d6c5;
+  --danger: #a43d45;
+  --danger-soft: #ffe4df;
+  --success: #6d633d;
+  --shadow: 0 8px 28px #684c4308;
   --font-ui: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-editorial: Georgia, "Times New Roman", serif;
   font-family: var(--font-ui);
@@ -20,7 +24,7 @@
   background: var(--background);
 }
 body { background: var(--background); background-image: none; }
-::selection { background: #dee6be; color: #192a22; }
+::selection { background: #ffb1b1; color: #49342e; }
 h1, h2, h3 { font-family: var(--font-ui); font-weight: 600; letter-spacing: -.045em; }
 p { line-height: 1.6; }
 a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline-color: var(--accent); }
@@ -35,7 +39,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .primary-button, .button--dark { background: var(--primary); color: var(--surface); border: 1px solid var(--primary); }
 .primary-button:hover, .button--dark:hover { background: var(--primary-dark); }
 .secondary-button, .small-button { background: var(--surface); border-color: var(--border); color: var(--primary); }
-.secondary-button:hover, .small-button:hover, .icon-button:hover { background: var(--primary-soft); border-color: #b1beaf; }
+.secondary-button:hover, .small-button:hover, .icon-button:hover { background: var(--primary-soft); border-color: #cda58d; }
 .button:hover, .primary-button:hover, .secondary-button:hover { transform: none; }
 .button:active, .primary-button:active, .secondary-button:active, .icon-button:active { transform: scale(.98); }
 .text-link, .field__link { color: var(--primary); text-underline-offset: 4px; }
@@ -46,32 +50,32 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   border-radius: 7px; padding: 13px 14px; font-size: 16px; min-height: 48px;
   box-shadow: none; transition: border-color 160ms;
 }
-.field input:hover, .field select:hover, .field textarea:hover { border-color: #a6b3a2; }
+.field input:hover, .field select:hover, .field textarea:hover { border-color: #bd9480; }
 .field small { color: var(--muted); font-size: 13px; line-height: 1.5; }
 .field { gap: 9px; margin-bottom: 20px; }
-.form-errors, .form-error { background: var(--danger-soft); color: var(--danger); border-color: #ddbbb3; }
+.form-errors, .form-error { background: var(--danger-soft); color: var(--danger); border-color: #ddb6ac; }
 .school-picker__list { background: var(--surface); border-color: var(--border); border-radius: 8px; }
 .school-picker__option:hover, .school-picker__option[aria-selected="true"] { background: var(--primary-soft); }
 
 /* Auth is a simple, deliberate split; the form is the only call to action. */
 .auth-layout { grid-template-columns: 47% 53%; background: var(--surface); min-height: 100dvh; }
 .auth-story {
-  min-height: 100dvh; background: var(--primary); color: #fafbf4;
+  min-height: 100dvh; background: var(--sakura-peach); color: #543d37; isolation: isolate; overflow: hidden;
   padding: 42px clamp(36px, 4.7vw, 84px); gap: 48px; position: relative;
 }
-.auth-story .brand { color: #fafbf4; }
+.auth-story .brand { color: #543d37; }
 .auth-story__body { max-width: 560px; padding-block: 26px; }
-.auth-story__index { font-size: 14px; color: #cbd4c8; }
+.auth-story__index { font-size: 14px; color: #74554a; }
 .auth-story h2 { font: 500 clamp(50px, 4.8vw, 82px)/1.03 var(--font-ui); letter-spacing: -.065em; margin: 26px 0; }
-.auth-story h2 span { color: #e0e8b9; }
-.auth-story .auth-story__body > p { color: #d2dacf; font-size: 17px; line-height: 1.55; margin: 0 0 36px; }
+.auth-story h2 span { color: #9e4a50; }
+.auth-story .auth-story__body > p { color: #74554a; font-size: 17px; line-height: 1.55; margin: 0 0 36px; }
 .roommate-notes { max-width: 420px; font-size: 14px; }
-.roommate-notes > div { display: flex; align-items: center; gap: 14px; padding: 16px 0; border-top: 1px solid #7e93816b; }
-.roommate-notes > div > span:last-child:not(:first-child) { margin-left: auto; color: #b0c0ac; font: 12px var(--font-ui); }
-.roommate-notes > div > svg { color: #dce6c6; flex-shrink: 0; stroke-width: 1.4; }
-.roommate-notes .roommate-notes__heading { font-size: 12px; color: #bbcaba; border: 0; padding: 0 0 12px; }
+.roommate-notes > div { display: flex; align-items: center; gap: 14px; padding: 16px 0; border-top: 1px solid #ae7a6045; }
+.roommate-notes > div > span:last-child:not(:first-child) { margin-left: auto; color: #876553; font: 12px var(--font-ui); }
+.roommate-notes > div > svg { color: #9e4a50; flex-shrink: 0; stroke-width: 1.4; }
+.roommate-notes .roommate-notes__heading { font-size: 12px; color: #74554a; border: 0; padding: 0 0 12px; }
 .roommate-notes__heading svg { margin-left: auto; }
-.auth-story__footer { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #cbd4c8; }
+.auth-story__footer { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #74554a; }
 .auth-story__footer > span:last-child { font: 30px var(--font-editorial); letter-spacing: -2px; }
 .auth-content { padding: 60px clamp(35px, 6vw, 110px); }
 .auth-card { max-width: 420px; width: 100%; }
@@ -101,3 +105,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   .auth-card { margin: 0 auto; }
   .auth-card h1 { font-size: 40px; }
 }
+
+/* The same sakura palette, used as quiet surfaces rather than a full-page wash. */
+.auth-story > .blossoms { z-index: -1; }
+.auth-story .blossom-branch { width: 250px; opacity: .45; right: -65px; top: 105px; }
+.auth-story .blossom-branch--lower { display: none; }
+.blossom-branch { color: #a47e65; }
+.falling-petal { background: #ffb1b1; }
+.primary-button, .button--dark { color: #543d37; background: var(--sakura-pink); border-color: #e9a09a; }
+.primary-button:hover, .button--dark:hover { background: #ffa5a7; }

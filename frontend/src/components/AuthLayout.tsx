@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
 import { ArrowUpRight, Moon, Coffee, Utensils } from "lucide-react";
 import Brand from "./Brand";
+import Blossoms from "./Blossoms";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <main className="auth-layout">
       <aside className="auth-story" aria-label="About RoomieMatch">
+        <Blossoms quiet />
         <Brand />
         <div className="auth-story__body">
           <span className="auth-story__index">A place for your kind of person.</span>
