@@ -24,9 +24,6 @@ export default function AppLayout() {
       <header className="app-header">
         <Brand />
         <BottomNavigation />
-        <span className="app-header__note">
-          <i /> Make room for good company.
-        </span>
       </header>
       <div id="app-content" tabIndex={-1}>
         <Outlet />

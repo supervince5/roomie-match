@@ -114,3 +114,156 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .falling-petal { background: #ffb1b1; }
 .primary-button, .button--dark { color: #fffef8; background: var(--primary); border-color: var(--primary); }
 .primary-button:hover, .button--dark:hover { background: var(--primary-dark); }
+
+/* Application frame: one quiet toolbar and generous, aligned content. */
+.app-shell { position: relative; isolation: isolate; background: var(--background); }
+.app-shell > .blossoms { position: fixed; z-index: -1; }
+.blossoms--quiet .blossom-branch { opacity: .14; width: 230px; right: -70px; }
+.blossoms--quiet .blossom-branch--lower { width: 180px; left: -75px; right: auto; bottom: 0; }
+.app-header { height: 80px; padding-inline: max(5%, calc((100vw - 1320px)/2)); gap: 24px; background: #fffdf5ee; border-color: var(--border); backdrop-filter: blur(16px); }
+.app-header .brand { font-size: 25px; }
+.app-navigation { gap: 14px; align-self: stretch; }
+.app-navigation__link { position: relative; font-size: 14px; color: var(--muted); border-radius: 0; padding: 15px 12px; }
+.app-navigation__link.is-active { background: transparent; color: var(--primary); font-weight: 600; }
+.app-navigation__link.is-active::after { content: ""; position: absolute; bottom: 0; height: 3px; left: 12px; right: 12px; border-radius: 3px 3px 0 0; background: var(--primary); }
+.app-navigation__link:hover { background: #ffdbb026; }
+.page { max-width: 1180px; width: 90%; padding-top: 44px; }
+.page-header { margin-bottom: 32px; }
+.page-header h1 { font-size: 36px; line-height: 1.2; letter-spacing: -.05em; color: var(--primary); }
+.page-subtitle { font-size: 15px; }
+.app-footer { max-width: 1180px; width: 90%; border-color: var(--border); color: var(--muted); font-size: 11px; }
+.app-footer p { font-size: 12px; }
+.preview-navigation { max-width: 1060px; margin: auto; padding: 8px 0; gap: 24px; font-size: 13px; border-bottom: 1px solid var(--border); }
+.preview-navigation [aria-current="page"] { color: var(--primary); }
+.preview-navigation a { text-decoration-color: #c8ad99; }
+.page.discover-page { max-width: 1060px; padding-top: 28px; min-height: calc(100dvh - 80px); }
+.discover-toolbar { margin-bottom: 22px; }
+.discover-toolbar h1 { font: 600 28px/1.2 var(--font-ui); letter-spacing: -.045em; color: var(--primary); }
+.discover-tools { gap: 8px; }
+.discover-tools .icon-button { color: var(--primary); border-color: transparent; }
+.discover-tools .icon-button:hover { background: var(--primary-soft); }
+.discover-filter-button { color: var(--primary); background: var(--surface); border-color: var(--border); border-radius: 8px; font-weight: 500; }
+.discover-filter-button:hover { background: var(--primary-soft); }
+.discover-filter-button > span { background: var(--primary); }
+
+/* A person's own words first. The practical details follow in a consistent grid. */
+.profile-card, .discover-page .profile-card { grid-template-columns: minmax(260px, .8fr) minmax(0, 1.2fr); padding: 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: 0 8px 32px #684c4305; }
+.profile-card__photo-area, .discover-page .profile-card__photo-area { min-height: 500px; border-radius: 6px; overflow: hidden; background: var(--sakura-peach); }
+.profile-card__photo-area--avatar { background: var(--sakura-peach); }
+.profile-card__photo-area--avatar::before { content: ""; position: absolute; inset: 20px; border: 1px solid #a7806640; border-bottom: 0; pointer-events: none; }
+.profile-card__initial { font: 400 180px/1 var(--font-editorial); color: #a36d5c; margin-bottom: 70px; }
+.profile-card__photo-area--avatar .profile-card__photo-gradient { display: none; }
+.profile-card__photo-gradient { background: linear-gradient(0deg, #302722e8, transparent); }
+.profile-card__headline { left: 28px; right: 28px; bottom: 32px; }
+.profile-card__headline h2 { font: 500 42px/1.15 var(--font-ui); letter-spacing: -.045em; }
+.profile-card__headline h2 span { font-size: 27px; font-weight: 400; opacity: .8; }
+.profile-card__headline p { font-size: 14px; line-height: 1.6; }
+.profile-card__photo-area--avatar .profile-card__headline h2 { color: #543d37; }
+.profile-card__photo-area--avatar .profile-card__headline p { color: #74554a; }
+.profile-card__photo-area--avatar .avatar-caption { display: block; top: 35px; left: 35px; font: 12px var(--font-ui); letter-spacing: 0; color: #805b50; }
+.profile-card__details, .discover-page .profile-card__details { padding: 24px 28px 20px 34px; }
+.profile-card__school, .discover-page .profile-card__school { color: var(--muted); font-size: 13px; margin: 0 0 22px; gap: 8px; }
+.profile-about h3 { font: 500 14px var(--font-ui); color: var(--primary); margin: 0 0 10px; letter-spacing: 0; }
+.profile-card__bio { font-size: 17px; color: var(--text); line-height: 1.6; margin-bottom: 20px; }
+.tag-list { gap: 7px; }
+.tag { color: #7b574a; background: #ffdbb035; border: 1px solid #ecd7c1; border-radius: 5px; padding: 6px 10px; font-size: 12px; font-weight: 400; }
+.tag--selected { color: var(--surface); background: var(--primary); border-color: var(--primary); }
+.living-summary { margin-top: 26px; padding-block: 22px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); gap: 20px 18px; }
+.living-summary svg { color: #9e7967; width: 18px; stroke-width: 1.5; }
+.living-summary span { font-size: 12px; line-height: 1.65; }
+.living-summary strong { color: var(--primary); font-size: 16px; font-weight: 500; }
+.living-list { gap: 16px; margin: 14px 0 0; }
+.living-list span { background: transparent; color: var(--muted); padding: 0; font-size: 12px; }
+.living-list span::before { content: "·"; margin-right: 6px; color: #a67560; }
+.profile-prompt, .discover-page .profile-prompt { margin-top: 24px; padding: 18px 0 0; border: 0; border-top: 1px solid var(--border); background: transparent; }
+.profile-prompt__question { font: 12px var(--font-ui); color: var(--muted); margin-bottom: 9px; }
+.profile-prompt__answer { font: 400 22px/1.4 var(--font-editorial); color: var(--primary); }
+.discover-page .swipe-controls { margin-top: 20px; border-radius: 12px; padding: 6px; gap: 6px; border-color: var(--border); background: #fffef8ef; box-shadow: 0 6px 22px #684c430d; }
+.discover-page .swipe-button { height: 48px; min-width: 132px; border-radius: 7px; font-size: 14px; font-weight: 500; }
+.discover-page .swipe-button--like { background: var(--primary); color: var(--surface); border-color: var(--primary); }
+.discover-page .swipe-button--like:hover { background: var(--primary-dark); }
+.discover-page .swipe-button--pass { color: #77554a; background: var(--surface); border-color: transparent; }
+.discover-page .swipe-button--pass:hover { background: var(--primary-soft); }
+.discover-page .empty-state { margin: 40px auto; }
+.discover-page .empty-state h2 { color: var(--primary); font-size: 32px; letter-spacing: -.045em; }
+.empty-state__icon { background: var(--sakura-peach); color: #8e6554; }
+.discover-page .match-banner { background: var(--sakura-butter); color: var(--primary); border-color: var(--border); }
+.discover-page .match-banner a { color: var(--primary); }
+
+/* The same materials and spacing continue through filters, forms, and lists. */
+.discover-filters-dialog, .confirm-dialog { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 24px 70px #4b342f26; }
+.discover-filters-dialog::backdrop, .confirm-dialog::backdrop { background: #433a3045; backdrop-filter: blur(6px); }
+.discover-filter-heading { padding: 28px 30px 24px; }
+.discover-filter-heading h2 { font: 500 30px/1.2 var(--font-ui); color: var(--primary); letter-spacing: -.04em; }
+.discover-filter-heading p:last-child { color: var(--muted); font-size: 14px; }
+.discover-filters-dialog .field > span { font-size: 13px; }
+.discover-filters-dialog input, .discover-filters-dialog select { background: var(--background); font-size: 15px; }
+.discover-filter-actions { background: var(--surface); border-color: var(--border); }
+.discover-filter-actions .text-link { color: var(--muted); }
+.filter-panel { background: var(--surface); border-color: var(--border); }
+.profile-form { gap: 36px 64px; }
+.profile-form > fieldset { padding: 26px 0 0; border: 0; border-top: 1px solid var(--border); border-radius: 0; background: transparent; }
+.profile-form legend { font: 500 21px var(--font-ui); color: var(--primary); padding: 0 16px 0 0; letter-spacing: -.03em; }
+.profile-form > fieldset:first-of-type { padding: 22px 26px; background: #fffad366; border: 1px solid var(--border); border-radius: 10px; }
+.profile-form > fieldset:first-of-type legend { font-size: 16px; }
+.photo-picker__preview { background: var(--sakura-peach); color: #8e6554; border-radius: 7px; }
+.tag--choice { font-size: 13px; font-weight: 400; }
+.match-row, .person-row, .history-item { background: var(--surface); border-color: var(--border); border-radius: 10px; box-shadow: none; }
+.match-row:hover, .person-row:hover { background: #ffdbb024; }
+.match-row__photo--initial, .person-row__photo--initial { background: var(--sakura-peach); color: #8e6554; font-family: var(--font-editorial); }
+.match-row__text strong, .person-row__text strong { font: 500 21px var(--font-ui); letter-spacing: -.03em; color: var(--primary); }
+.matches-introduction { background: #fffad366; border-color: var(--border); color: var(--muted); font-size: 14px; }
+.history-item .badge { background: var(--primary-soft); color: var(--text); }
+.search-box { background: var(--surface); border-color: var(--border); border-radius: 8px; }
+.search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px #283e3410; }
+.compatibility-panel, .match-profile__contact { background: #fffad366; border-color: var(--border); }
+/* Motion stays in the gesture controllers. CSS never delays the dragged card. */
+@media (max-width: 900px) {
+ .app-navigation { gap: 3px; }
+ .app-navigation__link { font-size: 12px; padding-inline: 9px; gap: 6px; }
+ .profile-card__details, .discover-page .profile-card__details { padding: 22px; }
+ .profile-card__bio { font-size: 16px; }
+ .profile-form { gap: 30px; }
+}
+@media (max-width: 760px) {
+ .profile-card, .discover-page .profile-card { grid-template-columns: 1fr; padding: 8px; }
+ .profile-card__photo-area, .discover-page .profile-card__photo-area { min-height: 330px; }
+ .profile-card__initial { font-size: 140px; margin-bottom: 60px; }
+ .profile-card__headline { left: 24px; bottom: 24px; }
+ .profile-card__headline h2 { font-size: 36px; }
+ .profile-card__details, .discover-page .profile-card__details { padding: 24px 18px 20px; }
+ .page.discover-page { padding-top: 24px; }
+ .preview-navigation { width: 90%; }
+ .app-header .eyebrow { display: none; }
+ .app-header .text-link { font-size: 12px; }
+ .discover-page .swipe-controls { bottom: 88px; }
+}
+@media (max-width: 680px) {
+ .app-header { height: 76px; padding-inline: 24px; }
+ .app-header .brand { font-size: 23px; }
+ .app-navigation { background: #fffdf5f5; border-color: var(--border); }
+ .app-navigation__link { padding: 9px 8px; font-size: 10px; }
+ .app-navigation__link.is-active::after { bottom: auto; top: -8px; height: 2px; }
+ .page { width: 90%; padding-top: 28px; }
+ .page-header h1 { font-size: 30px; }
+ .profile-form { grid-template-columns: 1fr; }
+ .discover-toolbar h1 { font-size: 26px; }
+ .discover-filter-heading { padding: 24px 20px; }
+ .discover-filter-heading h2 { font-size: 27px; }
+}
+/* Preferences are last so branding never overrides accessibility. */
+@media (prefers-reduced-transparency: reduce) {
+ .app-header, .app-navigation, .swipe-controls, .discover-page .swipe-controls, .confirm-dialog, .discover-filters-dialog, .discover-filter-actions { background: var(--surface); backdrop-filter: none; }
+ dialog::backdrop, .discover-filters-dialog::backdrop, .confirm-dialog::backdrop { backdrop-filter: none; background: #433a30bd; }
+}
+@media (prefers-contrast: more) {
+ :root { --muted: #543d37; --border: #80685f; }
+ .field input, .field select, .field textarea, .discover-filter-button, .icon-button, .profile-card, .discover-page .profile-card { border: 1px solid var(--text); }
+ .demo-caption, .field small { color: var(--text); }
+}
+@media (prefers-reduced-motion: reduce) {
+ html { scroll-behavior: auto; }
+ html :is(.button, .primary-button, .secondary-button, .minimal-cta, .icon-button, button, a):is(:hover, :active) { transform: none; }
+ .blossom-branch { animation: none; }
+ .falling-petal { display: none; }
+}

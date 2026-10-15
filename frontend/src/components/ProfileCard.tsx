@@ -36,11 +36,10 @@ export default function ProfileCard({ profile, animation = null }: Props) {
           />
         ) : (
           <>
-            <span className="avatar-doorway" aria-hidden="true" />
             <span className="profile-card__initial" aria-hidden="true">
               {profile.name.charAt(0).toUpperCase()}
             </span>
-            <span className="avatar-caption">A NEW FACE. A NEW CHAPTER.</span>
+            <span className="avatar-caption">Photo not added yet</span>
           </>
         )}
         <div className="profile-card__photo-gradient" />
@@ -59,7 +58,21 @@ export default function ProfileCard({ profile, animation = null }: Props) {
           <MapPin size={15} />
           {profile.school}
         </p>
-        <p className="eyebrow">THE EVERYDAY DETAILS</p>
+        {profile.bio && (
+          <div className="profile-about">
+            <h3>A little about me</h3>
+            <p className="profile-card__bio">{profile.bio}</p>
+          </div>
+        )}
+        {profile.tags.length > 0 && (
+          <div className="tag-list">
+            {profile.tags.map((tag) => (
+              <span className="tag" key={tag}>
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
         <div className="living-summary">
           <div>
             <Wallet size={19} />
@@ -95,21 +108,6 @@ export default function ProfileCard({ profile, animation = null }: Props) {
           <span>{profile.smoking ? "Smokes" : "Non-smoker"}</span>
           <span>{profile.pets ? "Has pets" : "No pets"}</span>
         </div>
-        {profile.bio && (
-          <div className="profile-about">
-            <h3>A little about me</h3>
-            <p className="profile-card__bio">{profile.bio}</p>
-          </div>
-        )}
-        {profile.tags.length > 0 && (
-          <div className="tag-list">
-            {profile.tags.map((tag) => (
-              <span className="tag" key={tag}>
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
         {profile.prompt && (
           <div className="profile-prompt">
             <p className="profile-prompt__question">
