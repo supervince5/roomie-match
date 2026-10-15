@@ -397,3 +397,21 @@
   color: #684c43;
 }
 .discover-page .match-banner a { color: #684c43; }
+
+/* A compact toolbar still needs generous pointer and touch targets. */
+.discover-tools .icon-button, .discover-filter-heading .icon-button {
+  width: 44px; height: 44px;
+}
+.discover-filter-button { min-height: 44px; font-size: .875rem; }
+.discover-filters-dialog .field > span,
+.discover-filter-heading p:last-child, .filter-error { font-size: .875rem; }
+.discover-filters-dialog input, .discover-filters-dialog select { font-size: 1rem; min-height: 44px; }
+.discover-filter-actions :is(.text-link, .primary-button, .secondary-button) { min-height: 44px; font-size: .875rem; }
+.discover-page .profile-card__school { font-size: .8125rem; }
+.discover-page .empty-state > p { font-size: 1rem; }
+.discover-page .empty-actions :is(.button, button), .discover-page .empty-state > .text-link { font-size: .875rem; }
+.discover-filter-actions { flex-wrap: wrap; }
+@media (max-width:400px) {
+  .discover-toolbar { flex-wrap: wrap; gap: 8px; }
+  .discover-filters-dialog .filter-panel { grid-template-columns: 1fr; }
+}

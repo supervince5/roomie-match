@@ -14,7 +14,7 @@
   font-family: "DM Sans", sans-serif;
   color: var(--text);
   background: var(--background);
-  font-size: 15px;
+  font-size: 100%;
 }
 html {
   scroll-behavior: smooth;
@@ -61,7 +61,7 @@ select:focus-visible,
   outline-offset: 4px;
 }
 button:disabled {
-  cursor: wait;
+  cursor: not-allowed;
 }
 em {
   font-weight: 400;
@@ -2298,4 +2298,41 @@ em {
 }
 .confirm-dialog p {
   font-size: 13px;
+}
+
+/* Readable controls and consistent feedback across the app. */
+h1, h2, h3 { font-optical-sizing: auto; }
+h2 { letter-spacing: -.035em; }
+h3 { letter-spacing: -.02em; }
+.field > span, .field small, .living-summary span, .profile-card__school,
+.profile-prompt__question, .living-list, .tag, .person-row__text span,
+.match-row__text span, .history-row__aside small { font-size: .8125rem; }
+.profile-card__bio, .field input, .field select, .field textarea { font-size: 1rem; }
+.living-summary strong { font-size: .9375rem; }
+.icon-button, .small-button, .edit-button, .tag--choice { min-width: 44px; min-height: 44px; }
+.small-button, .tag--choice { padding: 8px 12px; }
+:is(button, .button, .primary-button, .secondary-button, .minimal-cta):active:not(:disabled) {
+  transform: scale(.98);
+  transition: transform 80ms ease-out;
+}
+button:disabled:hover { transform: none; }
+.app-header, .swipe-controls { backdrop-filter: blur(18px); }
+@media (prefers-reduced-transparency: reduce) {
+  .app-header, .app-navigation, .swipe-controls, .landing-card, .confirm-dialog,
+  .discover-filters-dialog, .discover-filter-actions {
+    background: var(--surface); backdrop-filter: none;
+  }
+  dialog::backdrop { backdrop-filter: none; background: #31231fc4; }
+}
+@media (prefers-contrast: more) {
+  :root { --muted: #59423c; --border: #79594d; }
+  .app-header, .app-navigation, .swipe-controls, .landing-card, dialog,
+  .profile-card, .field input, .field select, .field textarea,
+  .icon-button, .discover-filter-button { border: 1px solid #59423c; background: #fffdf5; }
+  .field small, .profile-prompt__question, .demo-caption { color: #59423c; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  :is(button, a):hover, :is(button, a):active { transform: none; }
+  .minimal-cta:hover svg { transform: none; }
 }

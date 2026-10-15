@@ -711,3 +711,20 @@ body:has(.minimal-landing) #root {
   outline: 2px solid #ab565c;
   outline-offset: 5px;
 }
+
+/* Keep the invitation minimal without making useful copy microscopic. */
+.minimal-kicker { font-size: .8125rem; letter-spacing: .09em; }
+.minimal-login, .minimal-cta { font-size: .875rem; min-height: 44px; }
+.minimal-monogram { min-width: 44px; min-height: 44px; }
+.minimal-motion { min-height: 44px; font-size: .75rem; }
+.minimal-footnote, .demo-caption, .campus-marquee > p { font-size: .75rem; }
+.demo-card-copy > span, .demo-feed-person > div > span { font-size: .6875rem; }
+@media (max-width:760px) {
+  .minimal-kicker { font-size: .75rem; }
+  .minimal-footnote { bottom: 65px; left: 0; right: 0; text-align: center; }
+  .minimal-motion { bottom: 12px; right: 15px; }
+  .demo-feed-person > div > span { display: none; }
+}
+@media (max-height:570px) and (max-width:760px) {
+  .minimal-footnote { display: none; }
+}
