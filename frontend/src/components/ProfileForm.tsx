@@ -1,5 +1,5 @@
 import { Camera } from "lucide-react";
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { uploadPhoto } from "../lib/photos";
 import FormErrors from "./FormErrors";
 import SchoolPicker, { type SchoolOption } from "./SchoolPicker";
@@ -18,6 +18,7 @@ import {
 
 type ProfileFormProps = {
   initial?: Partial<Profile>;
+  localPreview?: boolean;
   submitLabel: string;
   onSubmit: (profile: ProfileInput) => Promise<void>;
   onCancel?: () => void;
@@ -27,7 +28,12 @@ const MAX_TAGS = 5;
 
 // Inputs hold text while you type; we turn them into numbers/booleans when you submit.
 // The backend validates everything again, and its error list is shown at the top.
-function ProfileForm({ initial = {}, submitLabel, onSubmit, onCancel }: ProfileFormProps) {
+function ProfileForm({ initial = {}, localPreview = false, submitLabel, onSubmit, onCancel }: ProfileFormProps) {
+  const previewPhotos = useRef<string[]>([]);
+  useEffect(() => () => { previewPhotos.current.forEach(url => URL.revokeObjectURL(url)); }, []);
+  const form = useRef<HTMLFormElement>(null);
+  const saving = useRef(false);
+  const budgetHelp = useId();
   const [name, setName] = useState(initial.name ?? "");
   const [age, setAge] = useState(initial.age?.toString() ?? "");
   const [school, setSchool] = useState<SchoolOption | null>(
@@ -54,10 +60,22 @@ function ProfileForm({ initial = {}, submitLabel, onSubmit, onCancel }: ProfileF
   const [error, setError] = useState<unknown>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const budgetInvalid = budgetMin !== "" && budgetMax !== "" && Number(budgetMin) > Number(budgetMax);
+  useEffect(() => {
+    if (error) form.current?.querySelector<HTMLElement>(".form-error")?.focus();
+  }, [error]);
+
   // The photo uploads as soon as you pick it; the profile only remembers where it went (photoKey).
   async function handlePhotoPicked(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) {
+      return;
+    }
+    if (import.meta.env.DEV && localPreview) {
+      const url = URL.createObjectURL(file);
+      previewPhotos.current.push(url);
+      setPhotoPreview(url);
+      event.target.value = "";
       return;
     }
     setUploading(true);
@@ -84,6 +102,11 @@ function ProfileForm({ initial = {}, submitLabel, onSubmit, onCancel }: ProfileF
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    if (saving.current || uploading) return;
+    if (budgetInvalid) {
+      setError(new Error("Maximum budget must be at least your minimum budget."));
+      return;
+    }
     if (school === null) {
       setError(new Error("Pick your school from the list."));
       return;
@@ -109,23 +132,25 @@ function ProfileForm({ initial = {}, submitLabel, onSubmit, onCancel }: ProfileF
       pets: pets,
     };
 
+    saving.current = true;
     setSubmitting(true);
     setError(null);
     try {
       await onSubmit(profile);
     } catch (caught) {
       setError(caught);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+
     } finally {
+      saving.current = false;
       setSubmitting(false);
     }
   }
 
   return (
-    <form className="profile-form" onSubmit={handleSubmit}>
+    <form ref={form} className="profile-form" onSubmit={handleSubmit}>
       <FormErrors error={error} />
 
-      <fieldset>
+      <fieldset disabled={submitting}>
         <legend>Photo</legend>
         <div className="photo-picker">
           <div className="photo-picker__preview">
@@ -133,12 +158,12 @@ function ProfileForm({ initial = {}, submitLabel, onSubmit, onCancel }: ProfileF
           </div>
           <label className="secondary-button photo-picker__button">
             {uploading ? "Uploading..." : photoPreview ? "Change photo" : "Add a photo"}
-            <input type="file" accept="image/*" hidden disabled={uploading} onChange={handlePhotoPicked} />
+            <input type="file" accept="image/*" className="sr-only" disabled={uploading || submitting} onChange={handlePhotoPicked} />
           </label>
         </div>
       </fieldset>
 
-      <fieldset>
+      <fieldset disabled={submitting}>
         <legend>About you</legend>
         <label className="field">
           <span>First name</span>
@@ -174,7 +199,7 @@ function ProfileForm({ initial = {}, submitLabel, onSubmit, onCancel }: ProfileF
         </label>
       </fieldset>
 
-      <fieldset>
+      <fieldset disabled={submitting}>
         <legend>Living preferences</legend>
         <div className="field-row">
           <label className="field">
@@ -183,7 +208,8 @@ function ProfileForm({ initial = {}, submitLabel, onSubmit, onCancel }: ProfileF
           </label>
           <label className="field">
             <span>Budget max ($/mo)</span>
-            <input type="number" required min={0} value={budgetMax} onChange={(e) => setBudgetMax(e.target.value)} />
+            <input type="number" required min={Number(budgetMin) || 0} aria-invalid={budgetInvalid || undefined} aria-describedby={budgetInvalid ? budgetHelp : undefined} value={budgetMax} onChange={(e) => setBudgetMax(e.target.value)} />
+            {budgetInvalid && <small id={budgetHelp} className="field-error" role="status">Maximum must be at least your minimum budget.</small>}
           </label>
         </div>
         <label className="field">
@@ -220,7 +246,7 @@ function ProfileForm({ initial = {}, submitLabel, onSubmit, onCancel }: ProfileF
         </div>
       </fieldset>
 
-      <fieldset>
+      <fieldset disabled={submitting}>
         <legend>
           Tags <small>({tags.length}/{MAX_TAGS})</small>
         </legend>
@@ -240,7 +266,7 @@ function ProfileForm({ initial = {}, submitLabel, onSubmit, onCancel }: ProfileF
         </div>
       </fieldset>
 
-      <fieldset>
+      <fieldset disabled={submitting}>
         <legend>Prompt (optional)</legend>
         <label className="field">
           <span>Question</span>
@@ -263,7 +289,7 @@ function ProfileForm({ initial = {}, submitLabel, onSubmit, onCancel }: ProfileF
         {submitting ? "Saving..." : submitLabel}
       </button>
       {onCancel && (
-        <button className="secondary-button profile-form__cancel" type="button" onClick={onCancel}>
+        <button className="secondary-button profile-form__cancel" type="button" disabled={submitting} onClick={onCancel}>
           Cancel
         </button>
       )}

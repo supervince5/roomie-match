@@ -9,7 +9,7 @@ function FormErrors({ error }: { error: unknown }) {
   const fieldErrors = error instanceof ApiError ? error.errors : [];
 
   return (
-    <div className="form-error" role="alert">
+    <div className="form-error" role="alert" tabIndex={-1}>
       <p>{message}</p>
       {fieldErrors.length > 0 && (
         <ul>

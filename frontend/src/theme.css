@@ -2346,3 +2346,12 @@ button:disabled:hover { transform: none; }
 main[tabindex="-1"]:focus { outline: none; }
 body:has(dialog[open]) { overflow: hidden; }
 .confirm-dialog { max-height: calc(100dvh - 32px); overflow-y: auto; }
+
+.photo-picker__button { position: relative; }
+.photo-picker__button:focus-within { outline: 3px solid #ac525c; outline-offset: 4px; }
+.field .field-error { color: var(--danger); }
+.field [aria-invalid="true"] { border-color: var(--danger); }
+
+.preview-navigation { display: flex; gap: 24px; padding: 12px max(4vw, calc((100vw - 1040px) / 2)); }
+.preview-navigation a { min-height: 44px; display: inline-flex; align-items: center; text-underline-offset: 5px; }
+.preview-navigation [aria-current="page"] { font-weight: 700; }

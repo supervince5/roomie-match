@@ -1,5 +1,7 @@
 import Blossoms from "../components/Blossoms";
-import { Link } from "react-router";
+import { useState } from "react";
+import ProfileForm from "../components/ProfileForm";
+import { Link, useSearchParams } from "react-router";
 import Brand from "../components/Brand";
 import DiscoverPage from "./DiscoverPage";
 import type { Profile } from "../types/profile";
@@ -43,6 +45,9 @@ const profiles = [
   },
 ];
 export default function DesignPreviewPage() {
+  const [params] = useSearchParams();
+  const [saved, setSaved] = useState(false);
+  const formPreview = params.get("view") === "profile";
   return (
     <div className="app-shell">
       <Blossoms quiet />
@@ -53,7 +58,16 @@ export default function DesignPreviewPage() {
           Back to your account
         </Link>
       </header>
-      <DiscoverPage previewProfiles={profiles} />
+      <nav className="preview-navigation" aria-label="Preview views">
+        <Link to="/design-preview" aria-current={!formPreview ? "page" : undefined}>Discover</Link>
+        <Link to="/design-preview?view=profile" aria-current={formPreview ? "page" : undefined}>Profile form</Link>
+      </nav>
+      {formPreview ? <main className="page">
+        <header className="page-header"><h1>Sample profile</h1></header>
+        <p>Local preview. Changes and photos stay in this tab.</p>
+        {saved && <p role="status">Sample saved. No account changed.</p>}
+        <ProfileForm initial={base} localPreview submitLabel="Save sample profile" onSubmit={async () => { setSaved(true); }} />
+      </main> : <DiscoverPage previewProfiles={profiles} />}
     </div>
   );
 }
