@@ -29,6 +29,11 @@ const people = [
   { name: "Noah", initial: "n", habit: "coffee & good company", tone: "rose" },
 ];
 
+const swipeReactions = {
+  like: ["the roomie of your life?", "a meet-cute, but for rent.", "the shared-fridge era?", "the perfect one?"],
+  pass: ["good vibes, wrong lease.", "not quite in tune.", "the search continues…", "different sleep schedules?"],
+};
+
 // Hover pauses in place; leaving resumes on the next frame, without a cooldown.
 function usePreviewIdle(paused: boolean) {
   const [hovered, setHovered] = useState(false);
@@ -92,6 +97,18 @@ export function SwipePreview({ paused }: { paused: boolean }) {
     swipeFrame(createSwipeMotion(people.length)),
   );
   const [announcement, setAnnouncement] = useState("");
+  const [reaction, setReaction] = useState<{ id: number; text: string } | null>(null);
+  const reactionId = useRef(0);
+  useEffect(() => {
+    if (!reaction) return;
+    const timer = window.setTimeout(() => setReaction(null), 3300);
+    return () => window.clearTimeout(timer);
+  }, [reaction]);
+
+  function showReaction(direction: number) {
+    const options = direction > 0 ? swipeReactions.like : swipeReactions.pass;
+    setReaction({ id: ++reactionId.current, text: options[Math.floor(Math.random() * options.length)] });
+  }
   const stopPointer = useRef<(() => void) | null>(null);
   useEffect(() => () => stopPointer.current?.(), []);
   const width = () => deckRef.current?.clientWidth ?? 220;
@@ -119,6 +136,7 @@ export function SwipePreview({ paused }: { paused: boolean }) {
       setAnnouncement(
         `${direction > 0 ? "Liked" : "Passed"} ${person.name}. Moving this sample to the bottom.`,
       );
+      showReaction(direction);
       publish();
     }
   }
@@ -170,8 +188,10 @@ export function SwipePreview({ paused }: { paused: boolean }) {
               const direction = releaseSwipeDrag(
                 motion.current, width(), reduced(), !interrupted,
               );
-              if (direction !== null)
+              if (direction !== null) {
                 setAnnouncement(`${direction > 0 ? "Liked" : "Passed"} ${person.name}. Moving this sample to the bottom.`);
+                showReaction(direction);
+              }
               publish();
               idle.release();
               if (deck.hasPointerCapture(pointerId)) deck.releasePointerCapture(pointerId);
@@ -223,6 +243,7 @@ export function SwipePreview({ paused }: { paused: boolean }) {
       <span className="demo-caption">
         <MoveHorizontal size={15} /> try a swipe.
       </span>
+      {reaction && <p key={reaction.id} className="demo-swipe-note" aria-hidden="true">{reaction.text}</p>}
       <span id="swipe-preview-help" className="sr-only">
         Interactive sample only. Drag left to pass or right to like.
         Click for the next profile. Cards return to the bottom; no

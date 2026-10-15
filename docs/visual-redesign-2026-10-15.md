@@ -36,3 +36,7 @@ Keep the user's sakura palette: butter `#FFFAD3`, apricot `#FFDBB0`, peach `#FFC
 - Screenshot files and comparison gallery are saved in the task's `outputs` directory as `redesign-before-*.jpg`, `redesign-after-*.jpg`, and `roomiematch-before-after.html`.
 
 Real signup, password changes, likes, messages, and uploads were not submitted. System preference handling was inspected in code; physical touch hardware and a full screen-reader session were not exercised in this pass.
+
+## Final landing refinement
+
+Removed the header tagline and the demo area's two introductory labels at the user's request. Kept the swipe/scroll hints, the roomie/triplie footer, and motion controls. Completed manual tutorial swipes now show a randomized like/pass reaction in small black text with a transparent background. Reactions fade and clear after 3.3 seconds; cancelled drags do not trigger them. The reduced-motion alternative displays the note without an animation. Browser verification covered both directions and the transparent background; build, lint, and all 42 regression tests passed again after this interaction addition.
