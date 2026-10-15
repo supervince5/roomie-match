@@ -280,3 +280,17 @@ body:has(.minimal-landing) #root { height: 100%; min-height: 0; }
 
 /* The marquee track must not contribute its full loop width to the page grid. */
 .landing-campus-band, .landing-campus-band .campus-marquee, .campus-marquee__window, .landing-composition { min-width: 0; }
+@media (max-height: 600px) and (min-width: 761px) {
+  .minimal-landing { grid-template-rows: 68px minmax(0, 1fr) 74px 46px; }
+  .landing-composition { min-height: 0; }
+  .landing-playground { max-width: 360px; gap: 28px; }
+  .landing-playground__heading { display: none; }
+  .demo-deck { max-height: 200px; }
+  .demo-feed-window { height: 180px; }
+  .demo-caption, .landing-scroll-demo .demo-caption { margin-top: 12px; }
+  .minimal-center h1 { margin-bottom: 12px; }
+  .minimal-kicker { font-size: 15px; margin-bottom: 22px; }
+  .minimal-footnote { bottom: 16px; }
+  .minimal-motion { bottom: 1px; }
+  .minimal-landing .blossom-branch { width: 200px; right: -120px; }
+}

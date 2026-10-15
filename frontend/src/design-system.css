@@ -42,6 +42,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .secondary-button:hover, .small-button:hover, .icon-button:hover { background: var(--primary-soft); border-color: #cda58d; }
 .button:hover, .primary-button:hover, .secondary-button:hover { transform: none; }
 .button:active, .primary-button:active, .secondary-button:active, .icon-button:active { transform: scale(.98); }
+.small-button--danger { color: var(--danger); background: var(--danger-soft); border-color: #ddb6ac; }
+.small-button--danger:hover { color: var(--danger); background: #ffdbd4; }
 .text-link, .field__link { color: var(--primary); text-underline-offset: 4px; }
 .text-link:hover, .field__link:hover { color: var(--accent); }
 .field > span, .checkbox-field { color: var(--text); font-size: 14px; }
