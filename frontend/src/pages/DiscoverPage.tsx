@@ -216,6 +216,8 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
   const loadingMoreRef = useRef(false);
   const activeFeedKey = useRef("");
   const decisionInFlight = useRef(false);
+  const exitComplete = useRef<(() => void) | null>(null);
+  useEffect(() => () => exitComplete.current?.(), []);
 
   // Changing a filter (or refreshing) starts a fresh feed from the first page
   const feedKey = toQueryString(filters) + "#" + version;
@@ -349,6 +351,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
     decisionInFlight.current = true;
     setSwipeError(null);
     sound.prime();
+    const exit = new Promise<void>(resolve => { exitComplete.current = resolve; });
     setAnimation(action);
     showNote(action);
     if (action === "pass") void sound.play("pass");
@@ -363,14 +366,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
               method: "POST",
               body: { targetId: currentProfile.id, direction: action },
             }),
-        new Promise<void>((resolve) =>
-          window.setTimeout(
-            resolve,
-            window.matchMedia("(prefers-reduced-motion: reduce)").matches
-              ? 0
-              : 520,
-          ),
-        ),
+        exit,
       ]);
       const swipedId = currentProfile.id;
       if (!preview) invalidateApiCache("/swipes"); // history changed
@@ -455,6 +451,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
             onSwipe={handleDecision}
             name={currentProfile.name}
             decision={animation}
+            onExitComplete={() => { exitComplete.current?.(); exitComplete.current = null; }}
           >
             <ProfileCard profile={currentProfile} />
           </SwipeSurface>

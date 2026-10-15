@@ -1,4 +1,5 @@
-type PointerSample = Event & {
+export type PointerSample = Event & {
+  clientY: number;
   pointerId: number;
   clientX: number;
   buttons: number;
@@ -14,7 +15,7 @@ export function trackSwipePointer({
   blurTarget: EventTarget;
   pointerId: number;
   originX: number;
-  onMove: (distance: number) => void;
+  onMove: (distance: number, sample: PointerSample) => void;
   onEnd: (interrupted: boolean) => void;
 }) {
   let active = true;
@@ -32,8 +33,8 @@ export function trackSwipePointer({
   }
   function sample(event: PointerSample) {
     for (const point of event.getCoalescedEvents?.() ?? [])
-      onMove(point.clientX - originX);
-    onMove(event.clientX - originX);
+      onMove(point.clientX - originX, point);
+    onMove(event.clientX - originX, event);
   }
   function move(event: Event) {
     const point = event as PointerSample;
