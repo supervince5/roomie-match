@@ -5,7 +5,7 @@ import App from "./App";
 import AuthProvider from "./auth/AuthProvider";
 import "./index.css";
 import "./theme.css";
-import "./sakura.css";
+import "./design-system.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

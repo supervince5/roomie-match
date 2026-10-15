@@ -1,5 +1,4 @@
 import AuthLayout from "../components/AuthLayout";
-import { HeartHandshake } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../auth/authContext";
@@ -37,11 +36,9 @@ function LoginPage() {
   return (
     <AuthLayout>
       <form className="landing-card auth-card" onSubmit={handleSubmit}>
-        <div className="brand-icon">
-          <HeartHandshake size={42} strokeWidth={2.2} />
-        </div>
-        <p className="eyebrow">Welcome back</p>
-        <h1>Log in</h1>
+        <p className="auth-card__overline">Welcome back</p>
+        <h1>Good to have<br />you back.</h1>
+        <p className="auth-card__intro">Log in to pick up where you left off.</p>
 
         <FormErrors error={error} />
 

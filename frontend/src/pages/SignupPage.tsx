@@ -1,5 +1,4 @@
 import AuthLayout from "../components/AuthLayout";
-import { HeartHandshake } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import { useAuth } from "../auth/authContext";
@@ -56,11 +55,9 @@ function SignupPage() {
     <AuthLayout>
       {step === "account" ? (
         <form className="landing-card auth-card" onSubmit={handleCreateAccount}>
-          <div className="brand-icon">
-            <HeartHandshake size={42} strokeWidth={2.2} />
-          </div>
-          <p className="eyebrow">Get started</p>
-          <h1>Create an account</h1>
+          <p className="auth-card__overline">Let’s find your person</p>
+          <h1>Make room for<br />someone new.</h1>
+          <p className="auth-card__intro">Create your account to meet your next roommate.</p>
 
           <FormErrors error={error} />
 

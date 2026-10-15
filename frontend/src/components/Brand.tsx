@@ -6,7 +6,7 @@ export default function Brand() {
       <BrandMark />
       <span>
         roomie<span className="brand-word">match</span>
-        <small>A LITTLE MORE AT HOME.</small>
+        
       </span>
     </Link>
   );
