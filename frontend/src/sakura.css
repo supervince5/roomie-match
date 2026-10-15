@@ -126,3 +126,24 @@ body { background-image: url('/images/paper-grain.svg'); }
   .blossom-branch { animation:none; transform:rotate(var(--branch-turn)); }
   .falling-petal { display:none; }
 }
+
+/* Preferences follow the theme so its colors cannot override them. */
+@media (prefers-reduced-transparency: reduce) {
+  .app-header, .app-navigation, .swipe-controls, .landing-card, .confirm-dialog,
+  .discover-filters-dialog, .discover-filter-actions {
+    background: var(--surface); backdrop-filter: none;
+  }
+  dialog::backdrop { backdrop-filter: none; background: #31231fc4; }
+}
+@media (prefers-contrast: more) {
+  :root { --muted: #59423c; --border: #79594d; }
+  .app-header, .app-navigation, .swipe-controls, .landing-card, dialog,
+  .profile-card, .field input, .field select, .field textarea,
+  .icon-button, .discover-filter-button, .discover-tools .icon-button { border: 1px solid #59423c; background: #fffdf5; }
+  .field small, .profile-prompt__question, .demo-caption { color: #59423c; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  html :is(.button, .primary-button, .secondary-button, .minimal-cta, .icon-button, button, a):is(:hover, :active) { transform: none; }
+  .minimal-cta:hover svg { transform: none; }
+}

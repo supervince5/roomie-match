@@ -2317,25 +2317,6 @@ h3 { letter-spacing: -.02em; }
 }
 button:disabled:hover { transform: none; }
 .app-header, .swipe-controls { backdrop-filter: blur(18px); }
-@media (prefers-reduced-transparency: reduce) {
-  .app-header, .app-navigation, .swipe-controls, .landing-card, .confirm-dialog,
-  .discover-filters-dialog, .discover-filter-actions {
-    background: var(--surface); backdrop-filter: none;
-  }
-  dialog::backdrop { backdrop-filter: none; background: #31231fc4; }
-}
-@media (prefers-contrast: more) {
-  :root { --muted: #59423c; --border: #79594d; }
-  .app-header, .app-navigation, .swipe-controls, .landing-card, dialog,
-  .profile-card, .field input, .field select, .field textarea,
-  .icon-button, .discover-filter-button { border: 1px solid #59423c; background: #fffdf5; }
-  .field small, .profile-prompt__question, .demo-caption { color: #59423c; }
-}
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  :is(button, a):hover, :is(button, a):active { transform: none; }
-  .minimal-cta:hover svg { transform: none; }
-}
 .school-picker__status { display: block; margin-top: 6px; color: var(--muted); font-size: .8125rem; line-height: 1.5; }
 .school-picker__results:empty { display: none; }
 .school-picker__results > [role="option"] { display: grid; gap: 3px; padding: 12px 14px; min-height: 44px; cursor: pointer; }

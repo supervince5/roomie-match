@@ -728,3 +728,5 @@ body:has(.minimal-landing) #root {
 @media (max-height:570px) and (max-width:760px) {
   .minimal-footnote { display: none; }
 }
+
+.demo-caption { white-space: nowrap; }
