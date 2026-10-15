@@ -2336,3 +2336,9 @@ button:disabled:hover { transform: none; }
   :is(button, a):hover, :is(button, a):active { transform: none; }
   .minimal-cta:hover svg { transform: none; }
 }
+.school-picker__status { display: block; margin-top: 6px; color: var(--muted); font-size: .8125rem; line-height: 1.5; }
+.school-picker__results:empty { display: none; }
+.school-picker__results > [role="option"] { display: grid; gap: 3px; padding: 12px 14px; min-height: 44px; cursor: pointer; }
+.school-picker__results > [role="option"] span { color: var(--muted); font-size: .8125rem; }
+.school-picker__results > [role="option"]:hover,
+.school-picker__results > [aria-selected="true"] { background: var(--primary-soft); outline: 2px solid var(--primary); outline-offset: -2px; }
