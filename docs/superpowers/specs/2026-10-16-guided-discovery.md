@@ -1,0 +1,13 @@
+# A warmer start to discovery
+
+The owner wants an optional, iPhone-setup-inspired introduction from the Discovery filters button. Keep the existing Roomie Match colors, lowercase copy, centered landing wordmark, profile-first browsing and swipe physics. Do not automatically open a questionnaire.
+
+On the first visit to Discovery, a short handwritten-style hint with a curved arrow points to filters. Persist that the hint was seen per account/browser; subsequent visits do not repeat it. Opening filters before guided setup is completed opens a warm greeting (hello in a few languages), followed by one field per screen: name, college, major, then an optional shared-space preference. No count, progress bar or wall of future fields. Back, close and skip optional preferences remain available. Existing values are prefilled. Immediate input feedback and short, reversible transitions; reduced motion uses static greetings and fades. Nothing waits for an animation to accept input.
+
+The greeting is a small editorial moment in the existing warm palette, not an Apple clone or a new brand. A stable sheet keeps controls consistent. The name step must show only the name input; college reuses the accessible SchoolPicker. Cleanliness describes the roommate preference, not an inferred personal trait. Final save is explicit and reports errors without losing typed values. After completion filters open the existing comprehensive filter panel; it still contains all advanced choices. A route back to the short guided setup remains available.
+
+Data decision pending user clarification: whether name/college/major update the student's own profile or only browsing preferences. Build UI through an injected onComplete callback while this is pending; do not wire ambiguous writes. Existing profile fields/photos must survive any eventual update. No fake values for unanswered personal fields. No backend deployment or remote Git push is authorized.
+
+Also refine landing reaction placement: text should remain just outside the swipe side at the card's middle/lower height, slightly above the previous under-card fallback, without hitting the wordmark. Use actual text/obstacle geometry rather than treating the entire central column as solid. At genuinely cramped widths the nearest lower-side corner may be used with minimal vertical offset. Preserve varied tilt, fade lifetime, and no repeated feedback on match completion.
+
+Save meaningful design iterations locally, including experiments. Validate keyboard, narrow screens, school-search errors, dismissed/reopened setup, saved values, and first/repeat visits. Use local sample profiles to avoid changing the owner's real account.
