@@ -91,7 +91,8 @@ test("crowded landing places the reaction below cards without hitting the wordma
     { left: 466, right: 678, top: 437, height: 242 },
   ];
   const p = landingReactionPlacement(card, 1, 880, 900, obstacles, () => .5);
-  assert.ok(p.top >= 695);
+  assert.ok(p.top >= card.top + card.height + 8);
+  assert.ok(p.top < card.top + card.height + 36);
   assert.ok(p.left + p.width / 2 > (card.left + card.right) / 2);
   assert.ok(p.top + 66 < 884);
 });

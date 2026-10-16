@@ -119,7 +119,7 @@ export function SwipePreview({ paused }: { paused: boolean }) {
     const options = (direction > 0 ? swipeReactions.like : swipeReactions.pass).filter(text => text !== lastReaction.current);
     const rect = deckRef.current?.getBoundingClientRect();
     if (!rect) return;
-    const obstacles = [...document.querySelectorAll(".minimal-center, .landing-scroll-demo")].map(element => element.getBoundingClientRect());
+    const obstacles = [...document.querySelectorAll(".minimal-center h1, .minimal-kicker, .minimal-cta, .demo-feed-window")].map(element => element.getBoundingClientRect());
     const text = options[Math.floor(Math.random() * options.length)];
     lastReaction.current = text;
     setReaction({
