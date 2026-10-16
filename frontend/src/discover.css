@@ -324,8 +324,10 @@
   .discover-page .profile-card__details {
     padding: 25px;
   }
-  .discover-page .swipe-controls {
-    bottom: 84px;
+  /* Keep actions in flow on narrow cards: the floating bar covered names and photo dots. */
+  .discover-page .discover-main .swipe-controls {
+    position: relative;
+    bottom: auto;
   }
   .discover-page .empty-state {
     margin: 30px auto;

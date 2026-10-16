@@ -30,6 +30,7 @@ const base: Profile = {
       "You think good food and a little consideration make a house a home.",
   },
 };
+const samplePhotoUrls = ["/preview-photos/1.svg", "/preview-photos/2.svg", "/preview-photos/3.svg"];
 const profiles = [
   base,
   {
@@ -52,6 +53,7 @@ export default function DesignPreviewPage() {
   const navigate = useNavigate();
   const setupPreview = params.get("view") === "setup";
   const [saved, setSaved] = useState(false);
+  const photoPreview = params.get("view") === "photos" || params.get("photos") === "1";
   const formPreview = params.get("view") === "profile";
   return (
     <div className="app-shell">
@@ -65,16 +67,16 @@ export default function DesignPreviewPage() {
       </header>
       <nav className="preview-navigation" aria-label="Preview views">
         <Link viewTransition to="/design-preview" aria-current={!formPreview && !setupPreview ? "page" : undefined}>Discover</Link>
-        <Link viewTransition to="/design-preview?view=setup">guided setup</Link>
+        <Link viewTransition to="/design-preview?view=setup">profile setup</Link>
         <Link viewTransition to="/design-preview?view=profile" aria-current={formPreview ? "page" : undefined}>Profile form</Link>
       </nav>
-      {setupPreview && <Suspense fallback={<p role="status">opening your setup…</p>}><GuidedDiscovery localPreview initial={null} preferences onComplete={async()=>{setSaved(true);}} onDismiss={()=>navigate("/design-preview",{viewTransition:true})}/></Suspense>} 
+      {setupPreview && <Suspense fallback={<p role="status">opening your setup…</p>}><GuidedDiscovery localPreview initial={null} preferences={false} onComplete={async()=>{setSaved(true);}} onDismiss={()=>navigate("/design-preview",{viewTransition:true})}/></Suspense>}
       {formPreview ? <main className="page">
         <header className="page-header"><h1>Sample profile</h1></header>
         <p>Local preview. Changes and photos stay in this tab.</p>
         {saved && <p role="status">Sample saved. No account changed.</p>}
-        <ProfileForm initial={base} localPreview submitLabel="Save sample profile" onSubmit={async () => { setSaved(true); }} />
-      </main> : <DiscoverPage previewProfiles={profiles} />}
+        <ProfileForm initial={photoPreview ? {...base, photoKeys: samplePhotoUrls.map((_, index) => `photos/preview-1/${index + 1}.jpg`), photoUrls: samplePhotoUrls} : base} localPreview submitLabel="Save sample profile" onSubmit={async () => { setSaved(true); }} />
+      </main> : <DiscoverPage previewProfiles={photoPreview ? profiles.map(profile=>({...profile,photoUrls:samplePhotoUrls})) : profiles} />}
     </div>
   );
 }
