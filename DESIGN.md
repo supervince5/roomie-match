@@ -17,5 +17,5 @@ Confirmed by the owner, October 16, 2026. Read these before changing the interfa
 
 ## Git workflow
 
-The owner's latest preference is small, focused commits, with an occasional larger commit for a cohesive change. Commit completed, checked work. Do not push unless requested. Supersedes the earlier request to wait several minutes between commits.
+The owner's latest preference is small, focused commits, with an occasional larger commit for a cohesive change. Preserve intermediate design iterations, including unsuccessful positions or styles, as honestly labeled checkpoint commits. Do not wait for final approval to record an iteration; verify functional changes. Do not push unless requested. Supersedes the earlier request to wait several minutes between commits.
 
