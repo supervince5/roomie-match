@@ -24,3 +24,7 @@ Confirmed by the owner, October 16, 2026. Read these before changing the interfa
 
 The owner's latest preference is small, focused commits, with an occasional larger commit for a cohesive change. Preserve intermediate design iterations, including unsuccessful positions or styles, as honestly labeled checkpoint commits. Do not wait for final approval to record an iteration; verify functional changes. Do not push unless requested. Supersedes the earlier request to wait several minutes between commits.
 
+
+## Prelaunch waitlist
+
+The owner chose an email-only waitlist ahead of UVA early decision results. Do not promise a specific day or automatically launch the full app. Preserve the center wordmark, matcha bowl, petals and sample interactions. The landing CTA opens a short email dialog. Show success only after the API confirms saving; keep entries on retry. Public builds use VITE_WAITLIST_ONLY=true; development retains /app-preview and the full routes. No domain purchase and no chatgpt.site address. Selected host: Cloudflare Pages free plan; actual hostname remains unconfirmed until account sign-in and project creation.

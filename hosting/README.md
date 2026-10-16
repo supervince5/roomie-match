@@ -1,23 +1,26 @@
-# Matcharoomie hosting preparation
+# Matcharoomie waitlist hosting
 
-Status: prepared locally, not published. As of October 16, 2026, matcharoomie.com is registered and the owner of this app has not purchased it. Do not request its certificate, add it to API/S3 CORS, or modify DNS without confirmed control of the domain.
+## Current state — October 16, 2026
 
-## Prepared
+The email-only waitlist is implemented. The POST /waitlist endpoint is deployed to the existing AWS backend and a synthetic browser signup was verified in DynamoDB, then removed. Frontend publication is pending Cloudflare sign-in. The owner chose Cloudflare Pages free hosting and does not want to buy a domain or use chatgpt.site. Do not claim matcharoomie.pages.dev is reserved until project creation confirms its hostname.
 
-- `frontend/.env.production` provides the existing public API URL. The previous production build had no API URL because it only existed in `.env.development`.
-- Vite rejects builds with a missing or malformed API URL.
-- `amplify-rules.json` supplies the SPA rewrite for direct navigation to login, discovery, and profile routes; static assets remain static.
-- Invite links use the actual website origin unless `VITE_PUBLIC_SITE_URL` is explicitly configured. No unowned domain is embedded.
+The public app is prelaunch only, opening after UVA early decision results. No exact date is promised. No launch automation or emails have been scheduled.
 
-## Before publication
+## Frontend
 
-1. Confirm an owned domain, or obtain approval for a temporary hosting address and hosting costs. AWS Amplify is a candidate because the backend already uses AWS; no hosting provider has been purchased or created.
-2. Label existing `seed-` sample profiles clearly in cards and person rows before inviting real users. Keep the samples until the owner requests removal; no profile deletion is authorized now.
-3. Build and lint the frontend. Upload only `frontend/dist`, never source files, credentials, or `.env` files. Configure the SPA rewrite.
-4. Add only the verified HTTPS hosting origin to API Gateway and private photo-bucket CORS in `backend/serverless.yml`, then deploy that change. Preserve private photos and authentication.
-5. Verify HTTPS, direct route refresh, signup/verification/login, profile editing, photo uploads, discovery, and invites on the actual hosted origin. Existing local and unit checks do not establish a successful live launch.
-6. For a custom domain, add the hosting provider's exact certificate-validation and routing DNS records at its registrar. Wait for certificate and DNS verification before redirecting visitors.
+- Run `npm run build` in frontend. Production env sets the public API URL and VITE_WAITLIST_ONLY=true. Upload only frontend/dist.
+- The public build redirects app routes to the waitlist. Local development retains /app-preview and existing app routes.
+- Cloudflare Pages supplies SPA fallback when no top-level 404.html exists. Only the static build is uploaded, never source credentials or .env files.
+- Create the Pages project, record its actual pages.dev hostname, add only that exact HTTPS origin to API CORS in backend/serverless.yml, and deploy. Photo CORS stays unchanged because the waitlist does not upload photos.
+- Publish with Wrangler Pages using the signed-in owner account. Verify real browser submission from the public origin, duplicate handling, narrow screens, and direct-route redirect.
+- Amplify rules remain reference material; no Amplify hosting resource was created. No custom DNS or domain purchase is needed.
 
-The existing backend is the `roomie-match-backend-dev` stack. Keep its resource names and data intact during the brand/hosting changes. Branded email remains disabled at the owner's request.
+## Waitlist data
 
-Reference: https://docs.aws.amazon.com/amplify/latest/userguide/redirect-rewrite-examples.html
+The existing ProfilesTable stores one private record per normalized email, using PK WAITLIST#<sha256> and SK SIGNUP. Records contain email, createdAt, and consentVersion (waitlist-v1), and no discovery index keys. No account or student profile is created. Conditional writes keep duplicates from overwriting the original timestamp.
+
+There is no public list/export API. The owner can view these records in the AWS DynamoDB console by filtering PK to begin with WAITLIST#. Before the launch campaign, export only those records through an authenticated administrator workflow. Sending a launch email is a separate future action; the form does not send a confirmation email.
+
+The backend remains roomie-match-backend-dev. Existing profiles and private photos remain intact. Branded Cognito emails stay disabled at the owner’s request. AWS backend usage can incur charges even when Cloudflare static hosting is free.
+
+References: https://developers.cloudflare.com/pages/get-started/direct-upload/ and https://admission.virginia.edu/admission/deadlines-instructions
