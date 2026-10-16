@@ -146,8 +146,8 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
   const [appliedSchool, setAppliedSchool] = useState<SchoolOption | null>(
     initial?.school ?? null,
   );
-  const [ready, setReady] = useState(initial !== null);
-  const [showFilters, setShowFilters] = useState(initial === null);
+  // Start with people; preferences are always available from the toolbar.
+  const [showFilters, setShowFilters] = useState(false);
   const [filterError, setFilterError] = useState("");
   const filterDialog = useRef<HTMLDialogElement>(null);
   const sound = useDiscoverSound();
@@ -185,7 +185,6 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
     setFilterSchool(appliedSchool);
     setFilterError("");
     remember(filters, appliedSchool);
-    setReady(true);
     setShowFilters(false);
   }
   function applyFilters() {
@@ -201,7 +200,6 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
     setAppliedSchool(filterSchool);
     remember(draft, filterSchool);
     setFilterError("");
-    setReady(true);
     setShowFilters(false);
   }
   function showNote(kind: DiscoverFeedbackKind) {
@@ -224,7 +222,6 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
   const feedKey = toQueryString(filters) + "#" + version;
   const path = "/discover" + toQueryString(filters);
   useEffect(() => {
-    if (!ready) return;
     let cancelled = false;
     activeFeedKey.current = feedKey;
     const request = preview
@@ -264,7 +261,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
     return () => {
       cancelled = true;
     };
-  }, [feedKey, path, ready, preview, previewProfiles, filters]);
+  }, [feedKey, path, preview, previewProfiles, filters]);
 
   // Show the remembered deck instantly while the fresh one loads
   const remembered = preview ? undefined : readApiCache<DiscoverResponse>(path);
@@ -600,11 +597,8 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
       >
         <div className="discover-filter-heading">
           <div>
-            <p className="eyebrow">
-              {ready ? "YOUR PREFERENCES" : "BEFORE YOU MEET YOUR ROOMIE"}
-            </p>
             <h2 id="discover-filter-title">Your kind of everyday.</h2>
-            <p>A few preferences, then it’s all about the people.</p>
+            <p>Choose what matters to you. Leave the rest open.</p>
           </div>
           <button
             type="button"
@@ -781,7 +775,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
               type="button"
               onClick={closeFilters}
             >
-              {ready ? "Cancel" : "Skip for now"}
+              Cancel
             </button>
             <button className="primary-button" type="submit">
               Show people
@@ -840,11 +834,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
               </p>
             )}
           </div>
-          {ready ? (
-            content
-          ) : (
-            <div className="discover-placeholder" aria-hidden="true" />
-          )}
+          {content}
         </div>
       </div>
     </main>
