@@ -8,14 +8,14 @@ const campuses = [
   { name: "UNC Chapel Hill", file: "unc.png" },
 ];
 
-export default function CampusMarquee() {
+export default function CampusMarquee({ prelaunch = false }: { prelaunch?: boolean }) {
   return (
     <div
       className="campus-marquee"
       role="group"
-      aria-label="Explore roomies from these campuses"
+      aria-label={prelaunch ? "college inspiration" : "Explore roomies from these campuses"}
     >
-      <p>explore roomies from:</p>
+      <p>{prelaunch ? "where will you call home?" : "explore roomies from:"}</p>
       <div className="campus-marquee__window">
         <div className="campus-marquee__track">
           {[0, 1].map((copy) => (

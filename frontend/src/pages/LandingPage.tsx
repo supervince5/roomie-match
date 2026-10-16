@@ -6,20 +6,23 @@ import Brand from "../components/Brand";
 import BrandMark from "../components/BrandMark";
 import CampusMarquee from "../components/CampusMarquee";
 import { SwipePreview, ScrollPreview } from "../components/LandingDemos";
+import WaitlistDialog from "../components/WaitlistDialog";
 import "../landing.css";
+import "../waitlist.css";
 
-export default function LandingPage() {
+export default function LandingPage({ waitlist = true }: { waitlist?: boolean }) {
   const [paused, setPaused] = useState(false);
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
 
   return (
-    <main className={`minimal-landing ${paused ? "is-paused" : ""}`}>
-      <Blossoms paused={paused} />
+    <main className={`minimal-landing ${waitlist ? "waitlist-landing" : ""} ${paused ? "is-paused" : ""}`}>
+      <Blossoms paused={paused || waitlistOpen} />
 
       <header className="minimal-topbar">
         <Brand />
-        <Link viewTransition className="minimal-login" to="/login">
+        {waitlist ? <span className="waitlist-topnote">coming soon</span> : <Link viewTransition className="minimal-login" to="/login">
           log in <ArrowRight size={14} />
-        </Link>
+        </Link>}
       </header>
 
       <div className="landing-composition">
@@ -30,16 +33,21 @@ export default function LandingPage() {
             <span className="wordmark-dot">.</span>
           </h1>
           <p className="minimal-kicker">find the roommate of your life.</p>
-          <Link viewTransition className="minimal-cta" to="/signup">
+          {waitlist ? <>
+            <button type="button" className="minimal-cta" onClick={() => setWaitlistOpen(true)}>
+              join the waitlist <ArrowRight size={17} />
+            </button>
+            <p className="waitlist-launch">opening after uva early decision results</p>
+          </> : <Link viewTransition className="minimal-cta" to="/signup">
             find your roomie <ArrowRight size={17} />
-          </Link>
+          </Link>}
         </section>
         <div className="landing-playground" aria-label="fictional sample profiles">
-          <SwipePreview paused={paused} />
-          <ScrollPreview paused={paused} />
+          <SwipePreview paused={paused || waitlistOpen} />
+          <ScrollPreview paused={paused || waitlistOpen} />
         </div>
       </div>
-      <div className="landing-campus-band"><CampusMarquee /></div>
+      <div className="landing-campus-band"><CampusMarquee prelaunch={waitlist} /></div>
 
       <span className="minimal-footnote">
         one’s a roomie. two’s a triplie.
@@ -57,6 +65,7 @@ export default function LandingPage() {
         {paused ? <Play size={12} /> : <Pause size={12} />}
         <span>{paused ? "play motion" : "pause motion"}</span>
       </button>
+      {waitlist && <WaitlistDialog open={waitlistOpen} onClose={() => setWaitlistOpen(false)} />}
     </main>
   );
 }

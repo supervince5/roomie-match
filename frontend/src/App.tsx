@@ -1,6 +1,6 @@
 import RouteFocus from "./components/RouteFocus";
 import DesignPreviewPage from "./pages/DesignPreviewPage";
-import { Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
 import RequireAuth from "./auth/RequireAuth";
 import AppLayout from "./components/AppLayout";
 import DiscoverPage from "./pages/DiscoverPage";
@@ -17,10 +17,15 @@ import SearchPage from "./pages/SearchPage";
 import SignupPage from "./pages/SignupPage";
 
 function App() {
+  if (import.meta.env.VITE_WAITLIST_ONLY === "true") return <><RouteFocus /><Routes>
+    <Route path="/" element={<LandingPage />} />
+    <Route path="*" element={<Navigate to="/" replace />} />
+  </Routes></>;
   return (
     <>
     <RouteFocus />
     <Routes>
+      {import.meta.env.DEV && <Route path="/app-preview" element={<LandingPage waitlist={false} />} />}
       {import.meta.env.DEV && <Route path="/design-preview" element={<DesignPreviewPage />} />}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />

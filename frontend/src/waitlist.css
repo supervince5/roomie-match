@@ -1,0 +1,23 @@
+.waitlist-topnote { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.waitlist-launch { margin: 18px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.waitlist-dialog { box-sizing: border-box; width: min(480px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); margin: auto; padding: 44px 36px 32px; border: 1px solid var(--border); border-radius: 24px; background: var(--surface); color: var(--text); overflow-y: auto; box-shadow: 0 24px 100px #263e3330; }
+.waitlist-dialog::backdrop { background: #293f3540; backdrop-filter: blur(5px); }
+.waitlist-dialog[open] { animation: waitlist-arrive 280ms cubic-bezier(.22,1,.36,1) both; }
+.waitlist-close { position: absolute; top: 12px; right: 12px; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; color: var(--primary); background: transparent; cursor: pointer; }
+.waitlist-close:hover { background: var(--matcha-soft); }
+.waitlist-mark .brand-mark { width: 58px; height: 58px; }
+.waitlist-eyebrow { margin: 18px 0 10px; color: var(--matcha); font-size: 12px; }
+.waitlist-dialog h2 { margin: 0 0 16px; font: 400 clamp(29px, 6vw, 38px)/1.14 var(--font-editorial); letter-spacing: -.04em; }
+.waitlist-dialog #waitlist-description { margin: 0 0 28px; color: var(--muted); font-size: 15px; line-height: 1.65; }
+.waitlist-label { display: block; margin: 0 0 9px; font-size: 14px; }
+.waitlist-dialog input[type="email"] { box-sizing: border-box; width: 100%; min-height: 52px; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font: 16px var(--font-ui); background: var(--background); color: var(--text); }
+.waitlist-dialog :focus-visible { outline: 2px solid var(--matcha); outline-offset: 3px; }
+.waitlist-submit { width: 100%; justify-content: space-between; margin-top: 16px; cursor: pointer; }
+.waitlist-submit:disabled { opacity: .65; cursor: wait; }
+.waitlist-consent { margin: 16px 0 0; font-size: 12px; line-height: 1.6; color: var(--muted); }
+.waitlist-error { margin: 12px 0 0; font-size: 14px; line-height: 1.5; color: #a44850; }
+.waitlist-honey { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@keyframes waitlist-arrive { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: none; } }
+@media (max-width: 1100px) { .waitlist-landing { min-height: 760px; height: max(100dvh, 760px); } html:has(.waitlist-landing), body:has(.waitlist-landing) { height: auto; overflow: auto; } }
+@media (max-width: 760px) { .waitlist-landing { min-height: 700px; height: max(100dvh, 700px); } .waitlist-landing .minimal-topbar { margin-inline: 20px; gap: 16px; } .waitlist-landing .minimal-topbar .brand { font-size: 19px; gap: 5px; } .waitlist-launch { margin-top: 14px; font-size: 11px; } .waitlist-dialog { padding: 44px 24px 28px; } }
+@media (prefers-reduced-motion: reduce) { .waitlist-dialog[open] { animation: none; } }
