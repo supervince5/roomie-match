@@ -13,9 +13,6 @@ export const featuredCampuses: { name: string; file?: string }[] = [
     "file": "michigan.ico"
   },
   {
-    "name": "UC Berkeley"
-  },
-  {
     "name": "UCLA",
     "file": "ucla.png"
   },
