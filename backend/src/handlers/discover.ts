@@ -82,7 +82,7 @@ function matchesFilters(profile: Profile, filters: DiscoverFilters) {
     if (filters.pets !== undefined && profile.pets !== filters.pets) {
         return false;
     }
-    if (filters.maxBudget !== undefined && profile.budget.min > filters.maxBudget) {
+    if (filters.maxBudget !== undefined && (!profile.budget || profile.budget.min > filters.maxBudget)) {
         return false;
     }
     if (filters.classYear !== undefined && profile.classYear !== filters.classYear) {
@@ -94,14 +94,14 @@ function matchesFilters(profile: Profile, filters: DiscoverFilters) {
     if (filters.major !== undefined && !profile.major.toLowerCase().includes(filters.major.toLowerCase())) {
         return false;
     }
-    if (filters.minAge !== undefined && profile.age < filters.minAge) {
+    if (filters.minAge !== undefined && (profile.age === undefined || profile.age < filters.minAge)) {
         return false;
     }
-    if (filters.maxAge !== undefined && profile.age > filters.maxAge) {
+    if (filters.maxAge !== undefined && (profile.age === undefined || profile.age > filters.maxAge)) {
         return false;
     }
     // Dates in YYYY-MM-DD format sort correctly as plain text
-    if (filters.moveInBy !== undefined && profile.moveInDate > filters.moveInBy) {
+    if (filters.moveInBy !== undefined && (!profile.moveInDate || profile.moveInDate > filters.moveInBy)) {
         return false;
     }
     return true;

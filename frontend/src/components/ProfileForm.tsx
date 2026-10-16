@@ -52,10 +52,10 @@ function ProfileForm({ initial = {}, localPreview = false, submitLabel, onSubmit
   const [budgetMin, setBudgetMin] = useState(initial.budget?.min.toString() ?? "");
   const [budgetMax, setBudgetMax] = useState(initial.budget?.max.toString() ?? "");
   const [moveInDate, setMoveInDate] = useState(initial.moveInDate ?? "");
-  const [sleepSchedule, setSleepSchedule] = useState<SleepSchedule>(initial.sleepSchedule ?? "flexible");
-  const [cleanliness, setCleanliness] = useState<Cleanliness>(initial.cleanliness ?? "clean");
-  const [smoking, setSmoking] = useState(initial.smoking ?? false);
-  const [pets, setPets] = useState(initial.pets ?? false);
+  const [sleepSchedule, setSleepSchedule] = useState<SleepSchedule | "">(initial.sleepSchedule ?? "");
+  const [cleanliness, setCleanliness] = useState<Cleanliness | "">(initial.cleanliness ?? "");
+  const [smoking, setSmoking] = useState<boolean | undefined>(initial.smoking);
+  const [pets, setPets] = useState<boolean | undefined>(initial.pets);
 
   const [error, setError] = useState<unknown>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -113,10 +113,10 @@ function ProfileForm({ initial = {}, localPreview = false, submitLabel, onSubmit
     }
     const profile: ProfileInput = {
       name: name,
-      age: Number(age),
+      age: age === "" ? undefined : Number(age),
       schoolId: school.id,
       major: major,
-      classYear: Number(classYear),
+      classYear: classYear === "" ? undefined : Number(classYear),
       bio: bio.trim() === "" ? undefined : bio,
       instagram: instagram.trim() === "" ? undefined : instagram.trim(),
       photoKey: photoKey,
@@ -124,10 +124,10 @@ function ProfileForm({ initial = {}, localPreview = false, submitLabel, onSubmit
       prompt: promptQuestion === "" || promptAnswer.trim() === ""
         ? undefined
         : { question: promptQuestion, answer: promptAnswer },
-      budget: { min: Number(budgetMin), max: Number(budgetMax) },
-      moveInDate: moveInDate,
-      sleepSchedule: sleepSchedule,
-      cleanliness: cleanliness,
+      budget: budgetMin === "" && budgetMax === "" ? undefined : { min: Number(budgetMin), max: Number(budgetMax) },
+      moveInDate: moveInDate || undefined,
+      sleepSchedule: sleepSchedule || undefined,
+      cleanliness: cleanliness || undefined,
       smoking: smoking,
       pets: pets,
     };
@@ -172,11 +172,11 @@ function ProfileForm({ initial = {}, localPreview = false, submitLabel, onSubmit
         <div className="field-row">
           <label className="field">
             <span>Age</span>
-            <input type="number" required min={17} max={100} value={age} onChange={(e) => setAge(e.target.value)} />
+            <input type="number" min={17} max={100} value={age} onChange={(e) => setAge(e.target.value)} />
           </label>
           <label className="field">
             <span>Class of</span>
-            <input type="number" required min={2020} max={2040} placeholder="2030" value={classYear} onChange={(e) => setClassYear(e.target.value)} />
+            <input type="number" min={2020} max={2040} placeholder="2030" value={classYear} onChange={(e) => setClassYear(e.target.value)} />
           </label>
         </div>
         <div className="field">
@@ -204,22 +204,23 @@ function ProfileForm({ initial = {}, localPreview = false, submitLabel, onSubmit
         <div className="field-row">
           <label className="field">
             <span>Budget min ($/mo)</span>
-            <input type="number" required min={0} value={budgetMin} onChange={(e) => setBudgetMin(e.target.value)} />
+            <input type="number" required={budgetMax !== ""} min={0} value={budgetMin} onChange={(e) => setBudgetMin(e.target.value)} />
           </label>
           <label className="field">
             <span>Budget max ($/mo)</span>
-            <input type="number" required min={Number(budgetMin) || 0} aria-invalid={budgetInvalid || undefined} aria-describedby={budgetInvalid ? budgetHelp : undefined} value={budgetMax} onChange={(e) => setBudgetMax(e.target.value)} />
+            <input type="number" required={budgetMin !== ""} min={Number(budgetMin) || 0} aria-invalid={budgetInvalid || undefined} aria-describedby={budgetInvalid ? budgetHelp : undefined} value={budgetMax} onChange={(e) => setBudgetMax(e.target.value)} />
             {budgetInvalid && <small id={budgetHelp} className="field-error" role="status">Maximum must be at least your minimum budget.</small>}
           </label>
         </div>
         <label className="field">
           <span>Move-in date</span>
-          <input type="date" required value={moveInDate} onChange={(e) => setMoveInDate(e.target.value)} />
+          <input type="date" value={moveInDate} onChange={(e) => setMoveInDate(e.target.value)} />
         </label>
         <div className="field-row">
           <label className="field">
             <span>Sleep schedule</span>
             <select value={sleepSchedule} onChange={(e) => setSleepSchedule(e.target.value as SleepSchedule)}>
+              <option value="">not shared yet</option>
               {Object.entries(SLEEP_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}
@@ -228,6 +229,7 @@ function ProfileForm({ initial = {}, localPreview = false, submitLabel, onSubmit
           <label className="field">
             <span>Cleanliness</span>
             <select value={cleanliness} onChange={(e) => setCleanliness(e.target.value as Cleanliness)}>
+              <option value="">not shared yet</option>
               {Object.entries(CLEANLINESS_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}
@@ -235,13 +237,15 @@ function ProfileForm({ initial = {}, localPreview = false, submitLabel, onSubmit
           </label>
         </div>
         <div className="field-row">
-          <label className="checkbox-field">
-            <input type="checkbox" checked={smoking} onChange={(e) => setSmoking(e.target.checked)} />
-            I smoke
+          <label className="field"><span>smoking</span>
+            <select value={smoking === undefined ? "" : String(smoking)} onChange={e => setSmoking(e.target.value === "" ? undefined : e.target.value === "true")}>
+              <option value="">not shared yet</option><option value="false">i don't smoke</option><option value="true">i smoke</option>
+            </select>
           </label>
-          <label className="checkbox-field">
-            <input type="checkbox" checked={pets} onChange={(e) => setPets(e.target.checked)} />
-            I have pets
+          <label className="field"><span>pets</span>
+            <select value={pets === undefined ? "" : String(pets)} onChange={e => setPets(e.target.value === "" ? undefined : e.target.value === "true")}>
+              <option value="">not shared yet</option><option value="false">no pets</option><option value="true">i have pets</option>
+            </select>
           </label>
         </div>
       </fieldset>

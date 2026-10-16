@@ -22,10 +22,10 @@ export const PROMPT_QUESTIONS = [
 export const profileSchema = z.object({
     // About you
     name: z.string().trim().min(1, "Name can't be empty").max(50),
-    age: z.number().int().min(17).max(100),
+    age: z.number().int().min(17).max(100).optional(),
     schoolId: z.number().int().refine(id => getSchool(id) !== undefined, "Pick a school from the list"),
     major: z.string().trim().min(1).max(100),
-    classYear: z.number().int().min(2020).max(2040),
+    classYear: z.number().int().min(2020).max(2040).optional(),
     bio: z.string().trim().max(500).optional(),
     tags: z.array(z.enum(TAGS, "Not one of the allowed tags")).max(5, "Pick at most 5 tags").default([]),
     // Only shown to people you've matched with. A leading "@" is fine; we strip it.
@@ -44,12 +44,12 @@ export const profileSchema = z.object({
     budget: z.object({
         min: z.number().int().min(0),
         max: z.number().int().min(0)
-    }).strict().refine(b => b.min <= b.max, "Budget min can't be more than max"),
-    moveInDate: z.iso.date("Use the format YYYY-MM-DD"),
-    sleepSchedule: z.enum(["early_bird", "flexible", "night_owl"]),
-    cleanliness: z.enum(["very_clean", "clean", "relaxed"]),
-    smoking: z.boolean(),
-    pets: z.boolean()
+    }).strict().refine(b => b.min <= b.max, "Budget min can't be more than max").optional(),
+    moveInDate: z.iso.date("Use the format YYYY-MM-DD").optional(),
+    sleepSchedule: z.enum(["early_bird", "flexible", "night_owl"]).optional(),
+    cleanliness: z.enum(["very_clean", "clean", "relaxed"]).optional(),
+    smoking: z.boolean().optional(),
+    pets: z.boolean().optional()
 }).strict();
 
 // The TypeScript type, generated from the schema so the two can never drift apart.

@@ -1,3 +1,6 @@
+import { lazy, Suspense } from "react";
+const GuidedDiscovery = lazy(() => import("../components/GuidedDiscovery"));
+import { useNavigate } from "react-router";
 import Blossoms from "../components/Blossoms";
 import { useState } from "react";
 import ProfileForm from "../components/ProfileForm";
@@ -46,6 +49,8 @@ const profiles = [
 ];
 export default function DesignPreviewPage() {
   const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const setupPreview = params.get("view") === "setup";
   const [saved, setSaved] = useState(false);
   const formPreview = params.get("view") === "profile";
   return (
@@ -59,9 +64,11 @@ export default function DesignPreviewPage() {
         </Link>
       </header>
       <nav className="preview-navigation" aria-label="Preview views">
-        <Link viewTransition to="/design-preview" aria-current={!formPreview ? "page" : undefined}>Discover</Link>
+        <Link viewTransition to="/design-preview" aria-current={!formPreview && !setupPreview ? "page" : undefined}>Discover</Link>
+        <Link viewTransition to="/design-preview?view=setup">guided setup</Link>
         <Link viewTransition to="/design-preview?view=profile" aria-current={formPreview ? "page" : undefined}>Profile form</Link>
       </nav>
+      {setupPreview && <Suspense fallback={<p role="status">opening your setup…</p>}><GuidedDiscovery localPreview initial={null} preferences onComplete={async()=>{setSaved(true);}} onDismiss={()=>navigate("/design-preview",{viewTransition:true})}/></Suspense>} 
       {formPreview ? <main className="page">
         <header className="page-header"><h1>Sample profile</h1></header>
         <p>Local preview. Changes and photos stay in this tab.</p>

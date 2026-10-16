@@ -36,21 +36,21 @@ export const CLEANLINESS_LABELS: Record<Cleanliness, string> = {
 // What you send when creating or editing your profile
 export type ProfileInput = {
   name: string;
-  age: number;
+  age?: number;
   schoolId: number; // official college id; pick from the /schools search
   major: string;
-  classYear: number;
+  classYear?: number;
   bio?: string;
   instagram?: string; // only shown to people you've matched with
   photoKey?: string;  // where your photo lives in S3 (from uploadPhoto)
   tags: Tag[];
   prompt?: { question: PromptQuestion; answer: string };
-  budget: { min: number; max: number };
-  moveInDate: string; // YYYY-MM-DD
-  sleepSchedule: SleepSchedule;
-  cleanliness: Cleanliness;
-  smoking: boolean;
-  pets: boolean;
+  budget?: { min: number; max: number };
+  moveInDate?: string; // YYYY-MM-DD
+  sleepSchedule?: SleepSchedule;
+  cleanliness?: Cleanliness;
+  smoking?: boolean;
+  pets?: boolean;
 };
 
 // What the API sends back. photoUrl is a temporary link (about an hour) to show the photo.

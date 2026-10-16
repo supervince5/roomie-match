@@ -1,3 +1,6 @@
+import { lazy, Suspense } from "react";
+const GuidedDiscovery = lazy(() => import("../components/GuidedDiscovery"));
+import { hasSeenSetup, markSetupSeen, setupKeys, profileWithBasics, type GuidedValues } from "../lib/guidedDiscovery";
 import { createPortal } from "react-dom";
 import { reactionPlacement } from "../lib/reactionPlacement";
 import { isOutsideDialog } from "../lib/dialog";
@@ -26,7 +29,9 @@ import {
   type DiscoverFeedbackKind,
 } from "../lib/discoverFeedback";
 import { useDiscoverSound } from "../lib/useDiscoverSound";
+import { previewSchools } from "../lib/previewSchools";
 import "../discover.css";
+import "../guided-discovery.css";
 import {
   invalidateApiCache,
   readApiCache,
@@ -150,6 +155,52 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
   );
   // Start with people; preferences are always available from the toolbar.
   const [showFilters, setShowFilters] = useState(false);
+  const keys = setupKeys(preview ? "design-preview-v3" : userId ?? "guest");
+  const [showHint, setShowHint] = useState(() => !hasSeenSetup(localStorage, keys.hint));
+  const [setupDone, setSetupDone] = useState(() => hasSeenSetup(localStorage, keys.done));
+  const [setupOpen, setSetupOpen] = useState(false);
+  const [setupProfile, setSetupProfile] = useState<Profile | null>(null);
+  const [setupLoading, setSetupLoading] = useState(false);
+  const [setupError, setSetupError] = useState("");
+  const setupRequest = useRef(0);
+  const setupTrigger = useRef<HTMLButtonElement>(null);
+  useEffect(() => { markSetupSeen(localStorage, keys.hint); }, [keys.hint]);
+  useEffect(() => () => { setupRequest.current++; }, []);
+  async function openFilters(forceGuide = false) {
+    setShowHint(false);
+    if (setupDone && !forceGuide) { setShowFilters(true); return; }
+    setShowFilters(false);
+    const request = ++setupRequest.current;
+    setSetupLoading(true); setSetupError("");
+    try {
+      let own: Profile | null = preview ? setupProfile : null;
+      if (!preview) {
+        try { own = await apiRequest<Profile>("/profiles"); }
+        catch (caught) { if (!(caught instanceof ApiError && caught.status === 404)) throw caught; }
+      }
+      if (setupRequest.current !== request) return;
+      setSetupProfile(own); setSetupOpen(true);
+    } catch (caught) {
+      if (setupRequest.current === request) setSetupError(caught instanceof Error ? caught.message : "couldn't open setup. try again.");
+    } finally { if (setupRequest.current === request) setSetupLoading(false); }
+  }
+  function dismissSetup() { setSetupOpen(false); setupTrigger.current?.focus(); }
+  async function completeSetup(values: GuidedValues) {
+    if (!setupProfile?.name || !setupProfile.schoolId || !setupProfile.major) {
+      const input = profileWithBasics(setupProfile, values);
+      const saved = preview
+        ? { ...input, id: "preview-self", school: values.school!.name }
+        : await apiRequest<Profile>("/profiles", { method: setupProfile ? "PUT" : "POST", body: input });
+      setSetupProfile(saved);
+      if (!preview) writeApiCache("/profiles", saved);
+    }
+    const next = { ...filters, cleanliness: values.cleanliness };
+    setFilters(next); setDraft(next); remember(next, appliedSchool);
+    markSetupSeen(localStorage, keys.done); setSetupDone(true);
+    if (!preview) invalidateApiCache("/discover");
+    setVersion(version => version + 1);
+  }
+
   const [filterError, setFilterError] = useState("");
   const filterDialog = useRef<HTMLDialogElement>(null);
   const sound = useDiscoverSound();
@@ -253,7 +304,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
             (p) =>
               (!filters.major ||
                 p.major.toLowerCase().includes(filters.major.toLowerCase())) &&
-              (!filters.maxBudget || p.budget.min <= Number(filters.maxBudget)),
+              (!filters.maxBudget || (p.budget && p.budget.min <= Number(filters.maxBudget))),
           ),
           nextCursor: null,
         })
@@ -589,21 +640,31 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
           >
             <History size={18} />
           </Link>
+          <div className="discover-filter-anchor">
           <button
+            ref={setupTrigger}
             className="discover-filter-button"
             type="button"
             aria-haspopup="dialog"
-            aria-controls="discover-filters"
-            aria-expanded={showFilters}
-            disabled={animation !== null}
-            onClick={() => setShowFilters(true)}
+            aria-controls={setupDone ? "discover-filters" : "guided-setup"}
+            aria-expanded={showFilters || setupOpen}
+            disabled={animation !== null || setupLoading}
+            onClick={() => void openFilters()}
           >
-            <SlidersHorizontal size={17} /> Filters{" "}
+            <SlidersHorizontal size={17} /> {setupLoading ? "opening…" : "Filters"}{" "}
             {activeFilterCount > 0 && <span>{activeFilterCount}</span>}
           </button>
+          {showHint && <span className="discover-first-hint"><svg viewBox="0 0 44 34" fill="none" aria-hidden="true"><path d="M3 30C26 31 33 21 31 4m-6 5 6-6 6 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>make this a little more you.<br/>start with filters.</span>}
+          </div>
         </div>
       </header>
 
+      {setupError && <p className="filter-error" role="alert">{setupError} <button type="button" className="text-link" onClick={() => void openFilters()}>try again</button></p>}
+      {setupOpen && <Suspense fallback={<p role="status">opening your setup…</p>}><GuidedDiscovery localPreview={preview} initial={setupProfile} initialCleanliness={filters.cleanliness as GuidedValues["cleanliness"]}
+        onComplete={completeSetup} onDismiss={dismissSetup}
+        onAdvanced={setupProfile?.name && setupProfile.schoolId && setupProfile.major ? () => {
+          setSetupOpen(false); markSetupSeen(localStorage, keys.done); setSetupDone(true); setShowFilters(true);
+        } : undefined}/></Suspense>} 
       <dialog
         ref={filterDialog}
         id="discover-filters"
@@ -643,10 +704,10 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
               {filterSchool === null ? (
                 <div className="filter-panel__school">
                   <span>Your school</span>
-                  <SchoolPicker value={null} onChange={pickSchool} />
+                  <SchoolPicker sampleSchools={preview ? previewSchools : undefined} value={null} onChange={pickSchool} />
                 </div>
               ) : (
-                <SchoolPicker value={filterSchool} onChange={pickSchool} />
+                <SchoolPicker sampleSchools={preview ? previewSchools : undefined} value={filterSchool} onChange={pickSchool} />
               )}
             </div>
             <label className="field">
@@ -781,6 +842,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
               {filterError}
             </p>
           )}
+          <button className="text-link" type="button" onClick={() => void openFilters(true)}>guide me through it</button>
           <div className="discover-filter-actions">
             <button
               className="text-link"

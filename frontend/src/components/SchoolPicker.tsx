@@ -4,11 +4,12 @@ import { apiRequest } from "../lib/api";
 export type SchoolOption = { id: number; name: string; city?: string; state?: string };
 type SchoolPickerProps = {
   value: SchoolOption | null;
+  sampleSchools?: SchoolOption[];
   onChange: (school: SchoolOption | null) => void;
 };
 type Results = { query: string; schools: SchoolOption[]; failed: boolean };
 
-function SchoolPicker({ value, onChange }: SchoolPickerProps) {
+function SchoolPicker({ value, onChange, sampleSchools }: SchoolPickerProps) {
   const id = useId();
   const input = useRef<HTMLInputElement>(null);
   const changeButton = useRef<HTMLButtonElement>(null);
@@ -28,14 +29,16 @@ function SchoolPicker({ value, onChange }: SchoolPickerProps) {
     let cancelled = false;
     const timer = window.setTimeout(async () => {
       try {
-        const data = await apiRequest<{ schools: SchoolOption[] }>("/schools?q=" + encodeURIComponent(trimmed));
+        const data = sampleSchools
+          ? {schools: sampleSchools.filter(school => [school.name, ...("aliases" in school ? school.aliases as string[] : [])].some(name => name.toLowerCase().includes(trimmed.toLowerCase())))}
+          : await apiRequest<{ schools: SchoolOption[] }>("/schools?q=" + encodeURIComponent(trimmed));
         if (!cancelled) setResults({ query: trimmed, schools: data.schools, failed: false });
       } catch {
         if (!cancelled) setResults({ query: trimmed, schools: [], failed: true });
       }
     }, 250);
     return () => { cancelled = true; window.clearTimeout(timer); };
-  }, [trimmed, retry, value]);
+  }, [trimmed, retry, value, sampleSchools]);
 
   useEffect(() => {
     if (active >= 0 && showOptions)

@@ -46,7 +46,7 @@ function MatchesPage() {
             <div className="match-row__text">
               <strong>{match.name}</strong>
               <span>
-                {match.major} · Class of {match.classYear}
+                {match.major}{match.classYear && ` · Class of ${match.classYear}`}
               </span>
             </div>
             <ChevronRight className="match-row__arrow" size={20} />

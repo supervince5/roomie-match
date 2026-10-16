@@ -46,10 +46,10 @@ export default function ProfileCard({ profile, animation = null }: Props) {
         <div className="profile-card__headline">
           <h2>
             {profile.name}
-            <span>, {profile.age}</span>
+            {profile.age !== undefined && <span>, {profile.age}</span>}
           </h2>
           <p>
-            {profile.major} · Class of {profile.classYear}
+            {profile.major}{profile.classYear && ` · Class of ${profile.classYear}`}
           </p>
         </div>
       </div>
@@ -79,34 +79,33 @@ export default function ProfileCard({ profile, animation = null }: Props) {
             <span>
               Monthly budget
               <strong>
-                ${profile.budget.min.toLocaleString()}–$
-                {profile.budget.max.toLocaleString()}
+                {profile.budget ? `$${profile.budget.min.toLocaleString()}–$${profile.budget.max.toLocaleString()}` : "not shared yet"}
               </strong>
             </span>
           </div>
           <div>
             <CalendarDays size={19} />
             <span>
-              Moving in<strong>{formatMoveIn(profile.moveInDate)}</strong>
+              Moving in<strong>{profile.moveInDate ? formatMoveIn(profile.moveInDate) : "not shared yet"}</strong>
             </span>
           </div>
           <div>
             <Moon size={19} />
             <span>
-              Daily rhythm<strong>{SLEEP_LABELS[profile.sleepSchedule]}</strong>
+              Daily rhythm<strong>{profile.sleepSchedule ? SLEEP_LABELS[profile.sleepSchedule] : "not shared yet"}</strong>
             </span>
           </div>
           <div>
             <Sparkles size={19} />
             <span>
               Shared space
-              <strong>{CLEANLINESS_LABELS[profile.cleanliness]}</strong>
+              <strong>{profile.cleanliness ? CLEANLINESS_LABELS[profile.cleanliness] : "not shared yet"}</strong>
             </span>
           </div>
         </div>
         <div className="living-list">
-          <span>{profile.smoking ? "Smokes" : "Non-smoker"}</span>
-          <span>{profile.pets ? "Has pets" : "No pets"}</span>
+          {profile.smoking !== undefined && <span>{profile.smoking ? "Smokes" : "Non-smoker"}</span>}
+          {profile.pets !== undefined && <span>{profile.pets ? "Has pets" : "No pets"}</span>}
         </div>
         {profile.prompt && (
           <div className="profile-prompt">

@@ -18,7 +18,7 @@ function PersonRow({ profile, to, aside }: { profile: Profile; to: string; aside
         <div className="match-row__text">
           <strong>{profile.name}</strong>
           <span>
-            {profile.major} · Class of {profile.classYear}
+            {profile.major}{profile.classYear && ` · Class of ${profile.classYear}`}
           </span>
         </div>
       </Link>

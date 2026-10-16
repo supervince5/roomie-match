@@ -1,3 +1,7 @@
+import { lazy, Suspense } from "react";
+const GuidedDiscovery = lazy(() => import("../components/GuidedDiscovery"));
+import { profileWithBasics, type GuidedValues } from "../lib/guidedDiscovery";
+import { useNavigate } from "react-router";
 import ContentArrival from "../components/ContentArrival";
 import { LogOut, Pencil } from "lucide-react";
 import { useState } from "react";
@@ -11,12 +15,15 @@ import type { Profile, ProfileInput } from "../types/profile";
 
 function ProfilePage() {
   const { logout } = useAuth();
+  const navigate = useNavigate();
+  const [showBasics, setShowBasics] = useState(true);
+  const [basicsSaved, setBasicsSaved] = useState(false);
   const { data: profile, error, loading, reload, setData } = useApi<Profile>("/profiles");
   const [editing, setEditing] = useState(false);
 
   const hasNoProfile = error?.status === 404;
   // Older profiles have no schoolId (saved before the school list existed)
-  const isIncomplete = profile !== null && !profile.schoolId;
+  const isIncomplete = profile !== null && (!profile.schoolId || !profile.name || !profile.major);
 
   const [deleteError, setDeleteError] = useState<unknown>(null);
   const [deleting, setDeleting] = useState(false);
@@ -35,8 +42,10 @@ function ProfilePage() {
     }
   }
 
-  async function createProfile(input: ProfileInput) {
-    setData(await apiRequest<Profile>("/profiles", { method: "POST", body: input }));
+  async function saveBasics(values: GuidedValues) {
+    const input = profileWithBasics(profile, values);
+    setData(await apiRequest<Profile>("/profiles", {method: profile ? "PUT" : "POST", body: input}));
+    setBasicsSaved(true);
   }
 
   async function updateProfile(input: ProfileInput) {
@@ -47,13 +56,8 @@ function ProfilePage() {
   let content;
   if (loading) {
     content = <p className="status-message">Loading your profile...</p>;
-  } else if (hasNoProfile) {
-    content = (
-      <>
-        <p className="status-message">Set up your profile so other students can find you.</p>
-        <ProfileForm submitLabel="Create profile" onSubmit={createProfile} />
-      </>
-    );
+  } else if (hasNoProfile || isIncomplete) {
+    content = <section className="empty-state"><h2>make yourself at home.</h2><p>start with your name, college, and major. the rest can wait.</p><button className="primary-button" onClick={()=>setShowBasics(true)}>let’s get started</button></section>;
   } else if (error) {
     content = (
       <div className="status-message">
@@ -61,7 +65,7 @@ function ProfilePage() {
         <button className="secondary-button" type="button" onClick={reload}>Try again</button>
       </div>
     );
-  } else if (profile && (editing || isIncomplete)) {
+  } else if (profile && editing) {
     content = (
       <>
         {isIncomplete && <p className="status-message">Finish your profile to start using Discover.</p>}
@@ -99,6 +103,10 @@ function ProfilePage() {
       </header>
 
       <ContentArrival busy={loading} pace="detail">{content}</ContentArrival>
+      {!loading && (hasNoProfile || isIncomplete || basicsSaved) && showBasics && <Suspense fallback={<p role="status">opening your setup…</p>}><GuidedDiscovery initial={profile} preferences={false} onComplete={saveBasics} onDismiss={() => {
+        setShowBasics(false);
+        if (basicsSaved) navigate("/discover", {viewTransition:true});
+      }}/></Suspense>}
 
       {!loading && (
         <section className="danger-zone">
