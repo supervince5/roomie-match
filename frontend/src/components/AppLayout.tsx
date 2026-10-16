@@ -29,7 +29,7 @@ export default function AppLayout() {
         <Outlet />
       </div>
       <footer className="app-footer">
-        <span>ROOMIEMATCH</span>
+        <span>matcharoomie</span>
         <p>A thoughtful start to living together.</p>
         <BrandMark />
       </footer>

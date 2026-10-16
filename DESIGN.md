@@ -1,10 +1,10 @@
-# Roomie Match design preferences
+# Matcharoomie design preferences
 
 Confirmed by the owner, October 16, 2026. Read these before changing the interface.
 
 - Preserve the original cream, butter, apricot, peach, sakura pink, and dark-green palette. Existing CSS variables are the source of truth.
-- Keep **roomiematch.** as the central landing-page focal point, in the existing editorial serif. Preserve the small doorway brand.
-- Aim for minimal, cozy, playful design. Refine the existing interface instead of introducing a new brand, elaborate scenes, or generated portrait mockups.
+- Keep **matcharoomie.** as the central landing-page focal point, in the existing editorial serif. The owner renamed the product on October 16. Use a small ceramic matcha bowl logo with a sakura petal; retain the original visual style.
+- Aim for minimal, cozy, playful design. The Matcharoomie rebrand adds restrained matcha green (#65774d) and pale tea green (#e6ecd8), alongside the existing pink, cream, and dark green. Preserve the layout, typography, and motion; avoid elaborate scenes or generated portrait mockups.
 - Use lowercase interface copy. Preserve the casing of members' supplied names, personal content, and typed values.
 - Vary scale deliberately: large wordmark, medium profile cards, smaller scroll previews, quiet utility controls. Do not make every element the same size.
 - Preserve the existing swipe physics and idle timings. Falling petals vary in size, delay, duration, and drift. Motion should feel varied and natural rather than synchronized.
