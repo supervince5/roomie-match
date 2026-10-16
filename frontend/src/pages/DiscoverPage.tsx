@@ -184,7 +184,10 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
       if (setupRequest.current === request) setSetupError(caught instanceof Error ? caught.message : "couldn't open setup. try again.");
     } finally { if (setupRequest.current === request) setSetupLoading(false); }
   }
-  function dismissSetup() { setSetupOpen(false); setupTrigger.current?.focus(); }
+  function dismissSetup() {
+    setSetupOpen(false);
+    requestAnimationFrame(() => setupTrigger.current?.focus());
+  }
   async function completeSetup(values: GuidedValues) {
     if (!setupProfile?.name || !setupProfile.schoolId || !setupProfile.major) {
       const input = profileWithBasics(setupProfile, values);

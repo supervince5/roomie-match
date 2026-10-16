@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { apiRequest } from "../lib/api";
 
-export type SchoolOption = { id: number; name: string; city?: string; state?: string };
+export type SchoolOption = { id: number; name: string; city?: string; state?: string; aliases?: string[] };
 type SchoolPickerProps = {
   value: SchoolOption | null;
   sampleSchools?: SchoolOption[];
@@ -30,7 +30,7 @@ function SchoolPicker({ value, onChange, sampleSchools }: SchoolPickerProps) {
     const timer = window.setTimeout(async () => {
       try {
         const data = sampleSchools
-          ? {schools: sampleSchools.filter(school => [school.name, ...("aliases" in school ? school.aliases as string[] : [])].some(name => name.toLowerCase().includes(trimmed.toLowerCase())))}
+          ? {schools: sampleSchools.filter(school => [school.name, ...(school.aliases ?? [])].some(name => name.toLowerCase().includes(trimmed.toLowerCase())))}
           : await apiRequest<{ schools: SchoolOption[] }>("/schools?q=" + encodeURIComponent(trimmed));
         if (!cancelled) setResults({ query: trimmed, schools: data.schools, failed: false });
       } catch {
@@ -97,14 +97,14 @@ function SchoolPicker({ value, onChange, sampleSchools }: SchoolPickerProps) {
         }}
       />
       <span id={`${id}-status`} className="school-picker__status" role="status">
-        {trimmed.length < 2 ? "Type at least two letters." : searching ? "Searching schools…"
-          : current?.failed ? "Couldn't load schools. Try again."
-          : schools.length === 0 ? "No schools found. Try another name."
-          : `${schools.length} ${schools.length === 1 ? "school" : "schools"} found. Use arrow keys to choose.`}
+        {trimmed.length < 2 ? (sampleSchools ? "sample colleges: virginia tech, uva, or boston university." : "type at least two letters.") : searching ? "searching schools…"
+          : current?.failed ? "couldn’t load schools. try again."
+          : schools.length === 0 ? "no schools found. try another name."
+          : `${schools.length} ${schools.length === 1 ? "school" : "schools"} found. use arrow keys to choose.`}
       </span>
       {showOptions && current?.failed && <button className="small-button" type="button" onClick={() => {
         setResults(null); setRetry(n => n + 1); input.current?.focus();
-      }}>Retry school search</button>}
+      }}>retry school search</button>}
       {showOptions && (
         <ul id={`${id}-list`} className="school-picker__results" role="listbox" aria-label="Schools" aria-busy={searching}>
           {schools.map((school, index) => (
