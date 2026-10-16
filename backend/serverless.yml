@@ -65,6 +65,12 @@ provider:
           - !Ref UserPoolClient
 
 functions:
+  waitlist:
+    handler: src/handlers/waitlist.handler
+    events:
+      - httpApi:
+          path: /waitlist
+          method: post
   messages:
     handler: src/handlers/messages.handler
     events:
