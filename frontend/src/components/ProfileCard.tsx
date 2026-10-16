@@ -1,3 +1,5 @@
+import ProfilePhotoCarousel from "./ProfilePhotoCarousel";
+import { profilePhotoUrls } from "../lib/profilePhotos";
 import {
   AtSign,
   CalendarDays,
@@ -24,24 +26,7 @@ export default function ProfileCard({ profile, animation = null }: Props) {
       className={`profile-card ${animation ? `profile-card--${animation}` : ""}`}
       aria-label={`Roommate profile for ${profile.name}`}
     >
-      <div
-        className={`profile-card__photo-area ${profile.photoUrl ? "" : "profile-card__photo-area--avatar"}`}
-      >
-        {profile.photoUrl ? (
-          <img
-            className="profile-card__photo"
-            src={profile.photoUrl}
-            alt={`${profile.name}'s photo`}
-            draggable={false}
-          />
-        ) : (
-          <>
-            <span className="profile-card__initial" aria-hidden="true">
-              {profile.name.charAt(0).toUpperCase()}
-            </span>
-            <span className="avatar-caption">Photo not added yet</span>
-          </>
-        )}
+      <ProfilePhotoCarousel key={profile.id} name={profile.name} photos={profilePhotoUrls(profile)}>
         <div className="profile-card__photo-gradient" />
         <div className="profile-card__headline">
           <h2>
@@ -52,7 +37,7 @@ export default function ProfileCard({ profile, animation = null }: Props) {
             {profile.major}{profile.classYear && ` · Class of ${profile.classYear}`}
           </p>
         </div>
-      </div>
+      </ProfilePhotoCarousel>
       <div className="profile-card__details">
         <p className="profile-card__school">
           <MapPin size={15} />

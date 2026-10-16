@@ -1,0 +1,30 @@
+/* Albums use the existing warm palette, with quiet controls over the photo. */
+.profile-photos { touch-action: pan-y; user-select: none; }
+.profile-photos.profile-photos--multiple .profile-card__headline { bottom: 46px; }
+.profile-photos__arrow {
+  position: absolute; top: 50%; z-index: 2; display: grid; place-items: center;
+  width: 44px; height: 44px; padding: 0; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--surface) 65%, transparent);
+  background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--primary);
+  transform: translateY(-50%); cursor: pointer;
+}
+.profile-photos__arrow--previous { left: 12px; }
+.profile-photos__arrow--next { right: 12px; }
+.profile-photos__arrow:disabled { opacity: .42; cursor: default; }
+.profile-photos__arrow:not(:disabled):hover { background: var(--sakura-butter); }
+.profile-photos__dots { position: absolute; bottom: 5px; left: 50%; z-index: 2; transform: translateX(-50%); display: flex; }
+.profile-photos__dot { display: grid; place-items: center; width: 28px; height: 36px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.profile-photos__dot span { width: 6px; height: 6px; border-radius: 50%; background: var(--surface); opacity: .5; box-shadow: 0 1px 4px #192a2270; transition: transform 160ms, opacity 160ms; }
+.profile-photos__dot[aria-current] span { opacity: 1; transform: scale(1.3); }
+.profile-photos__dot:focus-visible, .profile-photos__arrow:focus-visible { outline: 2px solid var(--sakura-butter); outline-offset: 2px; }
+.photo-album { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 16px; }
+.photo-album__item { min-width: 0; margin: 0; }
+.photo-album__preview { display: grid; place-items: center; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 7px; background: var(--sakura-peach); color: var(--primary); }
+.photo-album__preview img { width: 100%; height: 100%; object-fit: cover; }
+.photo-album__item figcaption { display: flex; flex-wrap: wrap; gap: 4px 8px; padding-top: 6px; font-size: 12px; }
+.photo-album__item button { border: 0; background: transparent; color: var(--primary); padding: 4px 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.photo-album__item button:last-child { color: var(--danger); }
+.photo-album__cover { padding: 4px 0; color: var(--muted); }
+.photo-album__help { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+@media (max-width: 420px) { .photo-album { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (prefers-reduced-motion: reduce) { .profile-photos__dot span { transition: none; } }

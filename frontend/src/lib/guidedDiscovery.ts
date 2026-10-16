@@ -17,8 +17,8 @@ export function profileWithBasics(profile: Profile | null, values: GuidedValues)
   }
   if (!profile) return { name: values.name.trim(), schoolId: values.school!.id, major: values.major.trim(), tags: [] };
   // Copy only writable fields. Never send public URLs or server identity back.
-  const { name, age, schoolId, major, classYear, bio, instagram, photoKey, tags, prompt, budget, moveInDate, sleepSchedule, cleanliness, smoking, pets } = profile;
-  return { name: name || values.name.trim(), age, schoolId: schoolId || values.school!.id, major: major || values.major.trim(), classYear, bio, instagram, photoKey, tags, prompt, budget, moveInDate, sleepSchedule, cleanliness, smoking, pets };
+  const { name, age, schoolId, major, classYear, bio, instagram, photoKey, photoKeys, tags, prompt, budget, moveInDate, sleepSchedule, cleanliness, smoking, pets } = profile;
+  return { name: name || values.name.trim(), age, schoolId: schoolId || values.school!.id, major: major || values.major.trim(), classYear, bio, instagram, photoKey, photoKeys, tags, prompt, budget, moveInDate, sleepSchedule, cleanliness, smoking, pets };
 }
 type StorageAccess = Pick<Storage, "getItem" | "setItem">;
 export function hasSeenSetup(storage: StorageAccess, key: string) {

@@ -1,6 +1,8 @@
 import { Camera } from "lucide-react";
 import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { uploadPhoto } from "../lib/photos";
+import { editablePhotos, MAX_PROFILE_PHOTOS } from "../lib/profilePhotos";
+import "../profile-photos.css";
 import FormErrors from "./FormErrors";
 import SchoolPicker, { type SchoolOption } from "./SchoolPicker";
 import {
@@ -43,8 +45,8 @@ function ProfileForm({ initial = {}, localPreview = false, submitLabel, onSubmit
   const [classYear, setClassYear] = useState(initial.classYear?.toString() ?? "");
   const [bio, setBio] = useState(initial.bio ?? "");
   const [instagram, setInstagram] = useState(initial.instagram ?? "");
-  const [photoKey, setPhotoKey] = useState(initial.photoKey);
-  const [photoPreview, setPhotoPreview] = useState(initial.photoUrl);
+  const [photos, setPhotos] = useState(() => editablePhotos(initial));
+  const uploadInProgress = useRef(false);
   const [uploading, setUploading] = useState(false);
   const [tags, setTags] = useState<Tag[]>(initial.tags ?? []);
   const [promptQuestion, setPromptQuestion] = useState<PromptQuestion | "">(initial.prompt?.question ?? "");
@@ -65,30 +67,36 @@ function ProfileForm({ initial = {}, localPreview = false, submitLabel, onSubmit
     if (error) form.current?.querySelector<HTMLElement>(".form-error")?.focus();
   }, [error]);
 
-  // The photo uploads as soon as you pick it; the profile only remembers where it went (photoKey).
+  // Upload in selection order. Successful photos stay in the draft if a later upload fails.
   async function handlePhotoPicked(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) {
+    const input = event.currentTarget;
+    const files = Array.from(input.files ?? []);
+    input.value = "";
+    if (!files.length || uploadInProgress.current) return;
+    if (files.length + photos.length > MAX_PROFILE_PHOTOS) {
+      setError(new Error(`choose up to ${MAX_PROFILE_PHOTOS} photos in total.`));
       return;
     }
-    if (import.meta.env.DEV && localPreview) {
-      const url = URL.createObjectURL(file);
-      previewPhotos.current.push(url);
-      setPhotoPreview(url);
-      event.target.value = "";
+    if (files.some(file => !file.type.startsWith("image/"))) {
+      setError(new Error("please choose image files."));
       return;
     }
+    uploadInProgress.current = true;
     setUploading(true);
     setError(null);
     try {
-      const uploaded = await uploadPhoto(file);
-      setPhotoKey(uploaded.photoKey);
-      setPhotoPreview(uploaded.previewUrl);
+      for (const file of files) {
+        const uploaded = import.meta.env.DEV && localPreview
+          ? { photoKey: undefined, previewUrl: URL.createObjectURL(file) }
+          : await uploadPhoto(file);
+        previewPhotos.current.push(uploaded.previewUrl);
+        setPhotos(current => [...current, { key: uploaded.photoKey, url: uploaded.previewUrl }]);
+      }
     } catch (caught) {
       setError(caught);
     } finally {
+      uploadInProgress.current = false;
       setUploading(false);
-      event.target.value = "";
     }
   }
 
@@ -119,7 +127,7 @@ function ProfileForm({ initial = {}, localPreview = false, submitLabel, onSubmit
       classYear: classYear === "" ? undefined : Number(classYear),
       bio: bio.trim() === "" ? undefined : bio,
       instagram: instagram.trim() === "" ? undefined : instagram.trim(),
-      photoKey: photoKey,
+      photoKeys: photos.flatMap(photo => photo.key ? [photo.key] : []),
       tags: tags,
       prompt: promptQuestion === "" || promptAnswer.trim() === ""
         ? undefined
@@ -150,17 +158,25 @@ function ProfileForm({ initial = {}, localPreview = false, submitLabel, onSubmit
     <form ref={form} className="profile-form" onSubmit={handleSubmit}>
       <FormErrors error={error} />
 
-      <fieldset disabled={submitting}>
-        <legend>Photo</legend>
-        <div className="photo-picker">
-          <div className="photo-picker__preview">
-            {photoPreview ? <img src={photoPreview} alt="Your profile photo" /> : <Camera size={30} />}
-          </div>
+      <fieldset disabled={submitting || uploading}>
+        <legend>photos <small>({photos.length}/{MAX_PROFILE_PHOTOS})</small></legend>
+        {photos.length > 0 && <div className="photo-album">
+          {photos.map((photo, index) => <figure className="photo-album__item" key={photo.key ?? photo.url ?? index}>
+            <div className="photo-album__preview">{photo.url ? <img src={photo.url} alt={`your photo ${index + 1}`} /> : <Camera size={26} />}</div>
+            <figcaption>
+              {index === 0 ? <span className="photo-album__cover">cover photo</span> : <button type="button" aria-label={`make photo ${index + 1} the cover`} onClick={() => setPhotos(current => [current[index], ...current.filter((_, i) => i !== index)])}>make cover</button>}
+              <button type="button" aria-label={`remove photo ${index + 1}`} onClick={() => setPhotos(current => current.filter((_, i) => i !== index))}>remove</button>
+            </figcaption>
+          </figure>)}
+        </div>}
+        {photos.length < MAX_PROFILE_PHOTOS && <div className="photo-picker">
+          {!photos.length && <div className="photo-picker__preview"><Camera size={30} /></div>}
           <label className="secondary-button photo-picker__button">
-            {uploading ? "Uploading..." : photoPreview ? "Change photo" : "Add a photo"}
-            <input type="file" accept="image/*" className="sr-only" disabled={uploading || submitting} onChange={handlePhotoPicked} />
+            {uploading ? "uploading…" : "add photos"}
+            <input type="file" accept="image/*" multiple className="sr-only" disabled={uploading || submitting} onChange={handlePhotoPicked} />
           </label>
-        </div>
+        </div>}
+        <p className="photo-album__help" role="status">{uploading ? "uploading your photos…" : "up to 6 photos. the first one is your cover."}</p>
       </fieldset>
 
       <fieldset disabled={submitting}>
@@ -293,7 +309,7 @@ function ProfileForm({ initial = {}, localPreview = false, submitLabel, onSubmit
         {submitting ? "Saving..." : submitLabel}
       </button>
       {onCancel && (
-        <button className="secondary-button profile-form__cancel" type="button" disabled={submitting} onClick={onCancel}>
+        <button className="secondary-button profile-form__cancel" type="button" disabled={submitting || uploading} onClick={onCancel}>
           Cancel
         </button>
       )}

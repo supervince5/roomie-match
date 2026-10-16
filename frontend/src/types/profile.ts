@@ -42,7 +42,8 @@ export type ProfileInput = {
   classYear?: number;
   bio?: string;
   instagram?: string; // only shown to people you've matched with
-  photoKey?: string;  // where your photo lives in S3 (from uploadPhoto)
+  photoKey?: string;  // legacy cover; private to the owner
+  photoKeys?: string[]; // ordered album, up to 6; [] explicitly clears it
   tags: Tag[];
   prompt?: { question: PromptQuestion; answer: string };
   budget?: { min: number; max: number };
@@ -55,5 +56,5 @@ export type ProfileInput = {
 
 // What the API sends back. photoUrl is a temporary link (about an hour) to show the photo.
 // instagram only comes back for yourself and your matches.
-export type Profile = ProfileInput & { id: string; school: string; photoUrl?: string };
+export type Profile = ProfileInput & { id: string; school: string; photoUrl?: string; photoUrls?: string[] };
 export type MatchedProfile = Profile & { matchedAt: string };
