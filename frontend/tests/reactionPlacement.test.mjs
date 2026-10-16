@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { reactionPlacement } from "../src/lib/reactionPlacement.ts";
+import { reactionPlacement, landingReactionPlacement } from "../src/lib/reactionPlacement.ts";
 test("reaction stays inside the card with a modest bias toward the swipe", () => {
   const rect = { left: 200, right: 1000, top: 100, height: 500 };
   const left = reactionPlacement(rect, -1, 1280, 900);
@@ -67,4 +67,31 @@ test("tilted reactions keep their full bounds inside small viewports", () => {
       }
     }
   }
+});
+
+test("landing reaction clears the stack and stays nearby when the side is open", () => {
+  const card = { left: 240, right: 440, top: 200, height: 260 };
+  for (const direction of [-1, 1]) {
+    const p = landingReactionPlacement(card, direction, 1200, 900, [], () => .5);
+    const angle = Math.abs(p.angle) * Math.PI / 180;
+    const extra = (p.width * Math.cos(angle) + 66 * Math.sin(angle) - p.width) / 2;
+    if (direction < 0) {
+      assert.ok(p.left + p.width + extra <= card.left - 12);
+      assert.ok(card.left - (p.left + p.width + extra) <= 24);
+    } else {
+      assert.ok(p.left - extra >= card.right + 12);
+      assert.ok(p.left - extra - card.right <= 24);
+    }
+  }
+});
+test("crowded landing places the reaction below cards without hitting the wordmark", () => {
+  const card = { left: 208, right: 415, top: 433, height: 218 };
+  const obstacles = [
+    { left: 140, right: 740, top: 212, height: 193 },
+    { left: 466, right: 678, top: 437, height: 242 },
+  ];
+  const p = landingReactionPlacement(card, 1, 880, 900, obstacles, () => .5);
+  assert.ok(p.top >= 695);
+  assert.ok(p.left + p.width / 2 > (card.left + card.right) / 2);
+  assert.ok(p.top + 66 < 884);
 });

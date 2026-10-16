@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom";
-import { reactionPlacement } from "../lib/reactionPlacement";
+import { landingReactionPlacement } from "../lib/reactionPlacement";
 import { Heart, MoveDown, MoveHorizontal, X } from "lucide-react";
 import {
   useEffect,
@@ -32,8 +32,8 @@ const people = [
 ];
 
 const swipeReactions = {
-  like: ["the roomie of your life?", "a meet-cute, but for rent.", "the shared-fridge era?", "the perfect one?"],
-  pass: ["good vibes, wrong lease.", "not quite in tune.", "the search continues…", "different sleep schedules?"],
+  like: ["the roomie of your life?", "a meet-cute, but for rent.", "the shared-fridge era?", "the perfect one?", "your future coffee buddy?", "a little roomie chemistry.", "same playlist, maybe?", "this could feel like home.", "one shared kitchen closer.", "a good morning person?"],
+  pass: ["good vibes, wrong lease.", "not quite in tune.", "the search continues…", "different sleep schedules?", "someone else’s perfect roomie.", "keeping a little room open.", "a different kind of cozy.", "not our chapter.", "another door to try.", "the right fit takes a minute."],
 };
 
 // Hover pauses in place; leaving resumes on the next frame, without a cooldown.
@@ -99,8 +99,9 @@ export function SwipePreview({ paused }: { paused: boolean }) {
     swipeFrame(createSwipeMotion(people.length)),
   );
   const [announcement, setAnnouncement] = useState("");
-  const [reaction, setReaction] = useState<({ id: number; text: string } & ReturnType<typeof reactionPlacement>) | null>(null);
+  const [reaction, setReaction] = useState<({ id: number; text: string } & ReturnType<typeof landingReactionPlacement>) | null>(null);
   const reactionId = useRef(0);
+  const lastReaction = useRef("");
   useEffect(() => {
     if (!reaction) return;
     const clear = () => setReaction(null);
@@ -115,13 +116,15 @@ export function SwipePreview({ paused }: { paused: boolean }) {
   }, [reaction]);
 
   function showReaction(direction: number) {
-    const options = direction > 0 ? swipeReactions.like : swipeReactions.pass;
+    const options = (direction > 0 ? swipeReactions.like : swipeReactions.pass).filter(text => text !== lastReaction.current);
     const rect = deckRef.current?.getBoundingClientRect();
     if (!rect) return;
+    const obstacles = [...document.querySelectorAll(".minimal-center, .landing-scroll-demo")].map(element => element.getBoundingClientRect());
+    const text = options[Math.floor(Math.random() * options.length)];
+    lastReaction.current = text;
     setReaction({
-      id: ++reactionId.current,
-      text: options[Math.floor(Math.random() * options.length)],
-      ...reactionPlacement(rect, direction, document.documentElement.clientWidth, window.innerHeight),
+      id: ++reactionId.current, text,
+      ...landingReactionPlacement(rect, direction, document.documentElement.clientWidth, window.innerHeight, obstacles),
     });
   }
   const stopPointer = useRef<(() => void) | null>(null);
