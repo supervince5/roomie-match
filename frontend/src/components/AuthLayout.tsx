@@ -6,7 +6,7 @@ import Blossoms from "./Blossoms";
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <main className="auth-layout">
-      <aside className="auth-story" aria-label="About RoomieMatch">
+      <aside className="auth-story" aria-label="About matcharoomie">
         <Blossoms quiet />
         <Brand />
         <div className="auth-story__body">
@@ -20,7 +20,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             <div><Utensils size={20} /><span>Someone to split dinner with</span><span>03</span></div>
           </div>
         </div>
-        <footer className="auth-story__footer"><span>One room. A new connection.</span><span>rm.</span></footer>
+        <footer className="auth-story__footer"><span>One room. A new connection.</span><span>mr.</span></footer>
       </aside>
       <div className="auth-content">{children}</div>
     </main>

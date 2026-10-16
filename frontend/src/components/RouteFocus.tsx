@@ -11,7 +11,7 @@ export default function RouteFocus() {
   const previous = useRef(pathname);
   useEffect(() => {
     const title = titles[pathname] ?? (pathname.startsWith("/matches/") ? "Your match" : pathname.startsWith("/people/") ? "Roommate profile" : "Page not found");
-    document.title = `${title} · RoomieMatch`;
+    document.title = `${title} · matcharoomie`;
     if (previous.current === pathname) return;
     previous.current = pathname;
     const frame = requestAnimationFrame(() => {

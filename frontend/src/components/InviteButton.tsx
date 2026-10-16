@@ -33,7 +33,7 @@ export default function InviteButton() {
       )}
       {fallback && isLocal && (
         <p className="page-subtitle" role="status">
-          Invites will be available when RoomieMatch has a public web address.
+          Invites will be available when matcharoomie has a public web address.
         </p>
       )}
       {fallback && !isLocal && (

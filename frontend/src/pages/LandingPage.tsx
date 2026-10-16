@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import Blossoms from "../components/Blossoms";
 import Brand from "../components/Brand";
+import BrandMark from "../components/BrandMark";
 import CampusMarquee from "../components/CampusMarquee";
 import { SwipePreview, ScrollPreview } from "../components/LandingDemos";
 import "../landing.css";
@@ -23,8 +24,9 @@ export default function LandingPage() {
 
       <div className="landing-composition">
         <section className="minimal-center" aria-label="Find your roommate">
+          <div className="matcha-hero-mark"><BrandMark /></div>
           <h1>
-            roomie<span>match</span>
+            <span className="matcha-word">matcha</span>roomie
             <span className="wordmark-dot">.</span>
           </h1>
           <p className="minimal-kicker">find the roommate of your life.</p>

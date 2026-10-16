@@ -96,7 +96,7 @@ export default function GuidedDiscovery({ initial, localPreview = false, initial
       {!closing && <motion.div className="guided-shell" key="shell"
         initial={{opacity:0,y:reduced ? 0 : 14,scale:reduced ? 1 : .985}} animate={{opacity:1,y:0,scale:1}}
         exit={{opacity:0,y:reduced ? 0 : 10,scale:reduced ? 1 : .99}} transition={{duration:.24,ease:[.22,1,.36,1]}}>
-        <header className="guided-topbar"><span>roomiematch.</span>
+        <header className="guided-topbar"><span>matcharoomie.</span>
           <button type="button" className="icon-button" aria-label="Close setup" disabled={saving} onClick={close}><X size={19}/></button>
         </header>
         <form noValidate onSubmit={event => {event.preventDefault(); void advance();}}>

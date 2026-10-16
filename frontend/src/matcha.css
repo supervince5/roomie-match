@@ -1,0 +1,20 @@
+/* Matcha joins the existing sakura palette; the original layout and motion remain. */
+:root { --matcha: #65774d; --matcha-soft: #e6ecd8; }
+.brand .brand-word { color: var(--matcha); }
+.brand .brand-mark { width: 36px; height: 36px; flex-shrink: 0; color: var(--primary); }
+.matcha-hero-mark { display: flex; justify-content: center; margin: 0 0 15px; }
+.matcha-hero-mark .brand-mark { width: 65px; height: 65px; color: var(--matcha); }
+.minimal-center h1 .matcha-word { color: var(--matcha); }
+.minimal-landing .demo-portrait--sage, .minimal-landing .demo-feed-avatar--sage { background: var(--matcha-soft); }
+.minimal-landing .demo-portrait--sage > span, .minimal-landing .demo-feed-avatar--sage { color: var(--matcha); }
+.auth-story .brand-word { color: #455538; }
+@media (min-width: 1101px) { .minimal-landing .minimal-center h1 { font-size: clamp(50px, 5.35vw, 85px); } }
+@media (max-width: 760px) {
+  .matcha-hero-mark { margin-bottom: 12px; }
+  .matcha-hero-mark .brand-mark { width: 49px; height: 49px; }
+  .minimal-landing .minimal-center h1 { font-size: clamp(34px, 9.7vw, 70px); }
+}
+@media (max-height: 730px) and (max-width: 760px) {
+  .matcha-hero-mark { margin-bottom: 8px; }
+  .matcha-hero-mark .brand-mark { width: 39px; height: 39px; }
+}
