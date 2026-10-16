@@ -394,3 +394,9 @@ body > .demo-swipe-note {
 .minimal-landing .falling-petal {
   width: var(--petal-width, 5px); height: calc(var(--petal-width, 5px) * 1.8);
 }
+
+/* The full campus lineup stays reachable when motion is reduced. */
+@media (prefers-reduced-motion: reduce) {
+  .campus-marquee__window { overflow-x: auto; mask-image: none; }
+  .campus-marquee__group[aria-hidden="true"] { display: none; }
+}

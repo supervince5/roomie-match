@@ -4,7 +4,7 @@ const titles: Record<string, string> = {
   "/": "Find your roomie", "/discover": "Discover", "/matches": "Matches",
   "/search": "Search", "/history": "Swipe history", "/profile": "My profile",
   "/login": "Log in", "/signup": "Create an account", "/forgot-password": "Reset password",
-  "/design-preview": "Design preview",
+  "/design-preview": "Design preview", "/app-preview": "Find your roomie",
 };
 export default function RouteFocus() {
   const { pathname } = useLocation();
