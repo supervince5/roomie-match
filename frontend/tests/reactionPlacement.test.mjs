@@ -96,3 +96,19 @@ test("crowded landing places the reaction below cards without hitting the wordma
   assert.ok(p.left + p.width / 2 > (card.left + card.right) / 2);
   assert.ok(p.top + 66 < 884);
 });
+
+test("landing notes never overlap the swipe caption at cramped widths", () => {
+  const card = {left:40,right:250,top:180,height:260};
+  const caption = {left:100,right:245,top:452,height:28};
+  for (const direction of [-1,1]) for (const random of [0,.5,1]) {
+    const p=landingReactionPlacement(card,direction,390,720,[caption],()=>random);
+    const a=Math.abs(p.angle)*Math.PI/180;
+    const dx=(p.width*Math.cos(a)+66*Math.sin(a)-p.width)/2;
+    const dy=(p.width*Math.sin(a)+66*Math.cos(a)-66)/2;
+    assert.ok(p.left+p.width+dx<=caption.left || p.left-dx>=caption.right || p.top+66+dy<=caption.top || p.top-dy>=caption.top+caption.height);
+  }
+});
+test("landing suppresses visual ink when there is no clear visible space", () => {
+  const p=landingReactionPlacement({left:20,right:230,top:180,height:260},1,320,480,[{left:0,right:320,top:0,height:480}],()=>.5);
+  assert.equal(p.visible,false);
+});

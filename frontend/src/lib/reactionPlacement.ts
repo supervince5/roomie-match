@@ -47,6 +47,11 @@ export function landingReactionPlacement(rect: Bounds, direction: number, viewpo
       if (overlaps(obstacle)) top = obstacle.top + obstacle.height + gap + extraY;
     }
   }
-  return { ...placement, left, top };
+  // Never trade legibility for placement. Keep the accessible swipe announcement
+  // when the viewport has no clear space for decorative ink.
+  const visible = left - extraX >= 16 && left + width + extraX <= viewportWidth - 16
+    && top - extraY >= 16 && top + 66 + extraY <= viewportHeight - 16
+    && !obstacles.some(overlaps);
+  return { ...placement, left, top, visible };
 
 }

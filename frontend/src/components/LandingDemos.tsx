@@ -119,7 +119,7 @@ export function SwipePreview({ paused }: { paused: boolean }) {
     const options = (direction > 0 ? swipeReactions.like : swipeReactions.pass).filter(text => text !== lastReaction.current);
     const rect = deckRef.current?.getBoundingClientRect();
     if (!rect) return;
-    const obstacles = [...document.querySelectorAll(".minimal-center h1, .minimal-kicker, .minimal-cta, .demo-feed-window")].map(element => element.getBoundingClientRect());
+    const obstacles = [...document.querySelectorAll(".minimal-center h1, .minimal-kicker, .minimal-cta, .demo-feed-window, .demo-caption")].map(element => element.getBoundingClientRect());
     const text = options[Math.floor(Math.random() * options.length)];
     lastReaction.current = text;
     setReaction({
@@ -261,7 +261,7 @@ export function SwipePreview({ paused }: { paused: boolean }) {
       <span className="demo-caption">
         <MoveHorizontal size={15} /> try a swipe.
       </span>
-      {reaction && createPortal(
+      {reaction?.visible && createPortal(
         <p key={reaction.id} className={`demo-swipe-note demo-swipe-note--${reaction.side}`}
           style={{ left: reaction.left, top: reaction.top, width: reaction.width, rotate: `${reaction.angle}deg` }}
           aria-hidden="true">{reaction.text}</p>,
