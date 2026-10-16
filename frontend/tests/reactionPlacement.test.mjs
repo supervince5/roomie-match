@@ -1,12 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { reactionPlacement } from "../src/lib/reactionPlacement.ts";
-test("reaction follows left and right gestures when there is room", () => {
-  const rect = { left: 400, right: 600, top: 200, height: 260 };
-  const left = reactionPlacement(rect, -1, 1280, 720);
-  const right = reactionPlacement(rect, 1, 1280, 720);
-  assert.ok(left.left + left.width < rect.left);
-  assert.ok(right.left > rect.right);
+test("reaction stays inside the card with a modest bias toward the swipe", () => {
+  const rect = { left: 200, right: 1000, top: 100, height: 500 };
+  const left = reactionPlacement(rect, -1, 1280, 900);
+  const right = reactionPlacement(rect, 1, 1280, 900);
+  assert.ok(left.left >= rect.left && right.left + right.width <= rect.right);
+  assert.ok(left.left + left.width / 2 > 400 && left.left + left.width / 2 < 600);
+  assert.ok(right.left + right.width / 2 > 600 && right.left + right.width / 2 < 800);
   assert.equal(left.side, "pass");
   assert.equal(right.side, "like");
 });
@@ -29,6 +30,41 @@ test("reaction stays above the bottom edge on short and scrolled screens", () =>
       const rect = { left: 400, right: 600, top: height - 20, height: 260 };
       const position = reactionPlacement(rect, direction, 1280, height);
       assert.ok(position.top + 66 <= height - 16);
+    }
+  }
+});
+
+test("reaction varies within the middle-to-lower card area", () => {
+  const rect = { left: 400, right: 680, top: 200, height: 400 };
+  for (const direction of [-1, 1]) {
+    const a = reactionPlacement(rect, direction, 1280, 800, () => 0);
+    const b = reactionPlacement(rect, direction, 1280, 800, () => 1);
+    assert.ok(a.top >= rect.top + rect.height * .55);
+    assert.ok(b.top >= rect.top + rect.height * .55);
+    assert.ok(a.top <= rect.top + rect.height * .75);
+    assert.ok(b.top <= rect.top + rect.height * .75);
+    assert.notEqual(a.top, b.top);
+    assert.notEqual(a.left, b.left);
+    assert.notEqual(a.angle, b.angle);
+    assert.ok(Math.abs(a.angle) >= 7 && Math.abs(a.angle) <= 14);
+    assert.ok(Math.abs(b.angle) >= 7 && Math.abs(b.angle) <= 14);
+  }
+});
+
+test("tilted reactions keep their full bounds inside small viewports", () => {
+  for (const viewport of [320, 390, 768]) {
+    for (const direction of [-1, 1]) {
+      for (const random of [0, 0.5, 1]) {
+        const rect = { left: 18, right: viewport - 18, top: 40, height: 200 };
+        const p = reactionPlacement(rect, direction, viewport, 320, () => random);
+        const angle = Math.abs(p.angle) * Math.PI / 180;
+        const rotatedWidth = p.width * Math.cos(angle) + 66 * Math.sin(angle);
+        const rotatedHeight = p.width * Math.sin(angle) + 66 * Math.cos(angle);
+        assert.ok(p.left + p.width / 2 - rotatedWidth / 2 >= 16);
+        assert.ok(p.left + p.width / 2 + rotatedWidth / 2 <= viewport - 16);
+        assert.ok(p.top + 33 - rotatedHeight / 2 >= 16);
+        assert.ok(p.top + 33 + rotatedHeight / 2 <= 304);
+      }
     }
   }
 });

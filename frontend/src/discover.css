@@ -158,29 +158,17 @@
   border-radius: 12px;
   background: linear-gradient(100deg, #ffdbb033, #fffdf555);
 }
-.discover-note-slot {
-  position: absolute;
-  z-index: 20;
-  inset: auto 0 77px;
-  pointer-events: none;
-  display: flex;
-  justify-content: center;
-}
 .discover-note {
+  position: fixed;
+  z-index: 20;
   margin: 0;
   padding: 0;
-  background: transparent;
-  color: #000;
-  font:
-    italic 17px/1.4 Georgia,
-    serif;
+  pointer-events: none;
+  color: var(--text);
+  font: italic 15px/1.45 var(--font-editorial);
+  text-align: center;
+  text-shadow: 0 1px 5px var(--surface), 0 0 10px var(--surface);
   animation: discover-note 3.3s ease both;
-}
-.discover-note--pass {
-  margin-right: 16%;
-}
-.discover-note--like {
-  margin-left: 16%;
 }
 .discover-page .match-banner {
   position: relative;
@@ -344,19 +332,6 @@
   }
   .discover-page .empty-state h2 {
     font-size: 27px;
-  }
-  .discover-note-slot {
-    position: fixed;
-    bottom: 156px;
-    left: 4%;
-    right: 4%;
-  }
-  .discover-note {
-    font-size: 15px;
-  }
-  .discover-note--pass,
-  .discover-note--like {
-    margin: 0;
   }
   .discover-filter-heading {
     padding: 24px 20px 20px;

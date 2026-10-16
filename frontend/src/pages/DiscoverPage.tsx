@@ -1,3 +1,5 @@
+import { createPortal } from "react-dom";
+import { reactionPlacement } from "../lib/reactionPlacement";
 import { isOutsideDialog } from "../lib/dialog";
 import SwipeSurface from "../components/SwipeSurface";
 import InviteButton from "../components/InviteButton";
@@ -151,10 +153,13 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
   const [filterError, setFilterError] = useState("");
   const filterDialog = useRef<HTMLDialogElement>(null);
   const sound = useDiscoverSound();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const noteId = useRef(0);
   const [note, setNote] = useState<{
     text: string;
     kind: DiscoverFeedbackKind;
     id: number;
+    placement: ReturnType<typeof reactionPlacement>;
   } | null>(null);
   const noteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastNote = useRef("");
@@ -164,6 +169,15 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
     },
     [],
   );
+  useEffect(() => {
+    const clear = () => setNote(null);
+    window.addEventListener("resize", clear);
+    window.addEventListener("scroll", clear, { passive: true });
+    return () => {
+      window.removeEventListener("resize", clear);
+      window.removeEventListener("scroll", clear);
+    };
+  }, []);
   useEffect(() => {
     const dialog = filterDialog.current;
     if (!dialog) return;
@@ -206,7 +220,15 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
     const text = pickDiscoverNote(kind, lastNote.current);
     lastNote.current = text;
     if (noteTimer.current) clearTimeout(noteTimer.current);
-    setNote({ text, kind, id: Date.now() });
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    // The buttons may scroll a tall card; anchor to its visible portion.
+    const top = Math.max(100, rect.top);
+    const placement = reactionPlacement(
+      { left: rect.left, right: rect.right, top, height: Math.max(0, Math.min(rect.bottom, window.innerHeight) - top) },
+      kind === "pass" ? -1 : 1, document.documentElement.clientWidth, window.innerHeight,
+    );
+    setNote({ text, kind, placement, id: ++noteId.current });
     noteTimer.current = setTimeout(() => setNote(null), 3300);
   }
   const [version, setVersion] = useState(0); // bump to refresh
@@ -379,7 +401,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
         const matched = result.match ?? currentProfile;
         setNewMatch(matched);
         void sound.play("match");
-        showNote("match");
+        // The banner announces the match; keep the original swipe note fading once.
         // Put them at the top of the remembered Matches list right away
         if (!preview)
           updateApiCache<{ matches: MatchedProfile[] }>("/matches", (list) => ({
@@ -443,7 +465,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
   } else if (currentProfile) {
     content = (
       <>
-        <div className="discover-card-entry" key={currentProfile.id}>
+        <div ref={cardRef} className="discover-card-entry" key={currentProfile.id}>
           <SwipeSurface
             disabled={animation !== null}
             onSwipe={handleDecision}
@@ -824,16 +846,13 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
           <p className="sr-only" role="status">
             {lastDecision}
           </p>
-          <div className="discover-note-slot" aria-live="polite">
-            {note && (
-              <p
-                key={note.id}
-                className={`discover-note discover-note--${note.kind}`}
-              >
-                {note.text}
-              </p>
-            )}
-          </div>
+          {note && createPortal(
+            <p key={note.id} className={`discover-note discover-note--${note.kind}`}
+              style={{ left: note.placement.left, top: note.placement.top, width: note.placement.width, rotate: `${note.placement.angle}deg` }}
+              aria-hidden="true">
+              {note.text}
+            </p>, document.body,
+          )}
           {content}
         </div>
       </div>

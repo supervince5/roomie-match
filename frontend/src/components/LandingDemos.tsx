@@ -260,7 +260,7 @@ export function SwipePreview({ paused }: { paused: boolean }) {
       </span>
       {reaction && createPortal(
         <p key={reaction.id} className={`demo-swipe-note demo-swipe-note--${reaction.side}`}
-          style={{ left: reaction.left, top: reaction.top, width: reaction.width }}
+          style={{ left: reaction.left, top: reaction.top, width: reaction.width, rotate: `${reaction.angle}deg` }}
           aria-hidden="true">{reaction.text}</p>,
         document.body,
       )}
