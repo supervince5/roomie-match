@@ -1,3 +1,4 @@
+import ContentArrival from "../components/ContentArrival";
 import Conversation from "../components/Conversation";
 import CompatibilityPanel from "../components/CompatibilityPanel";
 import { ArrowLeft } from "lucide-react";
@@ -134,7 +135,7 @@ function MatchProfilePage() {
         </div>
       </header>
 
-      {content}
+      <ContentArrival busy={loading} pace="detail">{content}</ContentArrival>
     </main>
   );
 }

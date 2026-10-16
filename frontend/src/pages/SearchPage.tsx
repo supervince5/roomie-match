@@ -1,3 +1,4 @@
+import ContentArrival from "../components/ContentArrival";
 import { ArrowLeft, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
@@ -85,7 +86,7 @@ function SearchPage() {
         />
       </label>
 
-      {content}
+      <ContentArrival busy={trimmed.length >= 2 && current === null} pace="search">{content}</ContentArrival>
     </main>
   );
 }

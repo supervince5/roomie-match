@@ -1,3 +1,4 @@
+import ContentArrival from "../components/ContentArrival";
 import CompatibilityPanel from "../components/CompatibilityPanel";
 import SwipeSurface from "../components/SwipeSurface";
 import { ArrowLeft, Heart, X } from "lucide-react";
@@ -140,7 +141,7 @@ function PersonPage() {
           <h1 className="member-name">{data?.profile.name ?? "profile"}</h1>
         </div>
       </header>
-      {content}
+      <ContentArrival busy={loading} pace="detail">{content}</ContentArrival>
     </main>
   );
 }

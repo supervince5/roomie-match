@@ -1,3 +1,4 @@
+import ContentArrival from "../components/ContentArrival";
 import { ArrowLeft, Heart, X } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
@@ -114,7 +115,7 @@ function HistoryPage() {
 
       {notice && <p className="decision-message" role="status">{notice}</p>}
       <FormErrors error={actionError} />
-      {content}
+      <ContentArrival busy={loading} pace="list">{content}</ContentArrival>
 
       <ConfirmDialog
         open={confirmItem !== null}

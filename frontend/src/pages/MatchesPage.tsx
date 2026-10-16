@@ -1,3 +1,4 @@
+import ContentArrival from "../components/ContentArrival";
 import { ChevronRight, Heart } from "lucide-react";
 import { Link } from "react-router";
 import FormErrors from "../components/FormErrors";
@@ -69,7 +70,7 @@ function MatchesPage() {
         <p>A match appears when two students both like each other. Open a match to compare your living habits and start a conversation.</p>
       </section>
 
-      {content}
+      <ContentArrival busy={loading} pace="list">{content}</ContentArrival>
     </main>
   );
 }

@@ -293,3 +293,28 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .eyebrow, .auth-card__overline, .auth-story__body > p { text-transform: lowercase; }
 
 .member-name { text-transform: none; }
+
+/* App content may arrive after the native route crossfade has finished.
+   These selectors deliberately exclude Discovery and its gesture controller. */
+.page--with-navigation:not(.discover-page) > .page-header {
+  animation: app-heading-arrive 260ms cubic-bezier(.22, 1, .36, 1) both;
+}
+.content-arrival { min-height: 160px; }
+.content-arrival--list { --arrival-duration: 340ms; }
+.content-arrival--detail { --arrival-duration: 400ms; }
+.content-arrival--search { --arrival-duration: 220ms; }
+.content-arrival[data-ready="true"] {
+  animation: app-content-arrive var(--arrival-duration) cubic-bezier(.22, 1, .36, 1) backwards;
+}
+@keyframes app-heading-arrive {
+  from { opacity: .65; }
+  to { opacity: 1; }
+}
+@keyframes app-content-arrive {
+  from { opacity: .35; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page--with-navigation:not(.discover-page) > .page-header,
+  .content-arrival[data-ready="true"] { animation: none; }
+}

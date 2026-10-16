@@ -1,3 +1,4 @@
+import ContentArrival from "../components/ContentArrival";
 import { LogOut, Pencil } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../auth/authContext";
@@ -97,7 +98,7 @@ function ProfilePage() {
         </button>
       </header>
 
-      {content}
+      <ContentArrival busy={loading} pace="detail">{content}</ContentArrival>
 
       {!loading && (
         <section className="danger-zone">
