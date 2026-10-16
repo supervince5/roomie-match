@@ -295,3 +295,102 @@ body:has(.minimal-landing) #root { height: 100%; min-height: 0; }
  .demo-swipe-note { left: 0; transform: none; width: calc(200% + 32px); max-width: none; font-size: 13px; }
 }
 @media (prefers-reduced-motion: reduce) { .demo-swipe-note { animation: none; } }
+
+/* The wordmark is the center of gravity; the two playful previews frame it. */
+.landing-composition {
+  width: 88%; max-width: 1440px;
+  grid-template-columns: minmax(150px, 230px) minmax(0, 1fr) minmax(150px, 230px);
+  gap: clamp(28px, 3.5vw, 64px);
+}
+.landing-playground { display: contents; }
+.minimal-center { grid-column: 2; grid-row: 1; text-align: center; }
+.minimal-center h1 { font-size: clamp(56px, 5.8vw, 92px); letter-spacing: -.06em; }
+.minimal-kicker { font-size: clamp(15px, 1.25vw, 19px); }
+.landing-swipe-demo { grid-column: 1; grid-row: 1; transform: rotate(-5deg); }
+.landing-scroll-demo { grid-column: 3; grid-row: 1; transform: rotate(3deg); }
+.demo-deck { aspect-ratio: .83; }
+.demo-feed-window { height: clamp(220px, 21vw, 310px); }
+.demo-card-copy strong, .demo-feed-person strong { text-transform: lowercase; }
+.demo-swipe-note { color: var(--text); }
+.minimal-cta svg { transition: transform 220ms cubic-bezier(.22, 1, .36, 1); }
+.minimal-cta:hover svg { transform: translateX(3px); }
+.minimal-login svg { transition: transform 180ms ease-out; }
+.minimal-login:hover svg { transform: translateX(3px); }
+
+@media (max-width: 1100px) {
+  .landing-composition { grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(600px, 86%); gap: 36px 64px; }
+  .minimal-center { grid-column: 1 / -1; grid-row: 1; }
+  .minimal-center h1 { font-size: clamp(52px, 8.3vw, 84px); margin-bottom: 12px; }
+  .minimal-kicker { font-size: 16px; margin-bottom: 24px; }
+  .landing-swipe-demo { grid-column: 1; grid-row: 2; width: min(100%, 190px); justify-self: end; }
+  .landing-scroll-demo { grid-column: 2; grid-row: 2; width: min(100%, 200px); justify-self: start; }
+  .demo-deck { max-height: none; aspect-ratio: .94; }
+  .demo-feed-window { height: 200px; }
+  .demo-portrait > span { font-size: 86px; }
+  .demo-caption { margin-top: 16px; }
+}
+@media (max-width: 760px) {
+  .landing-composition { display: grid; width: 86%; gap: 30px 36px; }
+  .minimal-center h1 { font-size: clamp(43px, 10.4vw, 72px); }
+  .minimal-kicker { font-size: 14px; margin-bottom: 20px; }
+  .landing-swipe-demo, .landing-scroll-demo { width: min(100%, 145px); }
+  .demo-portrait > span { font-size: 66px; }
+  .demo-feed-window { height: 154px; }
+  .demo-feed-person > div > span { display: block; font-size: 10px; max-width: 82px; }
+  .demo-feed-person { min-height: 65px; }
+  .demo-portrait > small { font-size: 9px; }
+  .demo-card-copy > span { display: block; font-size: 10px; }
+  .demo-card-copy strong { font-size: 15px; }
+  .demo-swipe-note { width: calc(200% + 36px); }
+}
+@media (max-height: 780px) and (min-width: 761px) and (max-width: 1100px) {
+  .minimal-landing { grid-template-rows: 76px 1fr 80px 52px; }
+  .landing-composition { gap: 22px 52px; }
+  .minimal-center h1 { font-size: 65px; margin-bottom: 8px; }
+  .minimal-kicker { margin-bottom: 16px; }
+  .landing-swipe-demo, .landing-scroll-demo { width: 150px; }
+  .demo-feed-window { height: 160px; }
+  .demo-portrait > span { font-size: 65px; }
+  .demo-card-copy { padding: 8px 12px; }
+  .demo-card-copy strong { font-size: 15px; }
+  .demo-card-copy > span { font-size: 10px; }
+}
+@media (max-height: 730px) and (max-width: 760px) {
+  .landing-composition { gap: 22px 34px; }
+  .minimal-center h1 { font-size: clamp(40px, 10.4vw, 60px); }
+  .minimal-kicker { font-size: 13px; margin-bottom: 16px; }
+  .landing-swipe-demo, .landing-scroll-demo { width: 116px; }
+  .demo-feed-window { height: 124px; }
+  .demo-portrait > span { font-size: 50px; }
+  .demo-card-copy > span { display: none; }
+}
+/* Short screens scroll naturally rather than clipping the previews or controls. */
+@media (max-height: 580px) {
+  html:has(.minimal-landing), body:has(.minimal-landing) { height: auto; overflow: auto; }
+  .minimal-landing { height: auto; min-height: 650px; grid-template-rows: 72px 1fr 80px 64px; }
+  .landing-composition { display: grid; padding-block: 30px; }
+  .landing-playground { display: contents; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .minimal-cta:hover svg, .minimal-login:hover svg { transform: none; }
+}
+
+
+/* Reaction ink follows the gesture; its portal avoids rotated/clipped card bounds. */
+body > .demo-swipe-note {
+  position: fixed; z-index: 20; margin: 0; max-width: none;
+  transform: none; color: var(--text); text-align: center;
+  font: italic 15px/1.45 var(--font-editorial);
+  pointer-events: none; animation: demo-note-fade 3.3s ease-in-out both;
+}
+@keyframes demo-note-fade {
+  0% { opacity: 0; }
+  18%, 68% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body > .demo-swipe-note { animation: none; }
+}
+.minimal-landing .falling-petal {
+  width: var(--petal-width, 5px); height: calc(var(--petal-width, 5px) * 1.8);
+}

@@ -1,3 +1,5 @@
+import { createPortal } from "react-dom";
+import { reactionPlacement } from "../lib/reactionPlacement";
 import { Heart, MoveDown, MoveHorizontal, X } from "lucide-react";
 import {
   useEffect,
@@ -79,7 +81,7 @@ function PreviewCard({ person }: { person: (typeof people)[number] }) {
     <>
       <div className={`demo-portrait demo-portrait--${person.tone}`}>
         <span>{person.initial}</span>
-        <small>roommate notes</small>
+        <small>sample roomie</small>
       </div>
       <div className="demo-card-copy">
         <strong>{person.name}</strong>
@@ -97,17 +99,30 @@ export function SwipePreview({ paused }: { paused: boolean }) {
     swipeFrame(createSwipeMotion(people.length)),
   );
   const [announcement, setAnnouncement] = useState("");
-  const [reaction, setReaction] = useState<{ id: number; text: string } | null>(null);
+  const [reaction, setReaction] = useState<({ id: number; text: string } & ReturnType<typeof reactionPlacement>) | null>(null);
   const reactionId = useRef(0);
   useEffect(() => {
     if (!reaction) return;
-    const timer = window.setTimeout(() => setReaction(null), 3300);
-    return () => window.clearTimeout(timer);
+    const clear = () => setReaction(null);
+    const timer = window.setTimeout(clear, 3300);
+    window.addEventListener("resize", clear);
+    window.addEventListener("scroll", clear, { passive: true });
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("resize", clear);
+      window.removeEventListener("scroll", clear);
+    };
   }, [reaction]);
 
   function showReaction(direction: number) {
     const options = direction > 0 ? swipeReactions.like : swipeReactions.pass;
-    setReaction({ id: ++reactionId.current, text: options[Math.floor(Math.random() * options.length)] });
+    const rect = deckRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setReaction({
+      id: ++reactionId.current,
+      text: options[Math.floor(Math.random() * options.length)],
+      ...reactionPlacement(rect, direction, document.documentElement.clientWidth, window.innerHeight),
+    });
   }
   const stopPointer = useRef<(() => void) | null>(null);
   useEffect(() => () => stopPointer.current?.(), []);
@@ -203,10 +218,10 @@ export function SwipePreview({ paused }: { paused: boolean }) {
         }}
         onDragStart={(event) => event.preventDefault()}
         onKeyDown={(event) => {
-          if (["Enter", " "].includes(event.key) && !event.repeat) {
+          if (["Enter", " ", "Delete", "Backspace"].includes(event.key) && !event.repeat) {
             event.preventDefault();
             idle.focus();
-            swipe(1);
+            swipe(["Delete", "Backspace"].includes(event.key) ? -1 : 1);
           }
         }}
       >
@@ -243,10 +258,15 @@ export function SwipePreview({ paused }: { paused: boolean }) {
       <span className="demo-caption">
         <MoveHorizontal size={15} /> try a swipe.
       </span>
-      {reaction && <p key={reaction.id} className="demo-swipe-note" aria-hidden="true">{reaction.text}</p>}
+      {reaction && createPortal(
+        <p key={reaction.id} className={`demo-swipe-note demo-swipe-note--${reaction.side}`}
+          style={{ left: reaction.left, top: reaction.top, width: reaction.width }}
+          aria-hidden="true">{reaction.text}</p>,
+        document.body,
+      )}
       <span id="swipe-preview-help" className="sr-only">
         Interactive sample only. Drag left to pass or right to like.
-        Click for the next profile. Cards return to the bottom; no
+        Press Enter to like or Delete to pass. Cards return to the bottom; no
         real likes are sent.
       </span>
       <span className="sr-only" role="status">

@@ -24,7 +24,7 @@ export default function Blossoms({ paused = false, quiet = false }: { paused?: b
       <Branch />
       <Branch lower />
       {!quiet && Array.from({length:9},(_,i)=>(
-        <i key={i} className="falling-petal" style={{"--left":`${7+i*11}%`,"--delay":`${-i*3.1}s`,"--duration":`${16+(i%4)*3}s`,"--drift":`${i%2?110:-85}px`} as CSSProperties} />
+        <i key={i} className="falling-petal" style={{"--petal-width":`${4+(i%3)*1.5}px`,"--left":`${7+i*11}%`,"--delay":`${-i*3.1}s`,"--duration":`${16+(i%4)*3}s`,"--drift":`${i%2?110:-85}px`} as CSSProperties} />
       ))}
     </div>
   );
