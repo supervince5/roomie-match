@@ -834,7 +834,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
               {filterError}
             </p>
           )}
-          <button className="text-link" type="button" onClick={() => void openFilters(true)}>guide me through it</button>
+          <button className="text-link" type="button" onClick={event => { if (event.currentTarget.form?.reportValidity()) openFilters(true); }}>guide me through it</button>
           <div className="discover-filter-actions">
             <button
               className="text-link"
