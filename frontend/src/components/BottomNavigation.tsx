@@ -10,7 +10,7 @@ export default function BottomNavigation() {
         { to: "/history", label: "History", Icon: History },
         { to: "/profile", label: "My profile", Icon: UserRound },
       ].map(({ to, label, Icon }) => (
-        <NavLink
+        <NavLink viewTransition
           key={to}
           to={to}
           className={({ isActive }) =>

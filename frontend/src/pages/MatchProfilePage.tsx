@@ -44,7 +44,7 @@ function MatchProfilePage() {
       updateApiCache<{ matches: MatchedProfile[] }>("/matches", (current) => ({
         matches: current.matches.filter((m) => m.id !== match.id),
       }));
-      navigate("/matches", { replace: true });
+      navigate("/matches", { replace: true, viewTransition: true });
     } catch (caught) {
       setUnmatchError(caught);
       setUnmatching(false);
@@ -58,7 +58,7 @@ function MatchProfilePage() {
     content = (
       <section className="empty-state">
         <FormErrors error={error} />
-        <Link className="secondary-button" to="/matches">
+        <Link viewTransition className="secondary-button" to="/matches">
           Back to matches
         </Link>
       </section>
@@ -97,12 +97,12 @@ function MatchProfilePage() {
           type="button"
           onClick={() => setConfirmOpen(true)}
         >
-          Unmatch with {match.name}
+          unmatch with <span className="member-name">{match.name}</span>
         </button>
 
         <ConfirmDialog
           open={confirmOpen}
-          title={`Unmatch with ${match.name}?`}
+          title={<>unmatch with <span className="member-name">{match.name}</span>?</>}
           message="You'll disappear from each other's matches, and you won't see each other in Discover again."
           confirmLabel="Unmatch"
           busyLabel="Unmatching..."
@@ -121,7 +121,7 @@ function MatchProfilePage() {
   return (
     <main className="page page--with-navigation">
       <header className="page-header page-header--with-back">
-        <Link
+        <Link viewTransition
           className="icon-button"
           to="/matches"
           aria-label="Back to matches"
@@ -130,7 +130,7 @@ function MatchProfilePage() {
         </Link>
         <div>
           <p className="eyebrow">Your match</p>
-          <h1>{match?.name ?? "Profile"}</h1>
+          <h1 className="member-name">{match?.name ?? "profile"}</h1>
         </div>
       </header>
 

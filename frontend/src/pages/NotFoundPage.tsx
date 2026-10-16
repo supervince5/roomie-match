@@ -10,7 +10,7 @@ function NotFoundPage() {
         The address may be incorrect, or the page may have moved.
       </p>
 
-      <Link className="primary-button" to="/">
+      <Link viewTransition className="primary-button" to="/">
         Return home
       </Link>
     </main>

@@ -269,3 +269,27 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
  .blossom-branch { animation: none; }
  .falling-petal { display: none; }
 }
+
+/* Lowercase interface voice; member content and typed values keep their casing. */
+:where(h1, h2, h3, button, label, .button, .primary-button, .secondary-button,
+.text-link, .field > span, .field__link, .auth-card__switch, .auth-card__intro,
+.auth-story__index, .auth-story__footer, .roommate-notes, .page-subtitle,
+.app-navigation, .app-footer, .preview-navigation, .discover-filter-heading,
+.demo-caption, .minimal-login, .minimal-cta, .eyebrow) { text-transform: lowercase; }
+.profile-card h2 { text-transform: none; }
+
+/* Native snapshots bridge routes without holding navigation behind an exit timer. */
+::view-transition { pointer-events: none; }
+::view-transition-group(root) { animation-duration: 280ms; animation-timing-function: cubic-bezier(.22, 1, .36, 1); }
+::view-transition-old(root) { animation: page-leave 130ms ease-out both; }
+::view-transition-new(root) { animation: page-arrive 280ms cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes page-leave { to { opacity: 0; } }
+@keyframes page-arrive { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(root), ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; }
+}
+
+
+.eyebrow, .auth-card__overline, .auth-story__body > p { text-transform: lowercase; }
+
+.member-name { text-transform: none; }

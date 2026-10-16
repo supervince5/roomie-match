@@ -66,7 +66,7 @@ function ForgotPasswordPage() {
             {submitting ? "Sending..." : "Send code"}
           </button>
           <p className="auth-card__switch">
-            Remembered it? <Link to="/login">Log in</Link>
+            Remembered it? <Link viewTransition to="/login">Log in</Link>
           </p>
         </form>
       )}
@@ -100,7 +100,7 @@ function ForgotPasswordPage() {
           <p className="eyebrow">All set</p>
           <h1>Password updated</h1>
           <p className="landing-card__description">You can log in with your new password now.</p>
-          <Link className="primary-button" to="/login">Log in</Link>
+          <Link viewTransition className="primary-button" to="/login">Log in</Link>
         </section>
       )}
     </AuthLayout>

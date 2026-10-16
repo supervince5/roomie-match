@@ -25,7 +25,7 @@ function LoginPage() {
     setError(null);
     try {
       await login(email, password);
-      navigate(goTo, { replace: true });
+      navigate(goTo, { replace: true, viewTransition: true });
     } catch (caught) {
       setError(caught);
     } finally {
@@ -49,14 +49,14 @@ function LoginPage() {
         <label className="field">
           <span>Password</span>
           <input type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} />
-          <Link className="field__link" to="/forgot-password">Forgot password?</Link>
+          <Link viewTransition className="field__link" to="/forgot-password">Forgot password?</Link>
         </label>
 
         <button className="primary-button" type="submit" disabled={submitting}>
           {submitting ? "Logging in..." : "Log in"}
         </button>
         <p className="auth-card__switch">
-          New here? <Link to="/signup">Create an account</Link>
+          New here? <Link viewTransition to="/signup">Create an account</Link>
         </p>
       </form>
     </AuthLayout>

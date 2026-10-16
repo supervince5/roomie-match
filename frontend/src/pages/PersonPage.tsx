@@ -41,7 +41,7 @@ function PersonPage() {
     act(async () => {
       const result = await swipeOn(userId, direction);
       if (result.matched) {
-        navigate("/matches/" + encodeURIComponent(userId)); // straight to their match page (with Instagram)
+        navigate("/matches/" + encodeURIComponent(userId), { viewTransition: true }); // straight to their match page (with Instagram)
         return;
       }
       if (data) setData({ ...data, swipe: direction });
@@ -76,11 +76,11 @@ function PersonPage() {
         <FormErrors error={actionError} />
 
         {data.matched ? (
-          <Link
+          <Link viewTransition
             className="primary-button person-page__action"
             to={`/matches/${encodeURIComponent(person.id)}`}
           >
-            You matched! See {person.name}'s match page
+            you matched! see <span className="member-name">{person.name}</span>'s match page
           </Link>
         ) : data.swipe === null ? (
           <div className="swipe-controls">
@@ -137,7 +137,7 @@ function PersonPage() {
         </button>
         <div>
           <p className="eyebrow">Profile</p>
-          <h1>{data?.profile.name ?? "Profile"}</h1>
+          <h1 className="member-name">{data?.profile.name ?? "profile"}</h1>
         </div>
       </header>
       {content}

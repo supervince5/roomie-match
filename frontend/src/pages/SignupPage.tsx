@@ -47,7 +47,7 @@ function SignupPage() {
     run(async () => {
       await apiRequest("/signup/confirm", { method: "POST", body: { email: email, confirmationCode: code } });
       await login(email, password);
-      navigate("/profile", { replace: true });
+      navigate("/profile", { replace: true, viewTransition: true });
     });
   }
 
@@ -75,7 +75,7 @@ function SignupPage() {
             {submitting ? "Creating..." : "Create account"}
           </button>
           <p className="auth-card__switch">
-            Already have an account? <Link to="/login">Log in</Link>
+            Already have an account? <Link viewTransition to="/login">Log in</Link>
           </p>
         </form>
       ) : (

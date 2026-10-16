@@ -64,7 +64,7 @@ function SearchPage() {
   return (
     <main className="page page--with-navigation">
       <header className="page-header page-header--with-back">
-        <Link className="icon-button" to="/discover" aria-label="Back to Discover">
+        <Link viewTransition className="icon-button" to="/discover" aria-label="Back to Discover">
           <ArrowLeft size={22} />
         </Link>
         <div>

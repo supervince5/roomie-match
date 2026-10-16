@@ -54,13 +54,13 @@ export default function DesignPreviewPage() {
       <header className="app-header">
         <Brand />
         <span className="eyebrow">SAMPLE PROFILES · LOCAL PREVIEW</span>
-        <Link className="text-link" to="/discover">
+        <Link viewTransition className="text-link" to="/discover">
           Back to your account
         </Link>
       </header>
       <nav className="preview-navigation" aria-label="Preview views">
-        <Link to="/design-preview" aria-current={!formPreview ? "page" : undefined}>Discover</Link>
-        <Link to="/design-preview?view=profile" aria-current={formPreview ? "page" : undefined}>Profile form</Link>
+        <Link viewTransition to="/design-preview" aria-current={!formPreview ? "page" : undefined}>Discover</Link>
+        <Link viewTransition to="/design-preview?view=profile" aria-current={formPreview ? "page" : undefined}>Profile form</Link>
       </nav>
       {formPreview ? <main className="page">
         <header className="page-header"><h1>Sample profile</h1></header>

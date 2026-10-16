@@ -7,7 +7,7 @@ import type { Profile } from "../types/profile";
 function PersonRow({ profile, to, aside }: { profile: Profile; to: string; aside?: ReactNode }) {
   return (
     <div className="match-row person-row">
-      <Link className="person-row__link" to={to}>
+      <Link viewTransition className="person-row__link" to={to}>
         {profile.photoUrl ? (
           <img className="match-row__photo" src={profile.photoUrl} alt="" />
         ) : (

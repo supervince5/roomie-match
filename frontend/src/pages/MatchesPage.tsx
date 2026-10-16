@@ -26,7 +26,7 @@ function MatchesPage() {
         </div>
         <h2>No matches yet</h2>
         <p>Keep swiping. When someone you liked likes you back, they'll show up here.</p>
-        <Link className="secondary-button" to="/discover">Go to Discover</Link>
+        <Link viewTransition className="secondary-button" to="/discover">Go to Discover</Link>
       </section>
     );
   } else {
@@ -34,7 +34,7 @@ function MatchesPage() {
     content = (
       <section className="match-list" aria-label="Roommate matches">
         {matches.map((match) => (
-          <Link className="match-row" key={match.id} to={`/matches/${encodeURIComponent(match.id)}`}>
+          <Link viewTransition className="match-row" key={match.id} to={`/matches/${encodeURIComponent(match.id)}`}>
             {match.photoUrl ? (
               <img className="match-row__photo" src={match.photoUrl} alt="" />
             ) : (

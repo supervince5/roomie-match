@@ -426,7 +426,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
           Discover shows students at your school, so we need to know where you
           go.
         </p>
-        <Link className="primary-button" to="/profile">
+        <Link viewTransition className="primary-button" to="/profile">
           Set up profile
         </Link>
       </section>
@@ -528,12 +528,12 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
               Check again
             </button>
           )}
-          <Link className="button button--dark" to="/history">
+          <Link viewTransition className="button button--dark" to="/history">
             Revisit your swipes
           </Link>
           <InviteButton />
         </div>
-        <Link className="text-link" to="/matches">
+        <Link viewTransition className="text-link" to="/matches">
           Make the first hello with your matches →
         </Link>
       </section>
@@ -557,10 +557,10 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
           >
             {sound.enabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
           </button>
-          <Link className="icon-button" to="/search" aria-label="Search people">
+          <Link viewTransition className="icon-button" to="/search" aria-label="Search people">
             <Search size={18} />
           </Link>
-          <Link
+          <Link viewTransition
             className="icon-button"
             to="/history"
             aria-label="Swipe history"
@@ -805,7 +805,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
                   </p>
                 )}
                 <p>
-                  <Link to={`/matches/${encodeURIComponent(newMatch.id)}`}>
+                  <Link viewTransition to={`/matches/${encodeURIComponent(newMatch.id)}`}>
                     View {newMatch.name}'s profile
                   </Link>
                 </p>

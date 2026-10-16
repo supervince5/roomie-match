@@ -105,7 +105,7 @@ export default function Conversation({ matchId, name }: Props) {
   return (
     <section className="conversation" aria-label={`Conversation with ${name}`}>
       <header className="conversation-header">
-        <h2>Say hello to {name}.</h2>
+        <h2>say hello to <span className="member-name">{name}</span>.</h2>
         <p>
           Just between you and your match. Showing your latest 100 messages.
         </p>

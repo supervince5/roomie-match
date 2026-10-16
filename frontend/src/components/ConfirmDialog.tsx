@@ -1,10 +1,10 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { isOutsideDialog } from "../lib/dialog";
 import FormErrors from "./FormErrors";
 
 type ConfirmDialogProps = {
   open: boolean;
-  title: string;
+  title: ReactNode;
   message: string;
   confirmLabel: string;
   busyLabel?: string;

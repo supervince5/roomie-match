@@ -16,8 +16,8 @@ export default function LandingPage() {
 
       <header className="minimal-topbar">
         <Brand />
-        <Link className="minimal-login" to="/login">
-          Log in <ArrowRight size={14} />
+        <Link viewTransition className="minimal-login" to="/login">
+          log in <ArrowRight size={14} />
         </Link>
       </header>
 
@@ -28,11 +28,11 @@ export default function LandingPage() {
             <span className="wordmark-dot">.</span>
           </h1>
           <p className="minimal-kicker">find the roommate of your life.</p>
-          <Link className="minimal-cta" to="/signup">
-            Find your roomie <ArrowRight size={17} />
+          <Link viewTransition className="minimal-cta" to="/signup">
+            find your roomie <ArrowRight size={17} />
           </Link>
         </section>
-        <div className="landing-playground">
+        <div className="landing-playground" aria-label="fictional sample profiles">
           <SwipePreview paused={paused} />
           <ScrollPreview paused={paused} />
         </div>
@@ -48,12 +48,12 @@ export default function LandingPage() {
       <button
         className="minimal-motion"
         type="button"
-        aria-label={paused ? "Play animations" : "Pause animations"}
+        aria-label={paused ? "play animations" : "pause animations"}
         aria-pressed={paused}
         onClick={() => setPaused(!paused)}
       >
         {paused ? <Play size={12} /> : <Pause size={12} />}
-        <span>{paused ? "Play motion" : "Pause motion"}</span>
+        <span>{paused ? "play motion" : "pause motion"}</span>
       </button>
     </main>
   );
