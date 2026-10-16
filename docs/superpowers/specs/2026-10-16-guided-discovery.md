@@ -11,3 +11,11 @@ Data decision confirmed: name/college/major are the student's own details; roomm
 Also refine landing reaction placement: text should remain just outside the swipe side at the card's middle/lower height, slightly above the previous under-card fallback, without hitting the wordmark. Use actual text/obstacle geometry rather than treating the entire central column as solid. At genuinely cramped widths the nearest lower-side corner may be used with minimal vertical offset. Preserve varied tilt, fade lifetime, and no repeated feedback on match completion.
 
 Save meaningful design iterations locally, including experiments. Validate keyboard, narrow screens, school-search errors, dismissed/reopened setup, saved values, and first/repeat visits. Use local sample profiles to avoid changing the owner's real account.
+
+## October 16 follow-up: separate filters and photo albums
+
+Supersedes the shared greeting/filter entry above: profile setup retains the greeting and name/college/major flow. Discovery filters now use a separate preferences-only drawer with two short choices, then optional full filters. Both entry paths mark setup complete when applied; switching between them preserves the draft. The first-visit hint uses a dedicated layout row with a 10–12px text/arrow gap.
+
+Profiles now support six ordered photos, cover selection, removal, and multiple uploads. Discovery photo gestures and keyboard controls are isolated from roommate like/pass. Rightward photo swipes advance, leftward swipes go back; bottom dots show the current image. Legacy single-photo profiles continue to work. Album writes enforce ownership and preserve concurrent album changes during basic-profile edits.
+
+Verification: frontend build/lint and 60 tests passed; 17 backend tests passed. Browser checks covered carousel arrows, dots, right/left gestures without votes, cover selection, removal, local multiple-file selection, mobile filters, applying quick preferences, focus return, and draft preservation. Backend deployed to dev; health passed, updateProfile active/successful, and S3 allows uploads from both localhost and 127.0.0.1. Branded email configuration remains disabled at the owner’s request; the prepared template is dormant.

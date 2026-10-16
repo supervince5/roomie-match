@@ -46,3 +46,11 @@
 - Verified mobile greeting/input at 390px in a temporary iframe fixture because browser viewport overrides did not change the rendered width. Fixture removed. Reduced-motion behavior inspected in source; no OS preference was changed. A real account was not created or edited for testing, and network save-failure injection was not performed.
 - Owner screenshot exposed caption collision. Added both demo captions to protected obstacles, bounded the rotated note to visible space, and suppress decorative ink if no clear location exists. Geometry regression and 880px browser check pass.
 - Deployed createProfile, updateProfile and discover to the existing dev service in us-east-1. All report Active / Successful. Health returned 200 with the current 127.0.0.1 preview origin allowed. Added that origin to serverless.yml and the live API alongside localhost; no authentication or IAM changes. No frontend production deploy and no Git push.
+
+## October 16 follow-up: separate filters and photo albums
+
+Supersedes the shared greeting/filter entry above: profile setup retains the greeting and name/college/major flow. Discovery filters now use a separate preferences-only drawer with two short choices, then optional full filters. Both entry paths mark setup complete when applied; switching between them preserves the draft. The first-visit hint uses a dedicated layout row with a 10–12px text/arrow gap.
+
+Profiles now support six ordered photos, cover selection, removal, and multiple uploads. Discovery photo gestures and keyboard controls are isolated from roommate like/pass. Rightward photo swipes advance, leftward swipes go back; bottom dots show the current image. Legacy single-photo profiles continue to work. Album writes enforce ownership and preserve concurrent album changes during basic-profile edits.
+
+Verification: frontend build/lint and 60 tests passed; 17 backend tests passed. Browser checks covered carousel arrows, dots, right/left gestures without votes, cover selection, removal, local multiple-file selection, mobile filters, applying quick preferences, focus return, and draft preservation. Backend deployed to dev; health passed, updateProfile active/successful, and S3 allows uploads from both localhost and 127.0.0.1. Branded email configuration remains disabled at the owner’s request; the prepared template is dormant.
