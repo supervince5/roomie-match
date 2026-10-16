@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
-const GuidedDiscovery = lazy(() => import("../components/GuidedDiscovery"));
-import { hasSeenSetup, markSetupSeen, setupKeys, profileWithBasics, type GuidedValues } from "../lib/guidedDiscovery";
+const GuidedFilters = lazy(() => import("../components/GuidedFilters"));
+import type { QuickPreferences } from "../components/GuidedFilters";
+import { hasSeenSetup, markSetupSeen, setupKeys } from "../lib/guidedDiscovery";
 import { createPortal } from "react-dom";
 import { reactionPlacement } from "../lib/reactionPlacement";
 import { isOutsideDialog } from "../lib/dialog";
@@ -158,47 +159,28 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
   const keys = setupKeys(preview ? "design-preview-v3" : userId ?? "guest");
   const [showHint, setShowHint] = useState(() => (preview && new URLSearchParams(location.search).get("view") === "hint") || !hasSeenSetup(localStorage, keys.hint));
   const [setupDone, setSetupDone] = useState(() => hasSeenSetup(localStorage, keys.done));
-  const [setupOpen, setSetupOpen] = useState(false);
-  const [setupProfile, setSetupProfile] = useState<Profile | null>(null);
-  const [setupLoading, setSetupLoading] = useState(false);
-  const [setupError, setSetupError] = useState("");
-  const setupRequest = useRef(0);
+  const [setupOpen, setSetupOpen] = useState(() => preview && new URLSearchParams(location.search).get("view") === "filters");
   const setupTrigger = useRef<HTMLButtonElement>(null);
   useEffect(() => { markSetupSeen(localStorage, keys.hint); }, [keys.hint]);
-  useEffect(() => () => { setupRequest.current++; }, []);
-  async function openFilters(forceGuide = false) {
+  function openFilters(forceGuide = false) {
     setShowHint(false);
+    if (!forceGuide) { setDraft(filters); setFilterSchool(appliedSchool); }
     if (setupDone && !forceGuide) { setShowFilters(true); return; }
     setShowFilters(false);
-    const request = ++setupRequest.current;
-    setSetupLoading(true); setSetupError("");
-    try {
-      let own: Profile | null = preview ? setupProfile : null;
-      if (!preview) {
-        try { own = await apiRequest<Profile>("/profiles"); }
-        catch (caught) { if (!(caught instanceof ApiError && caught.status === 404)) throw caught; }
-      }
-      if (setupRequest.current !== request) return;
-      setSetupProfile(own); setSetupOpen(true);
-    } catch (caught) {
-      if (setupRequest.current === request) setSetupError(caught instanceof Error ? caught.message : "couldn't open setup. try again.");
-    } finally { if (setupRequest.current === request) setSetupLoading(false); }
+    setSetupOpen(true);
   }
   function dismissSetup() {
     setSetupOpen(false);
     requestAnimationFrame(() => setupTrigger.current?.focus());
   }
-  async function completeSetup(values: GuidedValues) {
-    if (!setupProfile?.name || !setupProfile.schoolId || !setupProfile.major) {
-      const input = profileWithBasics(setupProfile, values);
-      const saved = preview
-        ? { ...input, id: "preview-self", school: values.school!.name }
-        : await apiRequest<Profile>("/profiles", { method: setupProfile ? "PUT" : "POST", body: input });
-      setSetupProfile(saved);
-      if (!preview) writeApiCache("/profiles", saved);
+  function completeSetup(values: QuickPreferences) {
+    const next = { ...draft, ...values };
+    if (next.minAge && next.maxAge && Number(next.minAge) > Number(next.maxAge)) {
+      setDraft(next); setFilterError("Minimum age must be no greater than maximum age.");
+      setShowFilters(true); return;
     }
-    const next = { ...filters, cleanliness: values.cleanliness };
-    setFilters(next); setDraft(next); remember(next, appliedSchool);
+    setFilterError("");
+    setFilters(next); setDraft(next); setAppliedSchool(filterSchool); remember(next, filterSchool);
     markSetupSeen(localStorage, keys.done); setSetupDone(true);
     if (!preview) invalidateApiCache("/discover");
     setVersion(version => version + 1);
@@ -264,6 +246,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
       setFilterError("Minimum age must be no greater than maximum age.");
       return;
     }
+    markSetupSeen(localStorage, keys.done); setSetupDone(true);
     setFilters(draft);
     setAppliedSchool(filterSchool);
     remember(draft, filterSchool);
@@ -307,7 +290,9 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
             (p) =>
               (!filters.major ||
                 p.major.toLowerCase().includes(filters.major.toLowerCase())) &&
-              (!filters.maxBudget || (p.budget && p.budget.min <= Number(filters.maxBudget))),
+              (!filters.maxBudget || (p.budget && p.budget.min <= Number(filters.maxBudget))) &&
+              (!filters.cleanliness || p.cleanliness === filters.cleanliness) &&
+              (!filters.sleepSchedule || p.sleepSchedule === filters.sleepSchedule),
           ),
           nextCursor: null,
         })
@@ -649,12 +634,12 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
             className="discover-filter-button"
             type="button"
             aria-haspopup="dialog"
-            aria-controls={setupDone ? "discover-filters" : "guided-setup"}
+            aria-controls={setupDone ? "discover-filters" : "guided-filters"}
             aria-expanded={showFilters || setupOpen}
-            disabled={animation !== null || setupLoading}
+            disabled={animation !== null}
             onClick={() => void openFilters()}
           >
-            <SlidersHorizontal size={17} /> {setupLoading ? "opening…" : "Filters"}{" "}
+            <SlidersHorizontal size={17} /> Filters{" "}
             {activeFilterCount > 0 && <span>{activeFilterCount}</span>}
           </button>
           
@@ -666,12 +651,12 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
         </div>}
       </header>
 
-      {setupError && <p className="filter-error" role="alert">{setupError} <button type="button" className="text-link" onClick={() => void openFilters()}>try again</button></p>}
-      {setupOpen && <Suspense fallback={<p role="status">opening your setup…</p>}><GuidedDiscovery localPreview={preview} initial={setupProfile} initialCleanliness={filters.cleanliness as GuidedValues["cleanliness"]}
-        onComplete={completeSetup} onDismiss={dismissSetup}
-        onAdvanced={setupProfile?.name && setupProfile.schoolId && setupProfile.major ? () => {
-          setSetupOpen(false); markSetupSeen(localStorage, keys.done); setSetupDone(true); setShowFilters(true);
-        } : undefined}/></Suspense>} 
+      {setupOpen && <Suspense fallback={<p role="status">opening your filters…</p>}><GuidedFilters
+        initial={{cleanliness: draft.cleanliness as QuickPreferences["cleanliness"], sleepSchedule: draft.sleepSchedule as QuickPreferences["sleepSchedule"]}}
+        onApply={completeSetup} onDismiss={dismissSetup}
+        onAdvanced={values => {
+          setDraft({...draft,...values}); setSetupOpen(false); setShowFilters(true);
+        }}/></Suspense>}
       <dialog
         ref={filterDialog}
         id="discover-filters"
