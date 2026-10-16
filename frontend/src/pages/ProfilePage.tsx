@@ -119,7 +119,7 @@ function ProfilePage() {
             open={confirmOpen}
             title="Delete your account?"
             message="This permanently deletes your profile, photos, matches, and login. It can't be undone."
-            requireTyping="DELETE"
+            requireTyping="delete"
             confirmLabel="Delete account"
             busyLabel="Deleting..."
             busy={deleting}
