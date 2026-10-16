@@ -1,204 +1,204 @@
 // A broad campus showcase, not a ranking or a claim of university affiliation.
 export const featuredCampuses: { name: string; file?: string }[] = [
   {
-    "name": "uva",
+    "name": "University of Virginia",
     "file": "virginia.ico"
   },
   {
-    "name": "rice",
+    "name": "Rice University",
     "file": "rice.ico"
   },
   {
-    "name": "michigan",
+    "name": "University of Michigan–Ann Arbor",
     "file": "michigan.ico"
   },
   {
-    "name": "uc berkeley"
+    "name": "University of California, Berkeley"
   },
   {
-    "name": "ucla",
+    "name": "University of California, Los Angeles",
     "file": "ucla.png"
   },
   {
-    "name": "uc san diego",
+    "name": "University of California, San Diego",
     "file": "ucsd.ico"
   },
   {
-    "name": "unc chapel hill",
+    "name": "University of North Carolina at Chapel Hill",
     "file": "unc.png"
   },
   {
-    "name": "georgia tech",
+    "name": "Georgia Institute of Technology",
     "file": "gatech.ico"
   },
   {
-    "name": "ut austin",
+    "name": "The University of Texas at Austin",
     "file": "utexas.png"
   },
   {
-    "name": "florida",
+    "name": "University of Florida",
     "file": "ufl.png"
   },
   {
-    "name": "stanford",
+    "name": "Stanford University",
     "file": "stanford.png"
   },
   {
-    "name": "mit",
+    "name": "Massachusetts Institute of Technology",
     "file": "mit.svg"
   },
   {
-    "name": "princeton",
+    "name": "Princeton University",
     "file": "princeton.ico"
   },
   {
-    "name": "harvard",
+    "name": "Harvard University",
     "file": "harvard.png"
   },
   {
-    "name": "yale",
+    "name": "Yale University",
     "file": "yale.png"
   },
   {
-    "name": "duke",
+    "name": "Duke University",
     "file": "duke.png"
   },
   {
-    "name": "johns hopkins"
+    "name": "Johns Hopkins University"
   },
   {
-    "name": "northwestern",
+    "name": "Northwestern University",
     "file": "northwestern.png"
   },
   {
-    "name": "uchicago",
+    "name": "University of Chicago",
     "file": "uchicago.ico"
   },
   {
-    "name": "penn",
+    "name": "University of Pennsylvania",
     "file": "upenn.ico"
   },
   {
-    "name": "caltech",
+    "name": "California Institute of Technology",
     "file": "caltech.png"
   },
   {
-    "name": "cornell",
+    "name": "Cornell University",
     "file": "cornell.png"
   },
   {
-    "name": "brown",
+    "name": "Brown University",
     "file": "brown.png"
   },
   {
-    "name": "dartmouth",
+    "name": "Dartmouth College",
     "file": "dartmouth.png"
   },
   {
-    "name": "columbia"
+    "name": "Columbia University"
   },
   {
-    "name": "vanderbilt",
+    "name": "Vanderbilt University",
     "file": "vanderbilt.png"
   },
   {
-    "name": "carnegie mellon",
+    "name": "Carnegie Mellon University",
     "file": "cmu.ico"
   },
   {
-    "name": "washu",
+    "name": "Washington University in St. Louis",
     "file": "washu.png"
   },
   {
-    "name": "notre dame",
+    "name": "University of Notre Dame",
     "file": "nd.png"
   },
   {
-    "name": "emory",
+    "name": "Emory University",
     "file": "emory.svg"
   },
   {
-    "name": "georgetown",
+    "name": "Georgetown University",
     "file": "georgetown.png"
   },
   {
-    "name": "usc",
+    "name": "University of Southern California",
     "file": "usc.png"
   },
   {
-    "name": "nyu",
+    "name": "New York University",
     "file": "nyu.ico"
   },
   {
-    "name": "uc davis",
+    "name": "University of California, Davis",
     "file": "ucdavis.png"
   },
   {
-    "name": "uc irvine",
+    "name": "University of California, Irvine",
     "file": "uci.ico"
   },
   {
-    "name": "uc santa barbara",
+    "name": "University of California, Santa Barbara",
     "file": "ucsb.png"
   },
   {
-    "name": "illinois urbana-champaign",
+    "name": "University of Illinois Urbana-Champaign",
     "file": "illinois.png"
   },
   {
-    "name": "wisconsin–madison",
+    "name": "University of Wisconsin–Madison",
     "file": "wisc.ico"
   },
   {
-    "name": "washington",
+    "name": "University of Washington",
     "file": "washington.ico"
   },
   {
-    "name": "purdue",
+    "name": "Purdue University",
     "file": "purdue.png"
   },
   {
-    "name": "ohio state",
+    "name": "The Ohio State University",
     "file": "osu.ico"
   },
   {
-    "name": "maryland",
+    "name": "University of Maryland, College Park",
     "file": "umd.png"
   },
   {
-    "name": "texas a&m",
+    "name": "Texas A&M University",
     "file": "tamu.png"
   },
   {
-    "name": "penn state",
+    "name": "The Pennsylvania State University",
     "file": "psu.png"
   },
   {
-    "name": "rutgers",
+    "name": "Rutgers University–New Brunswick",
     "file": "rutgers.ico"
   },
   {
-    "name": "virginia tech",
+    "name": "Virginia Polytechnic Institute and State University",
     "file": "virginia-tech.svg"
   },
   {
-    "name": "georgia",
+    "name": "University of Georgia",
     "file": "uga.ico"
   },
   {
-    "name": "florida state",
+    "name": "Florida State University",
     "file": "fsu.ico"
   },
   {
-    "name": "william & mary",
+    "name": "College of William & Mary",
     "file": "wm.png"
   },
   {
-    "name": "minnesota",
+    "name": "University of Minnesota Twin Cities",
     "file": "umn.ico"
   },
   {
-    "name": "uconn",
+    "name": "University of Connecticut",
     "file": "uconn.jpg"
   }
 ];
