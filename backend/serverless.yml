@@ -254,6 +254,14 @@ functions:
           method: post
 
 resources:
+  Conditions:
+    # Both parameters are required; default deployments keep Cognito's sender.
+    UseBrandedEmail:
+      Fn::And:
+        - Fn::Not:
+            - Fn::Equals: ["${param:emailSourceArn, ''}", ""]
+        - Fn::Not:
+            - Fn::Equals: ["${param:emailFrom, ''}", ""]
   Resources:
     ProfilesTable:
       Type: AWS::DynamoDB::Table
@@ -301,6 +309,18 @@ resources:
       Type: AWS::Cognito::UserPool
       Properties:
         UserPoolName: roomie-match-users
+        EmailConfiguration:
+          Fn::If:
+            - UseBrandedEmail
+            - EmailSendingAccount: DEVELOPER
+              SourceArn: ${param:emailSourceArn, ''}
+              From: ${param:emailFrom, ''}
+            - Ref: AWS::NoValue
+        VerificationMessageTemplate:
+          Fn::If:
+            - UseBrandedEmail
+            - ${file(./emails/verification.json)}
+            - Ref: AWS::NoValue
         AutoVerifiedAttributes:
           - email
         UsernameAttributes:
