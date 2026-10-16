@@ -156,7 +156,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
   // Start with people; preferences are always available from the toolbar.
   const [showFilters, setShowFilters] = useState(false);
   const keys = setupKeys(preview ? "design-preview-v3" : userId ?? "guest");
-  const [showHint, setShowHint] = useState(() => !hasSeenSetup(localStorage, keys.hint));
+  const [showHint, setShowHint] = useState(() => (preview && new URLSearchParams(location.search).get("view") === "hint") || !hasSeenSetup(localStorage, keys.hint));
   const [setupDone, setSetupDone] = useState(() => hasSeenSetup(localStorage, keys.done));
   const [setupOpen, setSetupOpen] = useState(false);
   const [setupProfile, setSetupProfile] = useState<Profile | null>(null);
@@ -618,7 +618,7 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
 
   return (
     <main className="page page--with-navigation discover-page">
-      <header className="discover-toolbar">
+      <header className={`discover-toolbar${showHint ? " discover-toolbar--hint" : ""}`}>
         <h1>Discover</h1>
         <div className="discover-tools">
           <button
@@ -657,9 +657,13 @@ function DiscoverPage({ previewProfiles }: { previewProfiles?: Profile[] }) {
             <SlidersHorizontal size={17} /> {setupLoading ? "opening…" : "Filters"}{" "}
             {activeFilterCount > 0 && <span>{activeFilterCount}</span>}
           </button>
-          {showHint && <span className="discover-first-hint"><svg viewBox="0 0 44 34" fill="none" aria-hidden="true"><path d="M3 30C26 31 33 21 31 4m-6 5 6-6 6 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>make this a little more you.<br/>start with filters.</span>}
+          
           </div>
         </div>
+        {showHint && <div className="discover-first-hint">
+          <span>make this a little more you.<br/>start with filters.</span>
+          <svg viewBox="0 0 44 34" fill="none" aria-hidden="true"><path d="M3 30C26 31 33 21 31 4m-6 5 6-6 6 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </div>}
       </header>
 
       {setupError && <p className="filter-error" role="alert">{setupError} <button type="button" className="text-link" onClick={() => void openFilters()}>try again</button></p>}

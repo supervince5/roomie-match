@@ -23,6 +23,7 @@
   letter-spacing: -0.055em;
 }
 .discover-tools {
+  margin-inline-start: auto;
   display: flex;
   align-items: center;
   gap: 9px;

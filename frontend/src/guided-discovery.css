@@ -40,9 +40,10 @@
 .guided-secondary { min-height: 26px; margin-top: 20px; text-align: center; font-size: 12px; color: var(--muted); }
 .guided-secondary button { border: 0; background: transparent; font: inherit; color: inherit; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; min-height: 28px; }
 .guided-next:active { transform: scale(.98); }
-.discover-filter-anchor { position: relative; }
-.discover-first-hint { position: absolute; z-index: 4; top: calc(100% + 10px); right: 10px; width: 180px; padding-top: 20px; font: italic 15px/1.35 var(--font-editorial); color: var(--accent); text-align: right; pointer-events: none; animation: hint-arrive 450ms ease both; }
-.discover-first-hint svg { position: absolute; top: -5px; right: 7px; width: 42px; height: 33px; }
+.discover-toolbar--hint { flex-wrap: wrap; row-gap: 10px; }
+.discover-first-hint { flex: 0 0 100%; display: flex; justify-content: flex-end; align-items: flex-start; gap: 12px; padding-right: 22px; box-sizing: border-box; font: italic 15px/1.45 var(--font-editorial); color: var(--accent); text-align: right; pointer-events: none; animation: hint-arrive 450ms ease both; }
+.discover-first-hint > span { max-width: 204px; padding-top: 12px; }
+.discover-first-hint svg { display: block; flex: 0 0 42px; width: 42px; height: 34px; }
 @keyframes hint-arrive { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @media (max-width: 600px) {
  .guided-shell { padding: 18px 22px 24px; }
@@ -53,7 +54,7 @@
  .guided-choice { padding: 13px 10px; }
  .guided-intro { font-size: 13px; }
  .guided-next { gap: 16px; padding-inline: 18px; }
- .discover-first-hint { width: 155px; font-size: 14px; }
+ .discover-first-hint { font-size: 14px; gap: 10px; padding-right: 20px; }
 }
 @media (max-height: 600px) { .guided-stage { min-height: 230px; } .guided-hello { height: 80px; } .guided-hello span { font-size: 66px; } .guided-step { padding-top: 8px; } .guided-field { margin-block: 18px; } }
 @media (prefers-reduced-motion: reduce) { .discover-first-hint { animation: none; } .guided-next:active { transform: none; } }
