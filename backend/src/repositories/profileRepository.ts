@@ -1,6 +1,6 @@
 import { DynamoDBClient, ConditionalCheckFailedException } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, PutCommand, DeleteCommand, QueryCommand, BatchGetCommand, BatchGetCommandOutput } from "@aws-sdk/lib-dynamodb";
-import { ProfileInput } from "../validation/profileSchemas.js";
+import { ProfileInput, normalizedPhotos } from "../validation/profileSchemas.js";
 import { requireEnv } from "../lib/env.js";
 import { getSchool } from "../data/schools.js";
 
@@ -28,6 +28,7 @@ function toItem(userId: string, profile: ProfileInput) {
         GSI1SK: "USER#" + userId,
         userId: userId,
         ...profile,
+        ...normalizedPhotos(profile),
         school: getSchool(profile.schoolId)?.name // stored so reads don't need a lookup
     };
 }
@@ -38,10 +39,11 @@ function toProfile(item: Record<string, any>): Profile {
     return { id: userId, ...profile } as Profile;
 }
 
-export async function getProfileByUserId(userId: string) {
+export async function getProfileByUserId(userId: string, consistentRead = false) {
     const command = new GetCommand({
         TableName: tableName,
-        Key: { PK: "USER#" + userId, SK: "PROFILE" }
+        Key: { PK: "USER#" + userId, SK: "PROFILE" },
+        ConsistentRead: consistentRead
     });
     const result = await docClient.send(command);
     if (result.Item === undefined) {
@@ -90,22 +92,44 @@ export async function createProfile(userId: string, profile: ProfileInput) {
     return toProfile(toItem(userId, profile));
 }
 
-// Replaces the whole profile. Returns undefined if there's no profile to update.
+export class ProfilePhotoConflict extends Error {}
+
+// Basic saves preserve photos using the existing GetItem/PutItem permissions.
+// Compare both old photo fields, including absence, so a concurrent album change is
+// re-read instead of overwritten. Explicit album edits retain normal PUT semantics.
 export async function updateProfile(userId: string, profile: ProfileInput) {
-    const command = new PutCommand({
-        TableName: tableName,
-        Item: toItem(userId, profile),
-        ConditionExpression: "attribute_exists(PK)" // only if it already exists
-    });
-    try {
-        await docClient.send(command);
-    } catch (error) {
-        if (error instanceof ConditionalCheckFailedException) {
-            return undefined;
+    const preservePhotos = profile.photoKeys === undefined && profile.photoKey === undefined;
+    for (let attempt = 0; attempt < 3; attempt++) {
+        let saved = profile;
+        const conditions = ["attribute_exists(PK)"];
+        const names: Record<string, string> = {};
+        const values: Record<string, unknown> = {};
+        if (preservePhotos) {
+            const current = await getProfileByUserId(userId, true);
+            if (!current) return undefined;
+            saved = { ...profile, photoKey: current.photoKey, photoKeys: current.photoKeys };
+            for (const field of ["photoKey", "photoKeys"] as const) {
+                names[`#${field}`] = field;
+                if (current[field] === undefined) conditions.push(`attribute_not_exists(#${field})`);
+                else { conditions.push(`#${field} = :${field}`); values[`:${field}`] = current[field]; }
+            }
         }
-        throw error;
+        const item = toItem(userId, saved);
+        try {
+            await docClient.send(new PutCommand({
+                TableName: tableName,
+                Item: item,
+                ConditionExpression: conditions.join(" AND "),
+                ...(Object.keys(names).length ? { ExpressionAttributeNames: names } : {}),
+                ...(Object.keys(values).length ? { ExpressionAttributeValues: values } : {})
+            }));
+            return toProfile(item);
+        } catch (error) {
+            if (!(error instanceof ConditionalCheckFailedException)) throw error;
+            if (!preservePhotos) return undefined;
+        }
     }
-    return toProfile(toItem(userId, profile));
+    throw new ProfilePhotoConflict("Your photos changed while saving. Please try again.");
 }
 
 // Returns undefined if there was nothing to delete.

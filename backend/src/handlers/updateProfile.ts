@@ -1,7 +1,7 @@
 import { APIGatewayProxyEventV2WithJWTAuthorizer } from "aws-lambda";
-import { updateProfile } from "../repositories/profileRepository.js";
+import { updateProfile, ProfilePhotoConflict } from "../repositories/profileRepository.js";
 import { parseBody } from "../validation/parseBody.js";
-import { profileSchema, photoBelongsTo } from "../validation/profileSchemas.js";
+import { profileSchema, profilePhotosBelongTo } from "../validation/profileSchemas.js";
 import { ownView } from "../services/profileViews.js";
 import { withErrorHandling } from "../lib/withErrorHandling.js";
 
@@ -11,10 +11,16 @@ export const handler = withErrorHandling(async (event: APIGatewayProxyEventV2Wit
         return parsed.response;
     }
     const userId = event.requestContext.authorizer.jwt.claims.sub as string;
-    if (!photoBelongsTo(parsed.data.photoKey, userId)) {
+    if (!profilePhotosBelongTo(parsed.data, userId)) {
         return { statusCode: 403, body: JSON.stringify({ message: "You can only use photos you uploaded." }) }
     }
-    const updated = await updateProfile(userId, parsed.data);
+    let updated;
+    try {
+        updated = await updateProfile(userId, parsed.data);
+    } catch (error) {
+        if (error instanceof ProfilePhotoConflict) return { statusCode: 409, body: JSON.stringify({ message: error.message }) };
+        throw error;
+    }
     if (updated === undefined) {
         return { statusCode: 404, body: JSON.stringify({ message: "No profile to update. Create one first." }) }
     }
